@@ -1,0 +1,179 @@
+<h3 class="location f14">系统<?php echo $this->menu('页面管理','/template/template/index'); ?></h3>
+<form id="form" class="cmxform">
+	<table class="detail_tabel psw_table f14 mt20">
+		<tr>
+			<td width="150" align="right"><?php echo Cms_L::_('template_name'); ?>：</td>
+			<td width="750"><a href="javascript:;" id="tplName" data-tpl_id="<?php echo $this->tpl_id; ?>"><?php echo $this->tpl_info['name']; ?></a></td>
+		</tr>
+		<?php if($this->entity_i18n_name): ?>
+		<tr>
+			<td align="right"><?php echo Cms_L::_($this->entity_i18n_name); ?>ID： </td>
+			<td>
+				<input   class="cpy_name" type="text" id="entity_id" name="data[entity_id]" value="<?php if(isset($this->page_info)) echo $this->page_info['entity_id']; ?>" size="5" data-validate="{require:[true, '<?php echo Cms_L::_('require'); ?>']}"<?php if(isset($this->page_info) && $this->page_info['entity_id'] > 0): ?> readonly="readonly"<?php endif; ?> />*
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_($this->entity_i18n_name), Cms_L::_('name'); ?>： </td>
+			<td>
+				<input  class="cpy_name" type="text" id="entity_name" name="data[entity_name]" value="<?php if(isset($this->page_info)) echo $this->page_info['entity_name']; ?>" size="60" readonly="readonly" />*
+			</td>
+		</tr>
+		<?php endif; ?>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('page'); ?>标题： </td>
+			<td>
+				<input  class="cpy_name" type="text" id="title" name="data[title]" value="<?php if(isset($this->page_info)) echo $this->page_info['title']; ?>" maxlength="100" data-maxlength="70" size="60" data-validate="{require:[true, '<?php echo Cms_L::_('require'); ?>']}" data-tip="<?php echo Cms_L::_('title_more_than', array('x'=>70)); ?>" />
+				<input type="hidden" id="id" name="data[page_id]" value="<?php if(isset($this->page_info)) echo $this->page_info['page_id']; ?>" />
+				<input type="hidden" id="tpl_id" name="tpl_id" value="<?php echo $this->tpl_id; ?>" />
+			</td>
+		</tr>
+		<tr>
+			<td align="right" valign="top"><?php echo Cms_L::_('page'); ?>关键字： </td>
+			<td>
+				<textarea class="text_cls wp60" id="keyword" name="data[keyword]" cols="90" rows="3" data-maxlength="250" class="easyui-tooltip" title="<?php echo Cms_L::_('page_keyword_tip'); ?>" data-options="position:'right'" data-validate="{require:[false, ''], regexp:[/^[^，\n]+$/, '<?php echo Cms_L::_('keyword_rule'); ?>']}" data-tip="<?php echo Cms_L::_('keyword_more_than', array('x'=>250)); ?>"><?php if(isset($this->page_info)) echo $this->escape($this->page_info['keyword']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td align="right" valign="top"><?php echo Cms_L::_('page'); ?>描述： </td>
+			<td>
+				<textarea id="description" class="text_cls wp60" name="data[description]" cols="90" rows="6" data-maxlength="155" data-tip="<?php echo Cms_L::_('desc_more_than', array('x'=>155)); ?>"><?php if(isset($this->page_info)) echo $this->escape($this->page_info['description']); ?></textarea>
+			</td>
+		</tr>
+	<?php if(isset($this->field_info)): ?>
+		<?php foreach($this->field_info as $field): ?>
+		<tr>
+			<td align="right"><?php echo $field['input_label']?>： </td>
+			<td>
+				<?php echo $field['input']; ?>
+			</td>
+		</tr>
+		<?php endforeach; ?>
+	<?php endif; ?>
+	<?php if($this->site_info['type'] === 'ppc' && $this->entity_i18n_name):?>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('is_default_page'); ?>:</td>
+			<td>
+				<input type="radio" id="is_default" name="data[is_default]" value="Y"<?php if(!isset($this->page_info) OR $this->page_info['is_default'] == 'Y'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('yes'); ?>
+				<input type="radio" id="is_default" name="data[is_default]" value="N"<?php if(isset($this->page_info) && $this->page_info['is_default'] == 'N'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('no'); ?>
+				<span class="warn"> <?php echo Cms_L::_('is_default_page_tip'); ?> </span>
+			</td>
+		</tr>
+	<?php endif; ?>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('page'); ?>url： </td>
+			<td>
+				<?php echo $this->tpl_info['host']; ?><input class="cpy_name" type="text" id="url" name="data[url]"  data-maxlength="100"  value="<?php if(isset($this->page_info)) echo $this->page_info['url']; ?>" size="76" data-validate="{require:[true, '<?php echo Cms_L::_('require'); ?>']}" data-tip="<?php echo Cms_L::_('url_more_than', array('x'=>100)); ?>"/>*
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('status'); ?>： </td>
+			<td>
+				<select id="status" name="data[status]" class="cang_assort">
+					<option value="enable"<?php if(isset($this->page_info) && $this->page_info['status']=='enable'):?> selected="selected"<?php endif?>><?php echo Cms_L::_('enable'); ?></option>
+					<option value="disable"<?php if(isset($this->page_info) && $this->page_info['status']=='disable'):?> selected="selected"<?php endif?>><?php echo Cms_L::_('disable'); ?></option>
+					<option value="deleted"<?php if(isset($this->page_info) && $this->page_info['status']=='deleted'):?> selected="selected"<?php endif?>><?php echo Cms_L::_('deleted'); ?></option>
+				</select>*
+			</td>
+		</tr>
+		<tr><td><a id="submitButton"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)"><?php echo Cms_L::_('submit'); ?></a>
+                    </td>
+          <td></td>
+        </tr>
+	</table>
+</form>
+<?php if(file_exists(APPLICATION_PATH . '/../public/' . $this->js_file)): ?>
+<script src="<?php echo $this->js_file; ?>"></script>
+<?php endif; ?>
+<script>
+var site_id = '<?php echo $this->site_id; ?>';
+
+$(function(){
+	<?php if(isset($this->entity_id)): ?>
+	$('#entity_id').val(<?php echo $this->entity_id; ?>).blur();
+	<?php endif; ?>
+	$.form_submit({
+		url : '/template/page/save/site_id/' + site_id,
+		check : function(){
+			if(typeof editor_sync == 'function') {			//为富文本框而设，用kinderEditor在本系统的提交方式下要同步一下，这里用fulltext-inputclass来标识富文本字段
+				$('.fulltext-input').each(function(i){
+					var id = $(this).attr('id');
+					editor_sync(id);
+				});
+			}
+		},
+		success : function(data){
+			var focus = 'title';
+			if(data.state == 'error'){
+				var msg = [];
+				if(typeof data.title != 'undefined') {
+					$.each(data.title, function(i, n){
+						msg.push('<a href="javascript:;" onclick="$.template_page.edit(' + n.tpl_id + ',' + n.page_id + ',\'<?php echo Cms_L::_('edit_page'); ?>\');"><?php echo Cms_L::_('title_dup_page'); ?></a>');
+					});
+				}
+
+				if(typeof data.url != 'undefined') {
+					$.each(data.url, function(i, n){
+						msg.push('<a href="javascript:;" onclick="$.template_page.edit(' + n.tpl_id + ',' + n.page_id + ',\'<?php echo Cms_L::_('edit_page'); ?>\');"><?php echo Cms_L::_('url_dup_page'); ?></a>');
+						focus = 'url';
+					});
+				}
+				
+				data.msg += '<div><span style="margin:20px;">' + msg.join('</span><span style="margin:20px;">') + '</span></div>';
+			} else {
+				<?php if($this->entity_i18n_name): ?>$('#entity_id').attr('readonly', 'readonly');<?php endif; ?>
+				//刷新父tab的datagrid
+				$.nav_tab.reload_parent();
+			}
+			$.messager.alert('<?php echo Cms_L::_('tip'); ?>', data.msg, data.state, function(){
+				if(typeof data.dom_id != 'undefined') {
+					focus = data.dom_id;
+				}
+				
+				$('#' + focus).focus();
+			});
+		}
+	});
+
+	$('#tplName').click(function(){
+		var tpl_id = $(this).data('tpl_id'),
+			tpl_name = $(this).text();
+
+		$.nav_tab.add('<?php echo Cms_L::_('page_list'); ?> - [' + tpl_name + ']', '/template/page/index', {site_id:site_id, tpl_id:tpl_id});
+	});
+	
+	$('#kwTooltip').tooltip({
+		content : $('<div></div>'),
+		showEvent : 'click',
+		onShow : function(){
+			var $this = $(this);
+			$this.tooltip('tip').unbind().bind('mouseenter', function(){
+				$this.tooltip('show');
+			}).bind('mouseleave', function(){
+				$this.tooltip('hide');
+			});
+			
+			$this.tooltip('arrow').css('left', 135);
+			$this.tooltip('tip').css('left', $this.offset().left - 100);
+		},
+		onUpdate : function(cc){
+			cc.panel({
+				width: 300,
+				height: 'auto',
+				border: false,
+				href: '/template/page/dup/site_id/' + site_id + '/?' + $('#id, #tpl_id, #keyword').serialize()
+			});
+		}
+	});
+
+	fn();
+});
+
+//定义一个回调，主要是为了处理和实体ID共同唯一的情况
+function fn() {
+	<?php if(isset($this->data)): ?>
+	<?php foreach($this->data as $key => $val): ?>
+	$('#<?php echo $key; ?>').val('<?php echo addslashes($val); ?>');
+	<?php endforeach; ?>
+	<?php endif; ?>
+}
+</script>

@@ -1,0 +1,387 @@
+<script	src="<?php echo $this->static;?>/js//libs/highcharts/highcharts.js"></script>
+<script	src="<?php echo $this->static;?>/js/libs/highcharts/hightheme.js"></script>
+
+<!--页面位置-->
+<!--<h3 class="location f14">-->
+<?php //echo $this->menu(); ?>
+<!--</h3>-->
+<p class="tr for_check f14">待审核厂商
+	<a href="/enterprise/index/pending"<?php if($this->enterprise_unaudit_count == 0):?>	style="color: green;" <?php endif;?>><?php echo $this->enterprise_unaudit_count; ?>	</a> 待发布产品
+	<a href="/product/index/pending"<?php if($this->product_unaudit_count == 0):?> style="color: green;"<?php endif;?>><?php echo $this->product_unaudit_count; ?> </a>
+</p>
+<div class="data_pool mt10">
+	<table width="100%" border="0">
+		<tbody>
+			<tr>
+				<td>
+					<div>
+						厂商数
+						<span><a href="/enterprise/index/index"><?php echo $this->enterprise_count; ?></a> </span>
+					</div>
+				</td>
+				<td>
+					<div>
+						产品数 
+						<span><a href="/product/index/list"><?php echo $this->product_count; ?>	</a> </span>
+					</div>
+				</td>
+				<td>
+					<div>
+						设备数 
+						<span><a href="/product/device/index"><?php echo $this->device_count; ?></a> </span>
+					</div>
+				</td>
+				<td>
+					<div>
+						注册用户 
+						<span><a href="/member/index/index"><?php echo $this->user_count; ?></a></span>
+					</div>
+				</td>
+				<td>
+					<div>
+						APP安装量 
+						<span><?php echo $this->app_count; ?> </span>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<div class="mt20 business_basic">
+	<table width="100%" border="0">
+		<thead>
+			<tr>
+				<td class="clearfix" colspan="5">
+					<span class="fl f14 business_basic_title">业务概览</span>
+					<div class="chart_search f14 fr mr10">
+						<form action="/product/about/index" id="search_form">
+							<input type="text" class="time_pick" id="timer_from" name="start_date"	value="<?php echo isset($this->start_date) ? $this->start_date : '';?>" readonly /> 
+							<input type="text" class="time_pick" id="timer_to" name="end_date" value="<?php echo isset($this->end_date) ? $this->end_date : '';?>" readonly /> 
+							<a type="submit" onfocus="blur();" id="search" class="f16 clF tc ml10 search_icon_btn" href="javascript:void(0)"><i class="find_icon"></i>查询</a>
+						</form>
+					</div>
+					<div class="chart_index fr f14">
+						<span period="yesterday" <?php if($this->period == 'yesterday'):?>	class="on" <?php endif;?>>昨天</span> 
+						<span period="current_week" <?php if($this->period == 'current_week'):?> class="on" <?php endif;?>>本周</span> 
+						<span period="current_month" <?php if($this->period == 'current_month'):?> class="on" <?php endif;?>>本月</span> 
+						<span period="seven_days" <?php if($this->period == 'seven_days'):?> class="on" <?php endif;?>>近7天</span> 
+						<span period="thirty_days" <?php if($this->period == 'thirty_days'):?> class="on" <?php endif;?>>近30天</span> 
+						<span period="one_year"	<?php if($this->period == 'one_year'):?> class="on"	<?php endif;?>>近1年</span>
+					</div>
+				</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<div>
+						<p>注册用户数</p>
+						<p class="td_data">
+							<?php echo $this->tableUserSum?>
+						</p>
+						<p>
+							环比增幅 <span <?php if($this->regUserRate >= 0):?>
+								class="business_up" <?php else: ?> class="business_down"
+								<?php endif;?>>
+								<?php 
+									if(is_numeric($this->regUserRate)){
+										echo number_format($this->regUserRate*100,2).'%';
+									}else{
+										echo $this->regUserRate;
+									}
+								?>
+							</span> <span class="business_up_icon"></span>
+						</p>
+					</div>
+				</td>
+				<td>
+					<div>
+						<p>APP安装量</p>
+						<p class="td_data">
+							<?php echo $this->tableAppSum?>
+						</p>
+						<p>
+							环比增幅 <span <?php if($this->appRate >= 0):?> class="business_up"
+							<?php else: ?> class="business_down" <?php endif;?>>
+							<?php 
+								if(is_numeric($this->appRate)){
+									echo number_format($this->appRate*100,2).'%';
+								}else{
+									echo $this->appRate;
+								}
+							?>
+							</span> <span class="business_up_icon"></span>
+						</p>
+					</div>
+				</td>
+				<td>
+					<div>
+						<p>设备接入量</p>
+						<p class="td_data">
+							<?php echo $this->tableDeviceSum; ?>
+						</p>
+						<p>
+							环比增幅 <span <?php if($this->deviceInRate >= 0):?>
+								class="business_up" <?php else: ?> class="business_down"
+								<?php endif;?>>
+								<?php 
+									if(is_numeric($this->deviceInRate)){
+										echo number_format($this->deviceInRate*100,2).'%';
+									}else{
+										echo $this->deviceInRate;
+									}
+								?>
+							</span> <span class="business_up_icon"></span>
+						</p>
+					</div>
+				</td>
+				<td>
+					<div>
+						<p>活跃用户数</p>
+						<p class="td_data"><?php echo $this->tableActiveUserSum; ?></p>
+						<p>环比增幅
+							<span <?php if($this->activeUserRate >= 0):?>class="business_up" 
+								  <?php else: ?> class="business_down"
+								  <?php endif;?>>
+								  <?php 
+								  	if(is_numeric($this->activeUserRate)){
+										echo number_format($this->activeUserRate*100,2).'%';
+									}else{
+										echo $this->activeUserRate;
+									}
+								  ?>
+							</span> 
+							<span class="business_up_icon"></span>
+						</p>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+<div class="product_detail mt22">
+	<div class="business_chart">
+		<h3 class="clearfix">
+			<span class="fl f14 business_basic_title">数据图</span>
+			<div class="chart_index fr mr10">
+				<span chart_line="reg_user" class="on">注册用户数</span> 
+				<span chart_line="app" ">APP安装量</span> 
+				<span chart_line="dev_in">设备接入量</span>
+				<span chart_line="active_user">活跃用户数</span>
+			</div>
+		</h3>
+		<div id="chart" class="vertical_nav"></div>
+	</div>
+	<div class="product_table mt24 f14">
+		<table class="table_s tc" width="100%" border="0"
+			style="text-align: right;">
+			<thead>
+				<tr>
+					<td style="text-align: left; width: 120px;">日期</td>
+					<td>注册用户数</td>
+					<td>APP安装量</td>
+					<td>设备接入量</td>
+					<td>活跃用户数</td>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td style="text-align: left;">总计</td>
+					<td><?php echo $this->tableUserSum; ?></td>
+					<td><?php echo $this->tableAppSum; ?></td>
+					<td><?php echo $this->tableDeviceSum; ?></td>
+					<td><?php echo $this->tableActiveUserSum; ?></td>
+				</tr>
+				<?php
+            foreach($this->tableUserData as $date=>$data):?>
+				<tr>
+					<td style="text-align: left;"><?php echo $date?></td>
+					<td>
+						<?php echo isset($this->tableUserData[$date]) ? $this->tableUserData[$date] : ''?>
+					</td>
+					<td>
+						<?php echo isset($this->tableAppData[$date]) ? $this->tableAppData[$date] : ''?></td>
+					<td>
+						<?php echo isset($this->tableDeviceData[$date]) ? $this->tableDeviceData[$date] : ''?>
+					</td>
+					<td>
+						<?php echo isset($this->tableActiveUserData[$date]) ? $this->tableActiveUserData[$date] : ''?>
+					</td>
+				</tr>
+				<?php
+            endforeach;?>
+			</tbody>
+		</table>
+	</div>
+</div>
+</div>
+</div>
+</div>
+<div id="tips_dialog" style="display: none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script>
+    $(function(){
+
+    	 $( "#tips_dialog" ).dialog({
+             autoOpen: false,
+             width: 555,
+             dialogClass: "my-dialog",
+             modal: true,
+             show: {
+                 effect: "blind",
+                 duration: 300
+             },
+             hide: {
+                 effect: null,
+                 duration: 500
+             },
+             buttons: {
+                 "确定": function() {
+                     $( this ).dialog( "close" );
+                 }
+             }
+         });
+         
+        //datepicker
+        (function(){
+            var config={
+                changeMonth: true,
+                changeYear: true,
+                rangeSelect: true,
+                yearRange: '-10:+10',
+                currentText: ""
+            }
+            $("#timer_from").datepicker(config);
+            $("#timer_to").datepicker(config);
+        })();
+        function toDb(num){//两位
+            if(num<10){
+                return '0'+num;
+            }
+            else{
+                return ''+num;
+            }
+        };
+
+        Highcharts.setOptions({
+            chart: {
+                backgroundColor: {
+                    linearGradient: [0, 0, 500, 500],
+                    stops: [
+                        [0, 'rgb(255, 255, 255)'],
+                        [1, 'rgb(255, 255, 255)']
+                        ]
+                },
+                borderWidth: 1,
+                borderColor:'#adadad',
+                plotBackgroundColor: 'rgba(255, 255, 255, .9)',
+                plotShadow: false,
+                plotBorderWidth: 1
+            }
+        });
+        
+        var charts = new Highcharts.Chart({
+            chart: {
+                renderTo: 'chart'
+            },
+            title: {
+                text: '注册用户数',
+                x: -20 //center
+            },
+            subtitle: {
+                x: -20
+            },
+            xAxis: {
+                categories: <?php echo $this->chartsDate?>,
+                tickInterval: <?php echo $this->date_step?>,
+                tickmarkPlacement:'on'
+            },
+            yAxis: {
+                title: {
+                	text: '数量',
+                    x: 10, //center
+                    style:{
+                        writingMode:'lr-tb'
+                    },
+                    rotation : 0,
+                    offset : 50 //标题离图表左边的距离
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }],
+                minorGridLineWidth : 0
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [
+                {
+                    name: '注册用户数',
+                    data: <?php echo $this->statisticsTotalJson?>},
+                {
+                    name: 'APP安装量',
+                    data: <?php echo $this->statisticsAppTotalJson?>},
+                {
+                    name: '设备接入量',
+                    data: <?php echo $this->statisticsDeviceTotalJson?>},
+                {
+                    name: '活跃用户数',
+                    data: <?php echo $this->statisticsActiveUserTotalJson?>}
+            ]
+        });
+        charts.series[1].hide();
+        charts.series[2].hide();
+        charts.series[3].hide();
+        $('span[chart_line]').click(function () {
+            var line_map = {
+                'reg_user':0,
+                'app':1,
+                'dev_in':2,
+                'active_user':3
+                
+            }
+            charts.setTitle({text:charts.series[line_map[$(this).attr('chart_line')]].name});
+            $('span[chart_line]').attr('class','');
+            $(this).attr('class','on');
+            for(var item in line_map) {
+                //console.log(line_map[item]);
+                charts.series[line_map[item]].hide();
+            }
+            charts.series[line_map[$(this).attr('chart_line')]].show();
+        });
+
+        $('span[period]').click(function () {
+            var period = $(this).attr('period');
+            location.href = '/product/about/index<?php echo $this->base_url?>&period='+period+'&start_date=&end_date=';
+        });
+
+        $('#search').click(function () {
+            var start_date = new Date($('#timer_from').val());
+            var end_date = new Date($('#timer_to').val());
+            var today = new Date();
+            if(end_date > today || start_date > today) { // 开始时间不能大于结束时间
+                $('#tips_msg').text('选定时间不能超过今天！');
+                $( "#tips_dialog" ).dialog( "open" );
+                return false;
+            }
+            if(start_date > end_date) { // 开始时间不能大于结束时间
+                $('#tips_msg').text('开始时间不能大于结束时间！');
+                $( "#tips_dialog" ).dialog( "open" );
+                return false;
+            }
+            var diff_days = countTimeLength('d',$('#timer_from').val(),$('#timer_to').val());
+            if(diff_days > 366) {
+                $('#tips_msg').text('抱歉，时间跨度不能超过366天！');
+                $( "#tips_dialog" ).dialog( "open" );
+                return false;
+            }
+            $('#search_form').submit();
+        });
+    })
+</script>

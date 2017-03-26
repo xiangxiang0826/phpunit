@@ -1,0 +1,36 @@
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('查看固件详情','/ezstudio/firmware/comm'); ?></h3>
+<table class="detail_tabel f14 mt20">
+                       <tr><th>基本信息</th><th></th></tr>
+                       	<tr><td>固件标识：</td><td><?php echo $this->fireware_comm_detail['label']?></td></tr> 
+                        <tr><td>固件类型：</td><td><?php echo $this->type_info['name']?></td></tr>  
+                        <tr><td>固件包名称：</td><td><?php echo $this->fireware_comm_detail['name']?></td></tr>    
+                        <tr><td>发布时间：</td><td><?php echo $this->fireware_comm_detail['ctime']?></td></tr>
+                        <tr><td>更新时间：</td><td><?php echo $this->fireware_comm_detail['mtime']?></td></tr>
+                        <tr><td>最新版本：</td><td><?php echo $this->latest_version['version']?></td></tr>
+                        <tr><td>升级方式：</td><td><?php echo $this->latest_version['is_force'] == 0 ? '静默升级' : '强制升级'?></td></tr>
+                        <tr><td>固件描述：</td><td><?php echo $this->fireware_comm_detail['description']?></td></tr>
+                        <tr><td>页面示例：</td><td>
+                        <?php if($this->fireware_comm_detail['images']):?>
+                            	<?php foreach($this->fireware_comm_detail['images'] as $image):?>
+			                        <img  src="<?php echo "{$this->uploadConfig['baseUrl']}{$image['image']}"?>" class="cut_make_up" width="272" height="410">
+								<?php endforeach;?>
+                            <?php endif;?>
+                        </td></tr>
+                        <tr><td>版本更新：</td><td><?php echo $this->latest_version['description']?></td></tr>
+                        <?php if($this->products):?>
+                        <tr><td>产品使用(<?php echo count($this->products)?>):</td><td>
+                        	<?php foreach($this->products as $product):?>
+                        		<div class="mt6"><?php echo $product['name']?></div>
+                        	<?php endforeach;?>
+                        </td></tr>
+                        <?php endif;?>
+                    </table>
+<div class="mt36 mb24 tr"><a  href="javascript:;" id="back" class="f16 clF fr tc search_btn grey_btn" >返 回</a></div>
+<script>
+$(function () {
+	$('#back').click(function () {
+		history.go(-1);
+	});
+});
+</script>

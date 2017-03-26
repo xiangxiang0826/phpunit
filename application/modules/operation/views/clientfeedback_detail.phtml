@@ -1,0 +1,384 @@
+<!--页面位置-->
+<h3 class="location f14">
+	<?php echo $this->menu("回复",'/operation/clientfeedback/index'); ?>
+</h3>
+<div class="product_detail mt22 ans_online clearfix">
+	<div class="ans_feedback">
+		<h3>问题回复</h3>
+		<div class="chat_lists">
+			<ul class="fixed_show">
+				<li><span class="fix_title">问题序号：</span><span><?php echo $this->main['no']?></span></li>
+				<li><span class="fix_title">产品：</span><span><?php echo isset($this->product['name']) ? $this->product['name'] : '-' ?></span></li>
+			</ul>
+			<ul class="chat_record">
+				<?php if(!empty($this->message)):?>
+				<?php foreach($this->message as $message):?>
+				<?php if($message['content_type']=='text'):?>
+				<li>
+					<div>
+						<span class="f_user"><?php if($message['type']=='feedback'){echo $message['name'] && $message['user_id'] ? '<span style="color: #FF6633 ">'.$message['name'].'</span>' : ($message['user_id'] ? '<span style="color: #FF6633 ">未命名用户</span>' : '<span style="color: #FF6633 ">未注册用户</span>');}else{ echo '<span style="color: #009900 ">我 &nbsp;&nbsp;(&nbsp;&nbsp;'.$message['reply_user'].'&nbsp;&nbsp;)</span>';} ?>：</span><span
+							class="f_content"><?php echo $message['content']?></span>
+					</div>
+				</li>
+				<?php elseif($message['content_type']=='log'):?>
+				<li>
+					<div class="f_quest">
+						<span class="f_user"><?php echo $message['name'] && $message['user_id'] ? '<span style="color: #FF6633 ">'.$message['name'] .'</span>' : ($message['user_id'] ? '<span style="color: #FF6633 ">未命名用户</span>' : '<span style="color: #FF6633 ">未注册用户</span>')?>：</span>
+						<span class="f_content f_down"><?php $file = pathinfo($message['content']);echo $file['basename'];?>&nbsp;&nbsp;&nbsp;&nbsp;
+							<a href="<?php echo $message['content']?>">文件下载</a></span>
+					</div>
+				</li>
+				<?php else:?>
+				<li>
+					<div>
+						<span class="f_user"><?php echo $message['name'] && $message['user_id'] ? '<span style="color: #FF6633 ">'.$message['name'] .'</span>' : ($message['user_id'] ? '<span style="color: #FF6633 ">未命名用户</span>' : '<span style="color: #FF6633 ">未注册用户</span>')?>：</span><span
+							class="f_content f_down"><?php $file = pathinfo($message['content']);echo $file['basename'];?>&nbsp;&nbsp;&nbsp;&nbsp;
+							<a href="<?php echo $message['content']?>" target="blank">图片下载</a></span>
+					</div>
+				</li>
+				<?php endif;?>
+				<div class="f_timer">
+					<?php echo $message['ctime']?>
+				</div>
+				<?php endforeach;?>
+				<?php endif;?>
+
+			</ul>
+		</div>
+		<div class="chart_input">
+			<div class="live_content_wrap">
+				<textarea tabindex="1" class="live-content" id="reply-content"
+					style="resize: none" cols="" rows=""></textarea>
+			</div>
+			<p class="f_enter" id="reply">回复</p>
+		</div>
+		<h3>
+			<span class="fr mr14 add_tag"><i class="add_tag_icon"></i>添加标签</span>管理标签<br />
+			<div class="add_tag_content">
+				<ul class="existed">
+					<?php if(!empty($this->tags)):?>
+					<?php foreach($this->tags as $v):?>
+					<li><input id="id<?php echo $v['id']?>" type="checkbox"
+						tagid="<?php echo $v['id']?>"
+						<?php if(array_key_exists($v['id'], $this->tagMessage)):?> checked
+						<?php endif;?> value="<?php echo $v['name']?>" /><label for="ids0"><?php echo $v['name']?></label></li>
+					<?php endforeach;?>
+					<?php endif;?>
+				</ul>
+				<div class="mt20 clearfix">
+					<input type="text" class="add_input fl" />
+					<div class="add_tag_btn fl ml10">添加</div>
+				</div>
+			</div>
+		</h3>
+		<div class="tags_show">
+			<ul class="clearfix" id="tags_show">
+				<?php if(!empty($this->tagMessage)):?>
+				<?php foreach($this->tagMessage as $v):?>
+				<li tagname="<?php echo $v['name']?>"><?php echo $v['name']?><i
+					class='tag_delete'></i></li>
+				<?php endforeach;?>
+				<?php endif;?>
+			</ul>
+		</div>
+		<h3>问题备注</h3>
+		<div class="quest_note">
+			<div class="live_content_wrap quest_note_live">
+				<textarea tabindex="1" class="live-content" id="remark-content"
+					style="resize: none" cols="" rows="">
+					<?php echo $this->main['remark']?>
+				</textarea>
+			</div>
+		</div>
+	</div>
+	<div class="infos">
+		<div class="device_info">
+			<h3 class="info_title">设备信息</h3>
+			<ul>
+				<li><span>产品ID：</span><span><?php echo (!empty($this->device['product_id'])) ? $this->device['product_id'] : '-'?></span></li>
+				<li><span>产品名称：</span><span><?php  echo ((!empty($this->product['name'])) ? $this->product['name'] : '-').' ('.$this->enterprise['company_name']. ' )'?></span></li>
+				<li><span>设备ID：</span><span><?php echo (!empty($this->device['id'])) ? $this->device['id'] : '-'?></span></li>
+				<li><span>SN码：</span><span><?php  echo (!empty($this->device['sn'])) ? $this->device['sn'] : '-'?></span></li>
+				<li><span>激活时间：</span><span><?php echo (!empty($this->device['user_activate_time'])) ? $this->device['user_activate_time'] : '-'?></span></li>
+			</ul>
+		</div>
+		<div class="app_info">
+			<h3 class="info_title">APP信息</h3>
+			<ul>
+				<li><span>APP：</span><span><?php echo (!empty($this->app['name'])) ? $this->app['name'] : '-'?></span></li>
+				<li><span>平台：</span><span><?php echo (!empty($this->app['platform'])) ? $this->app['platform'] : '-'  ?></span></li>
+				<li><span>版本：</span><span><?php echo (!empty($this->app['version'])) ? $this->app['version'] : '-'?></span></li>
+			</ul>
+		</div>
+		<div class="user_info">
+			<h3 class="info_title">用户信息</h3>
+			<ul>
+				<li><span>用户名：</span><span><?php echo (!empty($this->user['name'])) ? $this->user['name'] : '-' ?></span></li>
+				<li><span>会员ID：</span><span><?php echo (!empty($this->user['id'])) ? $this->user['id'] : '-'?></span></li>
+				<li><span>注册时间：</span><span><?php echo (!empty($this->user['reg_time'])) ? $this->user['reg_time'] : '-' ?></span></li>
+				<li class="clearfix"><div class="fl">设备绑定：</div>
+					<div class="fl">
+						<?php if((!empty($this->user))):?>
+						<?php foreach ($this->user['device_info'] as $d):?>
+						<p>
+							<?php echo $d['name'] ?>
+						</p>
+						<?php endforeach;?>
+						<?php else:?>
+						<p>-</p>
+						<?php endif;?>
+					</div></li>
+				<li><span>邮箱：</span><span><?php echo (!empty($this->user['email'])) ? $this->user['email'] : '-'?></span></li>
+				<li><span>电话：</span><span><?php echo (!empty($this->user['phone'])) ? $this->user['phone'] : '-'?></span></li>
+			</ul>
+		</div>
+		<input type='hidden' value="<?php echo $this->intri['key']?>"
+			id="intri_key" /> <input type='hidden'
+			value="<?php echo $this->intri['value']?>" id="intri_value" /> <input
+			type='hidden' value="<?php echo $this->main['reply_count']?>"
+			id="reply_count" /> <input type='hidden'
+			value="<?php echo $this->enterprise['id']?>" id="enterprise_id" />
+	</div>
+</div>
+<p class="tl mt14">
+	<a href="javascript:;" id="remark" class="upload_sdk tc clF">保存</a>
+</p>
+<div id="message_dialog" style="display: none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;"
+		class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+
+<div id="confirm_dialog" style="display: none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="confirm_message" href="javascript:;"
+		class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<script type="text/javascript"
+	src="<?php echo $this->static;?>/js/hashmap.js"></script>
+<script type="text/javascript">
+$(function () {
+    var  $add_tag2 = $(".add_tag");
+    $add_tag2.attr("v", "h");
+    
+    var tags_map = new HashMap();
+    var tags_map_checked_old = new HashMap();
+    var tags_map_checked = new HashMap();
+    var tags_map_new = new HashMap();
+    $("input:checkbox").each(function(index,name) {
+        	tags_map.put($(this).val(),$(this).attr('tagid'));
+        	if($(this).attr('checked') == 'checked'){
+        		tags_map_checked.put($(this).val(),$(this).attr('tagid'));
+        		tags_map_checked_old.put($(this).val(),$(this).attr('tagid'));
+        	}
+       
+		});
+
+    $("#message_dialog").dialog({
+		autoOpen : false,
+		width : 540,
+		height : 240,
+		show : {
+			effect : "blind",
+			duration : 300
+		},
+		hide : {
+			effect : "null",
+			duration : 500
+		},
+		dialogClass : "my_message_dialog",
+		modal : true
+	});
+	
+    $("#confirm_dialog").dialog({
+		autoOpen : false,
+		width : 540,
+		height : 240,
+		show : {
+			effect : "blind",
+			duration : 300
+		},
+		hide : {
+			effect : "null",
+			duration : 500
+		},
+		dialogClass : "my_message_dialog",
+		modal : true
+	});
+    $('#close_message').click(function() {
+        window.location.href = "/operation/clientfeedback/index?search[status]=replied";
+		//$("#message_dialog").dialog("close");
+	});
+    $('#confirm_message').click(function() {
+		$("#confirm_dialog").dialog("close");
+	});
+    (function () {
+        //添加标签框的显示隐藏
+        $(document).on("click", function (event) {
+            var $add_tag_content = $(event.target).closest(".add_tag_content"),
+                $add_tag_content2 = $(".add_tag_content"),
+                $add_tag = $(event.target).closest(".add_tag");
+            if ($add_tag.length && $add_tag.attr("v") == "h") {
+                $add_tag_content2.css("display", "block");
+                $add_tag2.attr("v", "s");
+            } else if (!$add_tag_content.length) {
+                $add_tag_content2.css("display", "none");
+                $add_tag2.attr("v", "h");
+            }
+        });
+    })();
+
+	//回复方法
+    $('#reply').on('click',function(){
+    	var content = $("#reply-content").val();
+    	if($.trim(content).length < 1){
+    		//$.alerts.onlySure('提示',"回复内容不能为空！",function(v){});
+    		$('#confirm_dialog .message_text').text('回复内容不能为空！！');
+    		$("#confirm_dialog").dialog("open");	
+        	return;
+       	}
+    	var feedback_id = "<?php echo $this->id?>";
+    	var reply_user = "<?php echo $this->loginUser?>";
+    	var intri_key = $('#intri_key').val();
+    	var intri_value = $('#intri_value').val();
+    	var reply_count = parseInt($('#reply_count').val());
+    	$.post('/operation/clientfeedback/reply',{content:content,id:feedback_id,intri_key:intri_key,intri_value:intri_value,reply_count:reply_count},function (data) {
+        	if(data.status == '200'){
+				var append_html = '<li>	<div><span class="f_user">我  &nbsp;&nbsp;(&nbsp;&nbsp;' + reply_user +'&nbsp;&nbsp;)：</span><span class="f_content">' + content + ' </span></div> </li><div class="f_timer">' + data.result.ctime + '</div>';
+				$(".chat_record").append(append_html);
+				$('#reply_count').val(reply_count + 1);
+				$('#message_dialog .message_text').text('回复成功！');
+	    		$("#message_dialog").dialog("open");	
+				return;	
+			}
+			//$.alerts.onlySure('提示',"保存失败",function(v){});
+			$('#confirm_dialog .message_text').text('回复失败！');
+    		$("#confirm_dialog").dialog("open");	
+    	},
+    	'json'
+    	);
+    });
+
+	//完成方法
+    $("#remark").on('click',function(){
+        //debugger;
+        var remark = $("#remark-content").val();
+        var feedback_id = "<?php echo $this->id?>";
+        var enterprise_id = $("#enterprise_id").val();
+        if($.trim(remark).length < 1 ){
+        	//$.alerts.onlySure('提示',"备注内容不能为空！",function(v){});
+        	$('#confirm_dialog .message_text').text('备注内容不能为空！');
+	    		$("#confirm_dialog").dialog("open");		
+        	return;
+        }
+        var tags = tags_map.values().join(',');
+        var tags_checked = tags_map_checked.values().join(',');
+        var tags_checked_old = tags_map_checked_old.values().join(',');
+        var tags_new = tags_map_new.keys().join(',');
+        //tags			all the tags loaded
+        //tags_checked	all the tags checked in which is already in the database
+        //tags_new 		newly added tags
+        //$.post('/operate/feedback/remark',{remark:remark,id:feedback_id,tags:tags,tags_checked:tags_checked,tags_new:tag_new},function (data) {
+        $.post('/operation/clientfeedback/remark',{remark:remark,id:feedback_id,tags:tags,tags_checked:tags_checked,tags_new:tags_new,tags_checked_old:tags_checked_old,enterprise_id:enterprise_id},function (data) {
+        	if(data.status == '200'){
+        		$('#message_dialog').unbind('click');
+	        	$('#close_message').click(function() {
+	        		window.location.href=document.referrer;
+	        	});
+        		$('#message_dialog .message_text').text('保存成功！');
+        		$("#message_dialog").dialog("open");	
+        		return;
+			}
+        	//$.alerts.onlySure('提示',"保存成功",function(v){});
+        	$('#confirm_dialog .message_text').text('保存失败！');
+    		$("#confirm_dialog").dialog("open");	
+    	},
+    	'json'
+    	);
+    });
+
+    //添加标签
+    $(".add_tag_btn").on('click',function(){
+        var tag_name = $.trim($(".add_input").val());
+        var tag_length = getByteLen(tag_name);
+		if(tag_length < 1){
+			//$.alerts.onlySure('提示',"标签名称不能为空！",function(v){});
+			$('#confirm_dialog .message_text').text('标签名称不能为空！');
+    		$("#confirm_dialog").dialog("open");	
+			return;
+		}else if(tag_length > 12){
+			$('#confirm_dialog .message_text').text('标签名称最长6个中文，12个字母！');
+    		$("#confirm_dialog").dialog("open");
+    		return;
+			}
+		var new_tag = "<li tagname='" + tag_name + "'>" + tag_name + "<i class=\"tag_delete\"></i></li>";
+		
+		//todo  check the original
+		if(tags_map.containsKey(tag_name)){
+			if(!tags_map_checked.containsKey(tag_name)){
+				var hash_value = tags_map.get(tag_name);
+				tags_map_checked.put(tag_name,hash_value);	
+				$("#tags_show").append(new_tag);		
+				$("#id"+hash_value).prop('checked','true');
+				return;
+			}else{
+				//$.alerts.onlySure('提示',"此标签名已存在",function(v){});
+				$('#confirm_dialog .message_text').text('此标签名已存在！');
+	    		$("#confirm_dialog").dialog("open");
+				}
+		}else if(!tags_map_new.containsKey(tag_name)){
+			$("#tags_show").append(new_tag);
+			$(".add_input").val('');
+			tags_map_new.put(tag_name,'0');
+			return;
+		} 
+		//$.alerts.onlySure('提示',"此标签名已存在",function(v){});
+		$('#confirm_dialog .message_text').text('此标签名已存在！');
+		$("#confirm_dialog").dialog("open");
+    });
+
+    //删除标签
+    $(document).on('click','.tag_delete',function(){
+        var tagname = $(this).parent().attr('tagname');
+        //alert(tagname);
+        if(tags_map_checked.containsKey(tagname)){
+            var tag_id = tags_map_checked.get(tagname);
+            $("#id"+tag_id).removeAttr('checked'); 
+        	tags_map_checked.remove(tagname);
+        	
+        }
+        if(tags_map_new.containsKey(tagname)){
+        	tags_map_new.remove(tagname);
+        }
+        $(this).parent().remove();
+    });
+
+	//checkbox 点击
+	$(document).on('click','input:checkbox',function(){
+		//debugger;
+		var tag_name = $(this).val();
+		var tag_id = tags_map.get(tag_name);
+		if($(this).prop('checked') == true){			
+			var new_tag = "<li tagname='" + tag_name + "'>" + tag_name + "<i class=\"tag_delete\"></i></li>";
+			$("#tags_show").append(new_tag);
+			tags_map_checked.put(tag_name,tag_id);
+			return;
+		}
+		$("li[tagname="+tag_name+"]").remove();
+		tags_map_checked.remove(tag_name);
+		});
+
+	//count byte of string 
+	function getByteLen(val) { 
+		var len = 0; 
+		for (var i = 0; i < val.length; i++) { 
+		if (val[i].match(/[^\x00-\xff]/ig) != null) //全角 
+		len += 2; 
+		else 
+		len += 1; 
+		} 
+		return len; 
+		} 
+    
+})
+</script>

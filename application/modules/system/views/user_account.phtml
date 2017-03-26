@@ -1,0 +1,134 @@
+<!--页面位置-->
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+	<form class="cmxform"  action="" method="post" id="form_account">
+            <table class="detail_tabel psw_table f14 mt20">
+                <tr>
+                    <td>用户名：</td>
+                    <td>
+                        <?php echo $this->account_info['user_name'];?>
+                    </td>
+                </tr>
+                <tr>
+                    <td>注册时间：</td>
+                    <td>
+                        <?php echo $this->account_info['ctime'];?>
+                    </td>
+                </tr>
+                <tr>
+                    <td>真实姓名：</td>
+                    <td>
+                        <input type="text" class="cpy_name" placeholder="请输入真实姓名" value="<?php echo $this->account_info['real_name'];?>" id="real_name" name="real_name" class="required"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>所在部门：</td>
+                    <td>
+                        <input type="text" class="cpy_name"  placeholder="请输入所在部门"  value="<?php echo $this->account_info['department'];?>" id="department" name="department"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>手机号：</td>
+                    <td>
+                        <input type="text" class="cpy_name"  placeholder="请输入手机号"  value="<?php echo $this->account_info['phone'];?>"  id="phone" name="phone"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>电子邮箱：</td>
+                    <td>
+                        <input type="text" class="cpy_name" id="email"  placeholder="请输入电子邮件" name="email" value="<?php echo $this->account_info['email'];?>"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a id="update_account"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)">保存</a>
+                    </td>
+                    <td></td>
+                </tr>
+</table>
+</form>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="tips_msg">账户更新成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)">确 定</a>
+</div>
+<script>
+    $(function(){
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 50
+            },
+            hide: {
+                effect: null,
+                duration: 10
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        
+        $("#close_message").on("click",function() {
+            $( "#message_dialog" ).dialog( "close" );
+            location.reload();
+        });
+
+       $('#form_account').validate({
+    		rules: {
+    			'real_name': {
+    				maxlength:20,
+    				minlength:2,
+    				required: true,
+    			},
+    			'department': {
+    				required: true,
+    				maxlength:20,
+    				minlength: 2
+    			},
+    			'email': {
+    				required: true,
+    				email:true,
+    				maxlength:64,
+    				minlength: 6
+    			},
+    			'phone': {
+    				required: true,
+    				isMobile: true,
+    				maxlength:20,
+    				minlength: 6
+    			}
+    		},
+    		messages: {   //自定义提示信息
+    			//old_password: "原密码输入错误",
+    		}
+    	});	
+
+    	$('#update_account').click(function () {
+			if($('#form_account').valid()) {
+				$('#form_account').ajaxSubmit({
+					url:'/system/user/modifyaccount', //提交给哪个执行
+					type:'POST',
+					dataType: 'json',
+					success: function (result) {
+						if(result.status == 200) {
+							$('#tips_msg').text('账户更新成功！');
+							$( "#message_dialog" ).dialog( "open" );
+							return false;
+						}
+						if(result.status == 403) {
+							$('#tips_msg').text('您的输入不合法，请重新输入！');
+							$( "#message_dialog" ).dialog( "open" );
+						}
+						if (result.msg == 505) {
+	                        $('#tips_msg').text('亲，你没有这个操作的权限！');
+	                        $("#message_dialog").dialog("open");
+	                    } 
+					}
+				},'json');
+				return false;
+			}
+		});
+    	
+	});
+</script>

@@ -1,0 +1,293 @@
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.ui.timepicker.addon.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.queue.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/fileprogress.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/handlers.js"></script>
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('添加厂商','/enterprise/index/index'); ?></h3>
+</h3>
+<form action="" id="enterprise_form">
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th style="width: 15%;">账号信息</th>
+        <th></th>
+    </tr>
+	<tr>
+        <td><?php echo $this->t('enterprise_login_email'); ?>：</td>
+        <td>
+            <input   name="enterprise[email]" class="cpy_name" id="email" placeholder="请输入正确的邮箱地址"/>
+        </td>
+    </tr>
+    <tr>
+        <td>密码：</td>
+        <td>
+            <input  placeholder="6~16位的数字、字符或特殊字符" name="enterprise[password]" class="cpy_name" id="password" />
+        </td>
+    </tr>
+    <tr>
+        <th>身份认证信息</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>类型：</td>
+        <td class="system_drop">
+              <input type="radio"  class="receive_type"  id="enterprise_type"  name="enterprise[user_type]" value="company" checked="checked"> 企业
+              <input type="radio"  class="receive_type"   value="personal" name="enterprise[user_type]"> 个人
+        </td>
+    </tr>
+    <tr>
+        <td>名称：</td>
+        <td>
+            <input   name="enterprise[company_name]" class="cpy_name" id="company_name" />
+        </td>
+    </tr>
+    <tr>
+        <td>地址：</td>
+        <td>
+            <input    name="enterprise[address]" class="cpy_name" id="address" />
+        </td>
+    </tr>
+    <tr>
+        <td>手机号码：</td>
+        <td>
+            <input    name="enterprise[mobile]" class="cpy_name" id="mobile" />
+        </td>
+    </tr>
+    
+    <tr>
+        <td>业务范围：</td>
+        <td>
+            <textarea rows="12" cols="50"   name="enterprise[business_scope]" class="mt10 mb10 text_cls" id="business_scope"></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td>资质证明：</td>
+        <td>
+            <span class="fieldset flash" id="fsUploadProgress_icon"></span>
+            <span id="upload_status_icon"></span>
+            <span style="display: block" id='icon_label'> （支持jpg/png格式，大小不超过5M）        </span>
+            <a  id="upload_icon" class="f14 clF tc search_btn brue_btn ml56" onfocus="blur();" href="javascript:void(0)">上传</a>
+            <input id="btnCancel_icon" type="button" value="取消上传" disabled="disabled" style="display:none" />
+            <input type="hidden" name="enterprise[certificate]" id="icon" value="">
+        </td>
+    </tr>
+    <tr>
+        <th>标识信息</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>企业标识：</td>
+        <td>
+            <input   placeholder="请输入a-z或A-Z的字符串" name="enterprise[label]" class="cpy_name" id="enterprise_label"></textarea>
+        </td>
+    </tr>
+ </table>
+</form>
+
+<div class="mt36 mb24 tr">
+    <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+    <a  onfocus="blur();" href="javascript:void(0)" id="edit_btn" class="f16 clF tc search_btn" >提 交</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;" class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<div id="product_list_div" style="display:none;" title="选择厂商"></div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/hashmap.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/json2.js"></script>
+<script>
+$(document).ready(function(){
+    $( "#message_dialog" ).dialog({
+        autoOpen: false,
+        width: 540,
+        height: 240,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        dialogClass: "my_message_dialog",
+        modal: true
+    });
+    $('#close_message').click(function() {
+		$( "#message_dialog" ).dialog( "close" );
+	});
+    //icon上传
+    var settings = {
+        flash_url : "<?php echo $this->static;?>/js/libs/swfupload/swfupload.swf",
+        upload_url: "/api/upload/index",
+        post_params: {"type" : "enterprise"},
+        file_size_limit : "5 MB",
+        file_types : "*.jpg;*.png;",
+        file_types_description : "All Files",
+        file_upload_limit : 100,  //配置上传个数
+        file_queue_limit : 1,
+        custom_settings : {
+            progressTarget : "fsUploadProgress_icon",
+            cancelButtonId : "btnCancel_icon",
+            ProgressStatusId:'upload_status_icon'
+        },
+        debug: false,
+        button_window_mode:'Opaque',
+        // Button settings
+        button_image_url: "<?php echo $this->static;?>/images/TestImageNoText_65x29.png",
+        button_width: "65",
+        button_height: "29",
+        button_placeholder_id: "upload_icon",
+        button_text: '<span class="falsh_upload_button">上传</span>',
+        button_text_style: '.falsh_upload_button{color:#FFFFFF;}',
+        button_text_left_padding: 16,
+        button_text_top_padding: 5,
+        button_text_top_margin: 10,
+        file_queued_handler : fileQueued,
+        file_queue_error_handler : fileQueueError,
+        file_dialog_complete_handler : fileDialogComplete,
+        upload_error_handler : uploadError,
+        upload_success_handler : function(file, serverData) {
+            try {
+                serverData = eval("("+ serverData +")");
+                var progress_div_id = this.customSettings.progressTarget;
+                var progress = new FileProgress(file, progress_div_id);
+                progress.setComplete();
+                progress.setStatus("上传成功");
+                progress.toggleCancel(false);
+                var img = '<img  src="'+ serverData.result.url +'" class="cut_make_up" width="100" height="100">';
+                var link = '<a target="_blank" href="'+ serverData.result.url +'">'+ img +'</a>';
+                $('#icon').val(serverData.result.path);
+                var file_container = '<span class="mr10">'+ link +'</span>';
+                $("#"+progress_div_id).html(file_container);
+            } catch (ex) {
+                this.debug(ex);
+            }
+        },
+        upload_complete_handler : uploadComplete,
+        queue_complete_handler : queueComplete
+    };
+    var swfu01 = new SWFUpload(settings);
+
+    jQuery.validator.addMethod("alnum", function(value, element) {
+        return this.optional(element) || /^[a-zA-Z]+$/.test(value);
+    }, "只能包括英文字母");
+
+    jQuery.validator.addMethod("pwd", function(value, element) {
+        return this.optional(element) || !/.*[\u4e00-\u9fa5]+.*$/.test(value);
+    }, "不能包括中文");
+
+    jQuery.validator.addMethod("isMobile", function(value, element) {
+        return this.optional(element) || /^1[3-8]+\d{9}$/.test(value);
+    }, "请输入正确的手机号码");
+
+    jQuery.extend(jQuery.validator.messages, {
+        required: "不可为空",
+        email: "邮箱格式不正确",
+        rangelength: jQuery.validator.format("长度要求{0}~{1}个字符")
+    });
+    var enterprise_form = $('#enterprise_form').validate({
+        rules : {            
+            'enterprise[password]' : {
+                required : true,
+                pwd : true,
+                rangelength : [6,16]
+            },
+            'enterprise[company_name]' : {
+                required : true,
+                rangelength : [2,200]
+            },
+            'enterprise[address]' : {
+                required : true,
+                rangelength : [2,200]
+            },
+            'enterprise[mobile]' : {
+            	required : true,
+                isMobile : true,
+                remote : { // 异步验证
+       			 url: "/enterprise/index/checkmobile",
+       			 type: "post",             
+       			 dataType: "json"        
+       		    }
+            },
+            'enterprise[email]' : {
+            	required : true,
+                email : true,
+                remote : { // 异步验证
+          			 url: "/enterprise/index/checkemail",
+          			 type: "post",             
+          			 dataType: "json"        
+          		    }
+            },
+            'enterprise[business_scope]' : {
+                required : true,
+                rangelength : [2,200]
+            },
+            'enterprise[label]' : {
+                required : true,
+                alnum : true,
+                remote : { // 异步验证
+         			 url: "/enterprise/index/labelexists",
+         			 type: "post",             
+         			 dataType: "json", 
+         			 data: {
+         				label : function(){
+         					return $("#enterprise_label").val();
+             			 }
+             		  }       
+         		   }
+            }
+        },
+        messages: {  
+        	'enterprise[label]' : {
+		    	remote : '该企业标识已经存在'
+		    },
+			'enterprise[email]' : {
+		    	remote : '该邮箱已经存在'
+		    },
+		    'enterprise[mobile]' : {
+		    	remote : '该手机号码已经存在'
+		    }
+		},
+        submitHandler : function() {
+            var param = $('#enterprise_form') .serialize();
+            if($("#icon").val().length < 1){
+				$("#icon_label").after('<label id="icon-error" class="error" for="icon">不可为空</label>');
+				return false;
+                }
+            $.post(
+                '/enterprise/index/add',
+                param,
+                function(result) {
+                    if (result.status == 200) {
+                        $('#message_dialog .message_text').text('保存成功！');
+                        $("#message_dialog").dialog("open");
+                        $('#close_message').unbind('click');
+                        $('#close_message').click(function() {
+                            location.href = "/enterprise/index/index";
+                        });
+                    } else if (result.status == 500) {
+                        $('#message_dialog .message_text').text('保存失败！');
+                        $("#message_dialog").dialog("open");
+                    } else if (result.msg == 505) {
+                        $('#message_dialog .message_text').text('亲，你没有这个操作的权限！');
+                        $("#message_dialog").dialog("open");
+                    } else  {
+                        $('#message_dialog .message_text').text(result.msg);
+                        $("#message_dialog").dialog("open");
+                    }
+                }, 'json');
+            return false;
+        }
+    });
+    $('#edit_btn').click(function() {
+        if (!$('#enterprise_form').valid())
+            return false;
+        $('#enterprise_form').submit();
+    });
+    $('#cancel_btn').click(function(){
+        history.go(-1);
+        });
+
+});
+</script>

@@ -1,0 +1,93 @@
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+    <div class="product_detail_search clearfix">
+        <div class="console_search_wrap fr mr10" style="margin-top:8px">
+            <a class="f16 clF tc search_btn ml16" onfocus="blur();" href="/enterprise/apipermission/add" id="add">添加权限</a>
+        </div>
+    </div>
+    <div class="product_detail_display">
+        <div class="product_table mt24 f14">
+            <table class="table_s tc tc_left auto_table_len" width="100%" border="0">
+                <thead>
+                    <tr>
+                        <td width="60px"><?php echo $this->t('api_auth_id'); ?></td>
+                        <td><?php echo $this->t('api_auth_name'); ?></td>
+                        <td><?php echo $this->t('api_auth_uri'); ?></td>
+                        <td width="150px" style="text-align: center;"><?php echo $this->t('api_auth_operate'); ?></td>
+                    </tr>
+                </thead>
+                <tbody>
+        <?php if(!empty($this->results['rows'])) :?>
+                 <?php foreach ($this->results['rows'] as $row) :?>
+                    <tr <?php if($row['status'] == 'disable'):?>class="stop" <?php endif;?>>
+                        <td><?php echo $row['id'];?></td>
+                        <td><?php echo $row['name'];?></td>
+                        <td align="left"><?php echo $row['uri'];?></td>
+                        <td class="cl0b9600" style="text-align: center;">
+                            <a href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'edit', 'id'=>$row['id'], 'title' => urlencode($row['name'])));?>" title="edit" class="manager_detail cl0b9600 "><?php echo $this->t('api_auth_edit');?></a>&nbsp;|
+                           <?php if($row['status'] == 'disable'): ?>
+                                <a href="#" data-href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'update', 'id'=>$row['id'], 'status' => 'enable'));?>" title="enable" class="check_detail cl0b9600 update_status"><?php echo $this->t('api_auth_enable');?></a>&nbsp;|
+                            <?php else: ?>
+                                <a href="#" data-href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'update', 'id'=>$row['id'], 'status' => 'disable'));?>" title="disable" class="check_detail cl0b9600 update_status"><?php echo $this->t('api_auth_disable');?></a>&nbsp;|
+                            <?php endif; ?>
+                           <a href="#" data-href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'update', 'id'=>$row['id'], 'status' => 'deleted'));?>" title="deleted" class="manager_detail cl0b9600 update_status"><?php echo $this->t('api_auth_deleted');?></a>
+                        </td>
+                    </tr>
+                <?php endforeach;?>
+        <?php else:?>
+                     <tr><td colspan="4">暂无记录</td></tr>
+       <?php endif;?>
+                </tbody>
+            </table>
+        </div>
+        <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+    </div>
+</div>
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script>
+$(function(){
+    var url = '';
+    $('.update_status').click(function(){
+        var msg ={
+            'enable':'<?php echo $this->t('api_auth_enable_notice');?>',
+            'disable':'<?php echo $this->t('api_auth_disable_notice');?>',
+            'deleted':'<?php echo $this->t('api_auth_deleted_notice');?>'
+        };
+        var notice = eval('msg.'+$(this).attr('title'));
+        url = $(this).attr('data-href');
+        $('#tips_msg').text(notice);
+        $( "#confirm_dialog" ).dialog("open");
+        return false;
+    });
+		
+		$( "#confirm_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: "explode",
+                duration: 500
+            },
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+        			window.location.href = url;
+                }
+            }
+        });
+		
+		$('#add').click(function () {
+			location.href = '/enterprise/apipermission/add';
+		});
+});
+</script>

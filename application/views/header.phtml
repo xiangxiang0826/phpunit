@@ -1,0 +1,18 @@
+<div class="vss_logo">
+            <a href="#"><img alt="企业云平台" src="<?php echo $this->static;?>/images/oss_logo.png"></a>
+</div>
+        <div class="top-nav f14">
+            <a class="trackable" href="/system/user/account"><?php echo $this->user_info['real_name'] ? $this->user_info['real_name'] : $this->user_info['user_name']?></a>
+            <!--  <a target="_blank" href="#"><?php echo $this->translate('ez'); ?></a>
+            <a target="_blank" href="/default/index/help"><?php echo $this->translate('help'); ?></a>-->
+            <a href="/login/index/logout"><?php echo $this->translate('logout'); ?></a>
+        </div>
+        <div class="menu-nav">
+        	<?php if($this->modules):?>
+            <ul id="nav">
+            	<?php foreach($this->modules as $module): //?>
+                  	<li <?php if($this->current_module['id'] == $module['id']):?> class="active" <?php endif;?> module_id="<?php echo $module['id']?>"><a href="<?php echo $module['default_controller']?>"><strong><span><?php echo $module['name']?></span></strong></a></li>
+                <?php endforeach;?>
+            </ul>
+            <?php endif;?>
+        </div>

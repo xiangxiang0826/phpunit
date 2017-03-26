@@ -1,0 +1,151 @@
+
+<!--页面位置-->
+<h3 class="location f14">
+	<?php echo $this->menu(); ?>
+</h3>
+<form action="" method="get" id="search_form">
+	<div class="product_detail mt22">
+		<div class="product_detail_search clearfix">
+			<div class="fl system_drop clearfix">
+				<select id="cang_assort" class="cpy_style cang_assort"
+					name="search[enterprise_id]" style="width: 185px;">
+					<option value="">选择厂商</option>
+					<?php foreach ($this->enterprises as $k=>$v) {?>
+					<option value="<?php echo $k;?>"
+						<?php if($k == $this->search['enterprise_id']):?>
+						selected="selected" <?php endif;?>>
+						<?php echo mb_strimwidth($v,0,26,'...');?>
+					</option>
+					<?php }?>
+				</select>
+			</div>
+			<div class="fl system_drop clearfix">
+				<select id="produt_assort" class="cpy_style product_assort"
+					name="search[category]" style="width: 120px;">
+					<option value="">选择品类</option>
+					<?php foreach ($this->category as $v) {?>
+					<option value="<?php echo $v['id'];?>"
+						<?php if($v['id'] == $this->search['category']):?>
+						selected="selected" <?php endif;?>>
+						<?php echo $v['levelstr'] . mb_strimwidth($v['name'],0,14,'...');?>
+					</option>
+					<?php }?>
+				</select>
+			</div>
+			<div class="fl system_drop clearfix">
+				<select class="cpy_style cang_assort" name="search[feedback_type]"
+					style="width: 120px;">
+					<option value="">问题分类</option>
+					<?php foreach ($this->feedbackType as $v) {?>
+					<option value="<?php echo $v['id'];?>"
+						<?php if($v['id'] == $this->search['feedback_type']):?>
+						selected="selected" <?php endif;?>>
+						<?php echo $v['levelstr'] . $v['name'];?>
+					</option>
+					<?php }?>
+				</select>
+			</div>
+			<div class="fl system_drop clearfix">
+				<select class="cpy_style product_assort" name="search[status]"
+					style="width: 120px;">
+					<option value="">问题状态</option>
+					<?php foreach ($this->status as $key=>$name) {?>
+					<option value="<?php echo $key;?>"
+						<?php if(!empty($this->search['status']) && $key == $this->search['status']):?>
+						selected="selected" <?php endif;?>>
+						<?php echo $this->t($name);?>
+					</option>
+					<?php }?>
+				</select>
+			</div>
+
+			<div class="fl f14 chart_search clearfix">
+				<input type="text" name="search[start]" class="time_pick"
+					id="timer_from" readonly /> <label> - </label> <input type="text"
+					name="search[end]" class="time_pick" id="timer_to" readonly />
+			</div>
+
+			<div class="fl clearfix" style="display: block;">
+				<div class="fl" style="margin-right: 20px;">
+					<input type="text" class="cpy_name w150" name="search[feedback_id]"
+						value="<?php if(!empty($this->search['feedback_id'])){ echo $this->search['feedback_id'];}?>"
+						placeholder="请输入问题ID">
+				</div>
+				<div class="fl" style="margin-right: 20px;">
+					<input type="text" class="cpy_name w150" name="search[mobile]"
+						value="<?php if(!empty($this->search['mobile'])){ echo $this->search['mobile'];}?>"
+						placeholder="请输入注册手机">
+				</div>
+				<div class="fl" style="margin-right: 20px;">
+					<input type="text" class="cpy_name w150" name="search[email]"
+						value="<?php if(!empty($this->search['email'])){ echo $this->search['email'];}?>"
+						placeholder="请输入注册邮箱">
+				</div>
+			</div>
+
+			<div class="console_search_wrap fr">
+				<a class="search_icon_btn f16 clF tc ml10" onFocus="blur();"
+					id="search_submit" href="javascript:;"><i class="find_icon"></i>查
+					询</a>
+			</div>
+		</div>
+	</div>
+</form>
+<div class="product_detail_display" style="margin-bottom: 20px;">
+	<div class="product_table mt24 f14">
+		<table class="table_s tc tc_left" width="100%" border="0">
+			<thead>
+				<tr>
+					<td width="60px">问题ID</td>
+					<td>产品</td>
+					<td>问题内容</td>
+					<td width="60px">反馈时间</td>
+					<td width="60px">问题分类</td>
+					<td width="60px">状态</td>
+					<td style="text-align: center; width: 60px;">操作</td>
+				</tr>
+			</thead>
+			<tbody>
+				<?php if($this->paginator->count()):?>
+				<?php foreach ($this->paginator as $row) :?>
+				<tr>
+					<td><?php echo $row['id'];?></td>
+					<td><?php echo $row['p_name'] ? $row['p_name'] : '-'; ?></td>
+					<td title="<?php echo $row['content']?>"><?php echo mb_strimwidth($this->escape($row['content']), 0, 80, '...');?></td>
+					<td><?php echo $row['ctime'];?></td>
+					<td><?php echo $row['t_name'] ? $row['t_name'] : '-';?></td>
+					<td
+						style="color: &lt;?php if($ row [ 'status' ]   ==   Model_Feedback :: STATUS_NEW){  echo 'red';"><?php if($row['status']) { echo $this->t($row['status']);}?></td>
+					<td class="cl0b9600" id="product_ctrl" style="text-align: center;">
+						<a
+						href="<?php echo $this->url( array('action'=>'detail', 'id' => $row['id']));?>">查看</a>
+					</td>
+				</tr>
+				<?php endforeach;?>
+				<?php else:?>
+				<tr>
+					<td colspan="7" style="text-align: center;">暂无记录</td>
+				</tr>
+				<?php endif;?>
+			</tbody>
+		</table>
+	</div>
+	<?php echo $this->paginationControl($this->paginator, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+</div>
+
+<script type="text/javascript">
+   $(document).ready(function(){
+	   <?php if($this->search['start']):?>
+	   var time_from = $("#timer_from").datepicker( 'setDate' , "<?php echo $this->search['start'];?>" );
+	   time_from.onClose = function(selectedDate){
+		   $( "#timer_to" ).datepicker( "option", "minDate", selectedDate );
+	    }
+	   <?php endif;?>
+	   <?php if($this->search['end']):?>
+	   var timer_to = $("#timer_to").datepicker( 'setDate' , "<?php echo $this->search['end'];?>" );
+	   timer_to.onClose = function(selectedDate){
+		   $( "#timer_from" ).datepicker( "option", "maxDate", selectedDate );
+	    }
+	   <?php endif;?>
+});
+  </script>

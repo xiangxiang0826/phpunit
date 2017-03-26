@@ -1,0 +1,237 @@
+<script src="<?php echo $this->static;?>/js//libs/highcharts/highcharts.js"></script>
+<script src="<?php echo $this->static;?>/js/libs/highcharts/hightheme.js"></script>
+<!--页面位置-->
+            <h3 class="location f14"><?php echo $this->menu(); ?></h3>
+            <div class="product_detail mt22">
+            	<form action="/product/overview/index" id="search_form">
+				<div class="product_detail_search clearfix">
+                    <div class="chart_index fl f14">
+                        <span period="current_month" <?php if($this->period == 'current_month'):?>class="on"<?php endif;?>>本月</span>
+                        <span period="last_month" <?php if($this->period == 'last_month'):?>class="on"<?php endif;?>>上月</span>
+                        <span period="seven_days" <?php if($this->period == 'seven_days'):?>class="on"<?php endif;?>>近7天</span>
+                        <span class="last <?php if($this->period == 'thirty_days'):?>on<?php endif;?>" period="thirty_days">近30天</span>
+                    </div>
+                    <div class="chart_search f14 fr mr50">
+                        <input type="text" name="start_date" class="time_pick" id="timer_from" readonly="readonly" value="<?php echo isset($this->start_date) ? $this->start_date : ''?>"/> 
+                         <label> - </label> 
+                        <input type="text" name="end_date" class="time_pick" id="timer_to"  readonly="readonly" value="<?php echo isset($this->end_date) ? $this->end_date : ''?>"/>
+                        <a type="submit" onFocus="blur();" id="search" class="f16 clF tc ml10 search_icon_btn" href="javascript:void(0)"><i class="find_icon"></i>查 询</a>
+                    </div>
+                </div></form>
+				<div class="product_table mt24 f14">
+				<div id="high_charts" class="vertical_nav"></div>
+				<div class="clearfix">
+				<div class="product_detail_display_tab_wrap fl clearfix wp49">
+					<div class="fl product_detail_display_tab">
+					<span id="publish" class="last on">产品排行榜</span>
+					</div>
+				</div>
+				<div class="product_detail_display_tab_wrap fr clearfix wp49">  
+					<div class="fl product_detail_display_tab">
+					<span id="publish" class="last on">厂商排行榜</span>
+					</div>
+				</div>
+				</div>
+					<table class="tc mt10 fl tc_left" width="49%" border="0" align="left">
+                        <thead>
+                        	<tr>
+                                <td>排行</td>
+                                <td>产品</td>
+                                <td style="text-align: right;">新增设备数</td>
+                                <td style="text-align: right;">环比增长</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        	<tr class="fstrong"><td></td><td>时段数据和</td><td style="text-align: right;"><?php echo $this->statistics_total?></td><td style="text-align: right;">
+                        	<?php if(($this->statistics_total != 0) && ($this->yny_total != 0)):?>
+                                	<font color="<?php echo $this->statistics_total - $this->yny_total > 0 ? 'green' : ( $this->statistics_total - $this->yny_total ==0  ? 'black' : 'red')?>"><?php echo number_format(($this->statistics_total - $this->yny_total)/$this->yny_total*100,2)."%" ?></font>
+                                	<?php else:?>
+                                	-
+                                <?php endif;?>
+                        	</td></tr>
+                            <?php
+                            $rank = 1;
+                            foreach($this->product_rank_list as $product_id=>$data):?>
+                            <tr>
+                                <td><?php echo str_pad($rank,3,'0',STR_PAD_LEFT)?></td>
+                                <td title="<?php echo isset($this->product_map[$product_id]) ? $this->product_map[$product_id]['name'] : '';?>"><?php echo isset($this->product_map[$product_id]) ? mb_strimwidth($this->product_map[$product_id]['name'],0,30,'...') : ''?></td>
+                                
+                                <td style="text-align: right;"><?php echo $data?></td>
+                                <td style="text-align: right;">
+                                <?php if(isset($this->yny_product[$product_id]) && ($this->yny_product[$product_id] != 0) && ($data != 0)):?>
+                                	<font color="<?php echo $data - $this->yny_product[$product_id] > 0 ? 'green' : ( $data - $this->yny_product[$product_id] ==0  ? 'black' : 'red')?>"><?php echo number_format(($data - $this->yny_product[$product_id])/$this->yny_product[$product_id]*100,2)."%" ?></font>
+                                	<?php else:?>
+                                	-
+                                <?php endif;?>
+                                </td>
+                            </tr>
+                            	<?php 
+                            	$rank++;
+                            	endforeach;?>
+                        </tbody>
+                    </table>
+                    <table class="tc mt10 fr tc_left" width="49%" border="0">
+                        <thead>
+                        	<tr>
+                                <td>排行</td>
+                                <td>厂商</td>
+                                <td style="text-align: right;">新增设备数</td>
+                                <td style="text-align: right;">环比增长</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        	<tr class="fstrong"><td></td><td>时段数据和</td><td style="text-align: right;"><?php echo $this->statistics_total?></td><td style="text-align: right;">
+                        	<?php if(($this->statistics_total != 0) && ($this->yny_total_et != 0)):?>
+                                	<font color="<?php echo $this->statistics_total - $this->yny_total_et > 0 ? 'green' : ( $this->statistics_total - $this->yny_total_et ==0  ? 'black' : 'red')?>"><?php echo number_format(($this->statistics_total - $this->yny_total_et)/$this->yny_total_et*100,2)."%" ?></font>
+                                	<?php else:?>
+                                	-
+                                <?php endif;?>
+                        	</td></tr>
+                                <?php 
+                                $rank = 1;
+                                foreach($this->enterprise_rank_list as $enterprise_id => $data):?>
+                            <tr>
+                                <td><?php echo str_pad($rank,3,'0',STR_PAD_LEFT)?></td>
+                                <td title="<?php echo $this->enterprise_map[$enterprise_id]['company_name'];?>"><?php echo mb_strimwidth($this->enterprise_map[$enterprise_id]['company_name'],0,30,'...');?></td>
+                                
+                                <td style="text-align: right;"><?php echo $data?></td>
+                                <td style="text-align: right;">
+                                <?php if(($this->yny_enterprise[$enterprise_id] != 0) && ($data != 0)):?>
+                                	<font color="<?php echo $data - $this->yny_enterprise[$enterprise_id] > 0 ? 'green' : ( $data - $this->yny_enterprise[$enterprise_id] ==0  ? 'black' : 'red')?>"><?php echo number_format(($data - $this->yny_enterprise[$enterprise_id])/$this->yny_enterprise[$enterprise_id]*100,2)."%" ?></font>
+                                	<?php else:?>
+                                	-
+                                <?php endif;?></td>
+                            </tr>
+                             <?php
+                            	$rank++;
+                            	endforeach;?>
+                        </tbody>
+                    </table>
+                    <div class="mt10"></div>
+                </div>
+</div>
+<div id="tips_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script>
+    $(function(){
+    	$( "#tips_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "确定": function() {
+                	$( this ).dialog( "close" );
+        		}
+            }
+        });
+        //datepicker
+        (function(){
+            var config={
+                changeMonth: true,
+                changeYear: true,
+                rangeSelect: true,
+                yearRange: '-10:+10',
+                currentText: "Now"
+            }
+            $("#timer_from").datepicker(config);
+            $("#timer_to").datepicker(config);
+        })();
+
+        Highcharts.setOptions({
+            chart: {
+                backgroundColor: {
+                    linearGradient: [0, 0, 500, 500],
+                    stops: [
+                        [0, 'rgb(255, 255, 255)'],
+                        [1, 'rgb(255, 255, 255)']
+                        ]
+                },
+                borderWidth: 1,
+                borderColor:'#adadad',
+                plotBackgroundColor: 'rgba(255, 255, 255, .9)',
+                plotShadow: false,
+                plotBorderWidth: 1,
+            }
+        });
+        
+        var charts = new Highcharts.Chart({
+        	chart: {
+                renderTo: 'high_charts'
+            },
+            title: {
+                text: '新增设备数',
+                x: -20 //center
+            },
+            subtitle: {
+                x: -20
+            },
+            xAxis: {
+                categories: <?php echo preg_replace('/2014\-/', '', $this->charts_date);?>,
+                tickInterval: <?php echo $this->date_step?>,
+                tickmarkPlacement:'on'
+            },
+            yAxis: {
+                title: {
+                    text: '数量',
+                    x: 10, //center
+                    style:{
+                        writingMode:'lr-tb'
+                    },
+                    rotation : 0,
+				    offset : 40 //标题离图表左边的距离
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }],
+                minorGridLineWidth : 0
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [
+                 {name: '新增设备数',data: <?php echo $this->statistics_total_json?>}
+                ]
+        });
+        $('span[period]').click(function () {
+			var period = $(this).attr('period');
+			location.href = '/product/overview/index<?php echo $this->base_url?>&period='+period;
+		});
+        $('#search').click(function () {
+        	var start_date = new Date($('#timer_from').val());
+        	var end_date = new Date($('#timer_to').val());
+        	var today = new Date();
+        	if(end_date > today || start_date > today) { // 开始时间不能大于结束时间
+				$('#tips_msg').text('选定时间不能超过今天！');
+    			$( "#tips_dialog" ).dialog( "open" );
+				return false;
+			}
+        	if(start_date > end_date) { // 开始时间不能大于结束时间
+				$('#tips_msg').text('开始时间不能大于结束时间！');
+    			$( "#tips_dialog" ).dialog( "open" );
+				return false;
+			}
+        	var diff_days = countTimeLength('d',$('#timer_from').val(),$('#timer_to').val());
+        	if(diff_days > 60) {
+        		$('#tips_msg').text('抱歉，时间跨度不能超过60天！');
+    			$( "#tips_dialog" ).dialog( "open" );
+				return false;
+            }
+            $('#search_form').submit();
+        });
+   })
+</script>

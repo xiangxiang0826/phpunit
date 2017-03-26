@@ -1,0 +1,191 @@
+<!--页面位置-->
+<h3 class="location f14">
+	<h3 class="location f14"> <?php echo $this->menu(); ?>	</h3>
+</h3>
+<form action="" method="get" id="search_form">
+	<div class="product_detail_search clearfix mt22 search_div">
+		<div class="fl system_drop clearfix">
+			<select id="cang_assort" class="cpy_style cang_assort"	name="search[category_id]" style="width: 120px;">
+				<option value="0" <?php if(0 == $this->search['category_id']):?> selected="selected" <?php endif;?>> <?php echo  "└全部分类";?> </option>
+				<?php foreach ($this->search['tree'] as $v) :?>
+				<option value="<?php echo $v['id'];?>"	<?php if($v['id'] == $this->search['category_id']):?>selected="selected" <?php endif;?>>
+					<?php echo mb_strimwidth($v['levelstr'] . $v['name'],0,20,'...');?>
+				</option>
+				<?php endforeach;?>
+			</select>
+		</div>
+
+		<div class="fl clearfix">
+			<input type="text w150" class="cpy_name w150" id="cpy_name"	name="search[title]" value="<?php if(!empty($this->search['title'])){ echo $this->search['title'];}?>" placeholder="请输入新闻标题">
+		</div>
+
+		<div class="console_search_wrap fr">
+			<a class="search_icon_btn f16 clF tc ml10" onFocus="blur();" id="search_submit" href="javascript:;"><i class="find_icon"></i>查	询</a>
+		</div>
+	</div>
+</form>
+
+<div class="product_detail_display">
+	<div class="product_detail_display_tab_wrap clearfix">
+		<a id="add_version" class="f16 clF tc search_btn fr  mr26 nmt10" href="<?php echo $this->url(array('action' =>'add'));?>">添加新闻</a>
+	</div>
+	<div class="product_table mt24 f14">
+		<table class="table_s tc tc_left" width="100%" border="0">
+			<thead>
+				<tr>
+					<td width="60px"><?php echo $this->t('news_id'); ?></td>
+					<td><?php echo $this->t('news_cate'); ?></td>
+					<td><?php echo $this->t('news_title'); ?></td>
+					<td width="60px"><?php echo $this->t('news_send_time'); ?></td>
+					<td width="60px"><?php echo $this->t('news_author'); ?></td>
+					<td width="60px"><?php echo $this->t('news_banner'); ?></td>
+					<td style="text-align: center; width: 60px;"><?php echo $this->t('control'); ?></td>
+				</tr>
+			</thead>
+			<tbody>
+				<?php if(!empty($this->results['list'])) :?>
+				<?php foreach ($this->results['list'] as $row):?>
+				<tr>
+					<td><?php echo $row['id'];?></td>
+					<td title="<?php echo $row['name']?>"><?php if($row['name']) { echo mb_strimwidth(($row['name']),0,60,'...');}?></td>
+					<td title="<?php echo $row['title']?>"><?php echo mb_strimwidth(($row['title']),0,80,'...');?></td>
+					<td><?php echo $row['ctime'];?></td>
+					<td><?php echo $row['author'];?></td>
+					<td><?php echo $row['banner_info'];?> <input id="list_img_<?php echo $row['id'];?>" type="hidden"	value="<?php echo empty($row['list_img'])?'0':'1';?>"></td>
+					<td class="cl0b9600" style="text-align: center;">
+						<?php if($row['is_banner'] == '0'):?>
+							<a href="javascript:;" class="check_detail cl0b9600 banner"	id="banner_<?php echo $row['id'].'_'.$row['is_banner'];?>">添加Banner</a>
+							&nbsp;&nbsp;|&nbsp;&nbsp;
+						<?php else:?>
+							<a href="javascript:;"	class="check_detail cl0b9600 banner"	id="banner_<?php echo $row['id'].'_'.$row['is_banner'];?>">取消Banner</a>
+							&nbsp;&nbsp;|&nbsp;&nbsp;
+						<?php endif;?> 
+						<a	href="<?php echo $this->url(array('action' => 'edit' , 'id' => $row['id']));?>"	class="check_detail cl0b9600">编辑</a>
+						&nbsp;&nbsp;|&nbsp;&nbsp; 
+						<a	href="javascript:;" id="id_<?php echo $row['id'];?>"	class="del_msg cl0b9600">删除</a>
+					</td>
+				</tr>
+				<?php endforeach;?>
+				<?php else:?>
+				<tr>
+					<td colspan="10">暂无记录</td>
+				</tr>
+				<?php endif;?>
+			</tbody>
+		</table>
+	</div>
+	<?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+	<div id="confirm_dialog" style="display: none;" title="系统提醒">
+		<p class="message_text">您确认删除此条记录吗？</p>
+	</div>
+	<div id="banner_dialog" style="display: none;" title="系统提醒">
+		<p class="message_text">您确认把此新闻移除banner吗？</p>
+	</div>
+	<div id="tips_dialog" style="display: none;" title="系统提醒">
+		<p class="message_text" id="tips_msg"></p>
+	</div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        
+        var msg_id = 0;
+        $( "#confirm_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+                    if(msg_id) {
+                        $.post('/website/news/del/', {id:msg_id}, function() {
+                            location.reload();
+                        },'json');
+                    }
+                }
+            }
+        });
+
+		var banner = '0';
+        $( "#banner_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+                    if(msg_id) {
+                        $.post('/website/news/banner/', {id:msg_id,banner:banner}, function() {
+                            location.reload();
+                        },'json');
+                    }
+                }
+            }
+        });
+
+        $( "#tips_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "确定": function() {
+                	$( this ).dialog( "close" );
+        		}
+            }
+        });
+
+        $('.del_msg').click(function(e){
+            var target = $(e.target);
+            var id = target.attr('id').split('_')[1];
+            msg_id = id;
+            $( "#confirm_dialog" ).dialog('open');
+        });
+
+        $('.banner').click(function(e){
+            var target = $(e.target);
+            var id = target.attr('id').split('_')[1];
+            var flag = $("#list_img_"+id).val();
+            if(flag == '0'){
+            	$('#tips_msg').text('设置为Banner需要上传列表图');
+    			$( "#tips_dialog" ).dialog( "open" );
+    			return false;
+            }
+            banner = target.attr('id').split('_')[2];
+            if(banner == '0')
+                $('#banner_dialog [class="message_text"]').text('您确认把此新闻加入banner吗？')
+            msg_id = id;
+            $( "#banner_dialog" ).dialog('open');
+        });
+    });
+</script>

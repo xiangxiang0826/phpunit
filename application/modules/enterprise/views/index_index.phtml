@@ -1,0 +1,117 @@
+
+<!--页面位置-->
+<h3 class="location f14">
+    <h3 class="location f14"><?php echo $this->menu(); ?></h3>
+</h3>
+<div class="product_detail mt22">
+<form method="get" action="" id="search_form">
+          <div class="product_detail_search clearfix">
+                           <div class="fl system_drop clearfix ml10">
+                               <select id="cang_assort" class="cpy_style cang_assort" name="search[status]" style="width: 120px;">
+                                   <option value="">厂商状态</option>      
+                                   <option value="locked" <?php if( !empty($this->search['status']) && $this->search['status'] =='locked'): ?>selected="selected" <?php endif;?>><?php echo $this->t('locked');?></option>
+                                   <option value="enable" <?php if( !empty($this->search['status']) && $this->search['status'] =='enable'): ?>selected="selected" <?php endif;?>><?php echo $this->t('enable');?></option>
+                               </select>
+                           </div>
+                           
+                           <div class="fl system_drop clearfix">
+                                   <input type="text" class="cpy_name w150" id="company_name"  name ="search[company_name]" value="<?php echo isset($this->search['company_name']) ? $this->search['company_name'] : ''?>" placeholder="请输入公司名称">
+                           </div>
+                 <div class="console_search_wrap fr mr10"><a class="search_icon_btn f16 clF tc" onFocus="blur();" href="javascript:;" id="search_submit"><i class="find_icon"></i>查 询</a></div>
+        </div>
+ </form>
+    <div class="product_detail_display">
+		<div class="product_detail_display_tab_wrap clearfix">
+				<div class="fl product_detail_display_tab" id="change_tab">
+				<span class="on" id="publish">已处理</span><span class="last" id="pending">待处理</span>
+				</div>
+            <a id="add_version" class="f16 clF tc search_btn fr  mr10 nmt10" href="<?php echo $this->url(array('action' =>'add'));?>">添加厂商</a>
+		 </div>
+        <div class="product_table mt24 f14">
+            <table class="table_s tc tc_left auto_table_len" width="100%" border="0">
+                <thead>
+                    <tr>
+                        <td width="60px">ID</td>
+                        <td width="60px"><?php echo $this->t('user_type'); ?></td>
+                        <td><?php echo $this->t('company_name'); ?></td>
+                        <td><?php echo $this->t('business_scope'); ?></td>
+                        <td width="120px"><?php echo $this->t('reg_time'); ?></td>
+                        <td width="60px"><?php echo $this->t('has_app'); ?></td>
+                        <td style="text-align: right;width: 60px;"><?php echo $this->t('product_number'); ?></td>
+                        <td width="60px"><?php echo $this->t('company_status'); ?></td>
+                        <td width="60px"><?php echo $this->t('inform_status'); ?></td>
+                        <td style="text-align: center;width: 120px"><?php echo $this->t('control'); ?></td>
+                    </tr>
+                </thead>
+                <tbody>
+<?php if(!empty($this->results['rows'])) :?>
+                 <?php foreach ($this->results['rows'] as $row) {?>
+                    <tr <?php if($row['status'] == 'locked'):?>class="stop" <?php endif;?>>
+                        <td><?php echo $row['id'];?></td>
+                        <td><?php if($row['user_type']) { echo $this->t($row['user_type']);}?></td>
+                        <td title = "<?php echo $row['company_name']?>"><?php echo $this->escape($row['company_name'])?></td>
+                        <td title = "<?php echo $row['business_scope']?>"><?php echo $this->escape($row['business_scope'])?></td>
+                        <td><?php echo $this->cutstring($row['reg_time'], 10, '');?></td>
+                        <td>
+                            <?php echo $this->t($row['is_ezapp']);?>
+                        </td>
+                        <td style="text-align: right;"><?php echo $row['product_num'];?></td>
+                        <td id="status_<?php echo $row['id'];?>"><?php if(!empty($row['status'])) { echo $this->t($row['status']);}?></td>
+                        <td id="inform_status_<?php echo $row['id'];?>">
+                            <?php if($row['inform_status'] == $row['inform_result']): ?>
+                                <?php if($row['inform_status'] == 0): ?>
+                            <span>-</span>
+                                <?php else: ?>
+                            <span>√</span>
+                                <?php endif; ?>
+                            <?php else: ?>
+                            <font color="red">!</font>
+                            <?php endif; ?>
+                        </td>
+                        <td class="cl0b9600" style="text-align: center;">
+                           <a href="<?php echo $this->url(array('controller'=>'index', 'action'=>'detail', 'id'=>$row['id']));?>" class="check_detail cl0b9600"><?php echo $this->t('view');?></a>&nbsp;|
+                           <a href="<?php echo $row['status'] == 'locked' ? 'javascript:void(0);' : '/analyze/index/newuser?enterprise='.$row['id']; ?>" class="check_detail cl0b9600" <?php if( $row['status'] =='locked'): ?>style="color:#c8c8c8" <?php endif;?>><?php echo $this->t('report');?></a>&nbsp;|
+                           <a href="javascript:;" id="id_<?php echo $row['id'];?>"  class="manager_detail cl0b9600" id="manager"><?php echo $this->t('manager');?></a>
+                        </td>
+                    </tr>
+                <?php }?>
+        <?php else:?>
+                     <tr><td colspan="10" style="text-align: center;">暂无记录</td></tr>
+       <?php endif;?>
+                </tbody>
+            </table>
+        </div>
+        <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+    </div>
+</div>
+<div id="manager_div" style="display:none;" title="厂商管理">
+  <form class="cmxform"  action="<?php echo $this->url(array('controller'=>'index', 'action' =>'manager'));?>" method="post" id="manage_form">
+    <table class="detail_tabel form_table f14">
+        <tr>
+            <td>当前状态：</td>
+            <td id="current_status"></td>
+        </tr>
+        
+        <tr class="h60">
+            <td>处理措施：</td>
+            <td>
+                 <input  type="radio" name="pass" checked="checked"  value="0"/><label >启用</label>
+                <input  type="radio" name="pass" class="ml56" value="1"/><label>冻结</label>
+            </td>
+        </tr>
+        <tr class="h170">
+            <td>管理备注：</td>
+            <td><textarea class="text_cls" name="remark" cols="40" rows="6" id="remark"></textarea></td>
+        </tr>
+        <tr>
+            <td>结果通知：</td>
+            <td>
+                <input  type="checkbox" checked="checked"  name="message[]"  value="msg"/><label for="message">短信</label>
+                <input  type="checkbox" checked="checked"  name="message[]" class="ml56"  value="email"/><label for="e-mail">邮箱</label>
+            </td>
+            <input type="hidden" name="enterprise_id" id="enterprise_id">
+        </tr>
+    </table>
+  </form>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/enterprise.js"></script>

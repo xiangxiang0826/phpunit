@@ -1,0 +1,122 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('查看用户详情', '/member/index/index'); ?></h3>
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th><?php echo $this->t('base_info');?></th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>用户名：</td>
+        <td><?php echo $this->member_info['name']?></td>
+    </tr> 
+    <tr>
+        <td>邮箱：</td>
+        <td><?php echo $this->member_info['email']?></td>
+    </tr>  
+    <tr>
+        <td>手机号：</td>
+        <td><?php echo $this->member_info['phone']?></td></tr>    
+    <tr>
+        <td>注册时间：</td>
+        <td><?php echo $this->member_info['reg_time']?></td>
+    </tr>
+    <tr>
+        <td>注册来源：</td>
+        <td><?php echo $this->member_info['platform']?></td>
+    </tr>
+    <tr>
+        <td>最近登录：</td>
+        <td><?php echo $this->member_info['last_login_time']?></td>
+    </tr>
+    <tr>
+        <td>所属地域：</td>
+        <td><label id="ip"><?php echo $this->member_info['last_login_ip'] ? long2ip($this->member_info['last_login_ip']) : ''?></label></td>
+    </tr>
+    <tr>
+        <th>产品绑定情况</th>
+        <th></th>
+    </tr>
+<?php if($this->member_info['bind_devices']):?> 
+<?php foreach($this->member_info['bind_devices'] as $key => $device):
+	$key++;
+?>
+    <tr>
+        <td><?php echo $device['name'] ? $device['name'] : "设备{$key}"?>：</td>
+        <td><?php echo $this->product_map[$device['product_id']]['name'];?>(<?php echo $device['device_id'];?>)</td>
+    </tr>
+<?php endforeach;?>
+<?php else: ?>
+    <tr>
+        <td></td>
+        <td>暂无</td>
+    </tr>
+<?php endif;?>
+    <tr>
+        <th>账号管理</th>
+        <th></th>
+    </tr> 
+    <tr>
+        <td>账号状态：</td>
+        <td><input type="radio" name="status" value="enable" <?php if($this->member_info['status']==$this->status_enable):?>checked="checked"<?php endif;?>> 正常 <input <?php if($this->member_info['status']!=$this->status_enable):?>checked="checked"<?php endif;?> type="radio" name="status" value="locked">冻结</td>
+    </tr>
+</table>
+<input type="hidden" value="<?php echo $this->member_info['id']?>" name="uid" id="uid">
+
+<div class="mt36 mb24 tr">
+    <a  onfocus="blur();" href="javascript:void(0)" id="back" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+    <a  onfocus="blur();" href="javascript:void(0)" id="save" class="f16 clF tc search_btn" >提 交</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">账户更新成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)">确 定</a>
+</div>
+<script>
+$(function () {
+	$( "#message_dialog" ).dialog({
+        autoOpen: false,
+        width: 540,
+        height: 240,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        dialogClass: "my_message_dialog",
+        modal: true
+    });
+	$("#close_message").on("click",function() {
+        location.href = '/member/index/index';
+    });
+	// 后退
+	$('#back').click(function () {
+		location.href = '<?php echo $_SERVER['HTTP_REFERER'];?>';
+	});
+
+	$('#save').click(function () {
+		$.post('/member/index/setstatus',{status:$('input[name="status"]:checked').val(),uid:$('#uid').val()},function (result) {
+			if(result.status == 200) {
+				$('.message_text').text('保存成功！');
+				return $( "#message_dialog" ).dialog( "open" );
+			}
+			$('.message_text').text('服务器忙，请重试！');
+			return $( "#message_dialog" ).dialog( "open" );
+		},'json');
+	});
+
+	var ip = $('#ip').text();
+	if(ip) {
+		loadScript('http://int.dpool.sina.com.cn/iplookup/iplookup.php?format=js&ip=&ip='+ip,function () {
+			if(typeof(remote_ip_info) == 'undefined' || !remote_ip_info) return false;
+			try {
+				if(remote_ip_info.city) {
+					$('#ip').text(remote_ip_info.city);
+				}
+			}catch (e)  {  }
+		});
+	}
+});
+</script>

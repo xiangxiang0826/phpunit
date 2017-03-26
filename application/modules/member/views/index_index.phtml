@@ -1,0 +1,79 @@
+<!--页面位置-->
+                     <h3 class="location f14"><?php echo $this->menu(); ?></h3>
+                     <div class="product_detail mt22">
+                     	<form action="/member/index/index" method="get"  id="search_form">
+                           <div class="product_detail_search clearfix">
+                                <div class="fl system_drop clearfix">
+                                    <select id="status" class="cpy_style product_assort" name ="search[status]" style="width: 80px;">
+                                        <option value="0">选择全部</option>
+                                        <?php foreach($this->status_map as $key=>$status):?>
+                                        <option value="<?php echo $key?>" <?php if($key == $this->search['status']):?> selected="selected"<?php endif?>><?php echo $status?></option>
+                                        <?php endforeach;?>
+                                    </select>
+                                </div>
+                                <div class="fl system_drop clearfix">
+                                   <select id="platform" class="cpy_style cang_assort" name ="search[platform]" style="width: 120px;">
+                                       <option value="0">全部来源</option>
+                                       <?php foreach($this->enterprise_list as $enterprise):?>
+                                        <option value="<?php echo $enterprise['label']?>" <?php if(!empty($enterprise['label']) && $enterprise['label'] == $this->search['platform']):?> selected="selected"<?php endif?>><?php echo mb_strimwidth($enterprise['company_name'],0,18,'...')?></option>
+                                        <?php endforeach;?>
+                                   </select>
+                               </div>
+                               <div class="fl system_drop clearfix">
+                                   <input type="text" class="cpy_name wp50 w150" id="user_id"  name ="search[user_id]" value="<?php echo isset($this->search['user_id']) ? $this->search['user_id'] : ''?>" placeholder="会员ID查询" >
+                               </div>
+                              <div class="fl system_drop clearfix">
+                                   <input type="text" class="cpy_name wp50 w150" id="user_id"  name ="search[phone]" value="<?php echo isset($this->search['phone']) ? $this->search['phone'] : ''?>" placeholder="手机号查询" >
+                               </div>
+                               <div class="fl system_drop clearfix">
+                                   <input type="text" class="cpy_name wp50 w150" id="user_id"  name ="search[email]" value="<?php echo isset($this->search['email']) ? $this->search['email'] : ''?>" placeholder="邮箱查询" >
+                               </div>
+                               <div class="console_search_wrap fr"><a class="search_icon_btn f16 clF tc" onFocus="blur();" href="javascript:;" id="search"><i class="find_icon"></i>查 询</a></div>
+                           </div>
+                           </form>
+                           <div class="product_detail_display">
+									<div class="product_table mt24 f14">
+                                       <table class="table_s tc tc_left auto_table_len" width="100%" border="0">
+                                         <thead>
+                                          <tr>                          
+                                            <td width="60px">会员ID</td>
+                                            <td>用户名</td>
+                                            <td>邮箱</td>
+                                            <td width="100px">手机号</td>
+                                            <td width="130px">注册时间</td>
+                                            <td width="130px">最近登录时间</td>
+                                            <td width="60px">状态</td>
+                                            <td style="text-align: center;width: 60px;">操作</td>
+                                          </tr>
+                                         </thead>
+                                         <tbody>
+                                         <?php if($this->list):?>
+                                         	<?php foreach($this->list as $item):?>
+                                         	<tr>
+                                            <td><?php echo $item['id']?></td>
+                                            <td title = "<?php echo $item['name']?>"><?php echo $item['name'] ? $item['name'] : '-'?></td>
+                                            <td title = "<?php echo $item['email']?>"><?php echo $item['email'] ? $item['email'] : '-'?></td>
+                                            <td><?php echo $item['phone'] ? $item['phone'] : '-'?></td>
+                                            <td><?php echo $item['reg_time']?></td>
+                                            <td><?php echo $item['last_login_time']?></td>
+                                            <td><?php echo isset($this->status_map[$item['status']]) ? $this->status_map[$item['status']] : ''?></td>
+                                              <td class="cl0b9600" style="text-align: center;"><a href="/member/index/detail?id=<?php echo $item['id']?>" class="check_detail cl0b9600">查看</a></td>
+                                          </tr>
+                                         	<?php endforeach;?>
+                                         	<?php else:?>
+                                         	<tr><td colspan="8" style="text-align: center;">暂无记录</td></tr>
+                                         <?php endif;?>
+                                         </tbody>
+                                   </table>
+                                </div>
+               <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+          </div>
+  </div>
+<script language="javascript" type="text/javascript">
+	$(function () {
+		$('#search').click(function () {
+			$('#search_form').submit();
+
+		});
+	});
+</script>

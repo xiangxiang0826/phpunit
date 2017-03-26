@@ -1,0 +1,67 @@
+<h3 class="location f14">系统<?php echo $this->menu(!isset($this->template_info) ? '增加模板' : '更新模板','/template/template/index'); ?></h3>
+<form id="form" class="cmxform">
+	<table class="detail_tabel psw_table f14 mt20">
+		<tr>
+			<td><?php echo Cms_L::_('template_name'); ?>:</td>
+			<td>
+				<input type="text" class="cpy_name" id="name" name="data[name]" value="<?php if(isset($this->template_info)) echo $this->escape($this->template_info['name']); ?>" placeholder="<?php echo Cms_L::_('template_name_placeholder'); ?>" data-validate="{regexp:[/^[^'\x22]+$/, '<?php echo Cms_L::_('invalid_format'); ?>']}" />
+				<input type="hidden" name="data[module]" value="shop" />
+				<input type="hidden" name="data[type]" value="index" />
+				<input type="hidden" id="id" name="data[tpl_id]" value="<?php if(isset($this->template_info)) echo $this->template_info['tpl_id']; ?>" />*
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo Cms_L::_('template_content'); ?>:</td>
+			<td>
+				<textarea class="text_cls wp60" id="content" name="data[content]"  rows="20" data-validate="{require:[true, '<?php echo Cms_L::_('require'); ?>']}" placeholder="<?php echo Cms_L::_('template_content'); ?>"><?php if(isset($this->template_info)) echo $this->escape($this->template_info['content']); ?></textarea>*
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo Cms_L::_('is_default'); ?>:</td>
+			<td>
+				<input type="radio" name="data[is_default]" value="N"<?php if(!isset($this->template_info) OR $this->template_info['is_default'] != 'Y'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('no'); ?>
+				<input type="radio" name="data[is_default]" value="Y"<?php if(isset($this->template_info) && $this->template_info['is_default'] == 'Y'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('yes'); ?>
+				<span style="padding-left:20px;"> <?php echo Cms_L::_('is_default_tip'); ?></span>
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo Cms_L::_('host'); ?>：</td>
+			<td><input type="text" class="cpy_name" name="data[host]" value="<?php if(isset($this->template_info)) echo $this->template_info['host']; else echo $this->site_info['host']; ?>" placeholder="<?php echo $this->site_info['host']; ?>" /> <?php echo Cms_L::_('host_tip'); ?>，不带http，示例：www.spotmau.cn</td>
+		</tr>
+		<tr>
+			<td><?php echo Cms_L::_('html_path'); ?>：</td>
+			<td><input class="cpy_name" type="text" name="data[html_path]" value="<?php if(isset($this->template_info)) echo $this->template_info['html_path']; else echo $this->site_info['html_path']; ?>" placeholder="<?php echo $this->site_info['html_path']; ?>" data-validate="{regexp:[/^[a-z\d\._-]/, '<?php echo Cms_L::_('html_path_format'); ?>']}"/> <?php echo Cms_L::_('html_path_tip'); ?></td>
+		</tr>
+		<tr><td><a id="submitButton"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)"><?php echo Cms_L::_('submit'); ?></a>
+                    </td>
+          <td></td>
+        </tr>
+	</table>
+</form>
+<script>
+var site_id = '<?php echo $this->site_id; ?>';
+
+$(function(){
+	$('#module').change(function(){
+		var mod = $(this).val();
+		if(!mod){
+			$('#type').html('<option value=""><?php echo Cms_L::_('select_type'); ?></option>');
+			return false;
+		}
+		
+		$('#type').load('/template/template/gettype', {mod:mod, site_id:site_id},function () {
+			$("#type").dropkick();alert('ok');
+		});
+	});
+	
+	$.form_submit({
+		url	: '/template/template/save/site_id/' + site_id
+	});
+	
+	if($('#name').val()) {
+		$('#content').focus();
+	} else {
+		$('#name').focus()
+	}
+});
+</script>

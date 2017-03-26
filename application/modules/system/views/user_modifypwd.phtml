@@ -1,0 +1,123 @@
+<!--页面位置-->
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+	<form class="cmxform"  action="/system/user/modifypwd" method="post" id="form_modify_pwd">
+            <table class="detail_tabel psw_table f14 mt20">
+                <tr>
+                    <td colspan="2" id="pwd_tx">温馨提示：密码修改后需要重新登录</td>
+                </tr>
+                <tr>
+                    <td>原密码：</td>
+                    <td>
+                        <input type="password" class="cpy_name" placeholder="请输入原密码" id="old_password" name="old_password" class="required"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>输入新密码：</td>
+                    <td>
+                        <input type="password" class="cpy_name"  id="password" name="password" placeholder="密码长度6~16位，支持数字、字符或特殊字符"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>新密码确认：</td>
+                    <td>
+                        <input type="password" class="cpy_name" id="confirm_password" name="confirm_password"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a id="save_password"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)">保存</a>
+                    </td><td></td>
+                </tr>
+</table>
+</form>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="tips_msg">密码修改成功，需要重新登录系统！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" >重新登录</a>
+</div>
+<script language="javascript" type="text/javascript">
+    $(function(){
+        var SUCCESS = false;
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        $("#save_password").on("click",function(){
+            //
+        });
+        $("#close_message").on("click",function() {
+            $( "#message_dialog" ).dialog( "close" );
+            if(SUCCESS) {
+            	location.href = '/login/index/logout';
+            }
+		});
+	
+    	$('#form_modify_pwd').validate({
+    		rules: {
+    			'old_password': {
+    				maxlength:25,
+    				required: true,
+    				remote : { // 异步验证
+    					 url: "/system/user/verifypwd",
+    					 type: "post",               //数据发送方式
+    					 dataType: "json",           //接受数据格式  
+    					 data: {   }
+    				}
+    			},
+    			'password': {
+    				required: true,
+    				maxlength:16,
+    				minlength: 6,
+    			},
+    			'confirm_password': {
+    				required: true,
+    				minlength: 6,
+    				equalTo: "#password"
+    			}
+    		},
+    		messages: {   //自定义提示信息
+    			old_password: "原密码输入错误"
+    		}
+    	});
+    	$('#save_password').click(function () {
+			if($('#form_modify_pwd').valid()) {
+				$('#form_modify_pwd').ajaxSubmit({
+					url:'/system/user/modifypwd', //提交给哪个执行
+					type:'POST',
+					dataType: 'json',
+					success: function (result) {
+						if(result.status == 200) {
+							SUCCESS = true;
+							$('#tips_msg').text('密码修改成功，需要重新登录系统！');
+							$( "#message_dialog" ).dialog( "open" );
+							return false;
+						}
+						if(result.status == 403) {
+							SUCCESS = false;
+							$('#tips_msg').text('您的输入不合法，请重新输入！');
+							$( "#message_dialog" ).dialog( "open" );
+							return false;
+						}
+						if (result.msg == 505) {
+							SUCCESS = false;
+	                        $('#tips_msg').text('亲，你没有这个操作的权限！');
+	                        $("#message_dialog").dialog("open");
+	                    } 
+					}
+				});
+				return false;
+			}
+		});
+})
+</script>

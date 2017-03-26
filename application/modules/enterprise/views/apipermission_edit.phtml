@@ -1,0 +1,55 @@
+<!--页面位置-->
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+	<?php $title = $this->requestTitle?('('.$this->requestTitle.')'):''; ?>
+	<h3 class="location f14"><?php echo $this->menu('编辑权限'.urldecode($title), '/enterprise/apipermission/index'); ?></h3>
+	<form class="cmxform"  action="/enterprise/apipermission/edit" method="post" id="form_add_action">
+            <table class="detail_tabel psw_table f14 mt20">
+                <tr>
+                    <td>权限名称：</td>
+                    <td>
+                        <input type="text" class="cpy_name" placeholder="请输入功能名称" id="name" value="<?php echo $this->item['name']?>" name="name" class="required"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>权限URL标识：</td>
+                    <td>
+                        <input type="text" class="cpy_name"  id="uri" name="uri" value="<?php echo $this->item['uri']?>" placeholder="功能标识，请输入URL字符串" class="required"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>权限组：</td>
+                    <td class="system_drop">
+                        <select id="group_name" class="cpy_style product_assort" name ="group_name">
+                           <?php foreach($this->groups as $key => $value): ?>
+                            <option value="<?php echo $key; ?>" <?php if($this->item['group_name'] == $key): ?>selected="selected"<?php endif; ?>><?php echo $value; ?></option>
+                           <?php endforeach; ?>
+                       </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>权限状态：</td>
+                    <td class="system_drop">
+                    	<select id="status" class="cpy_style product_assort" name ="status">
+                           <option value="enable"  <?php if($this->item['status'] == 'enable'): ?>selected="selected"<?php endif; ?>>启用</option>
+                           <option value="disable" <?php if($this->item['status'] !== 'enable'): ?>selected="selected"<?php endif; ?>>禁用</option>
+                       </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a id="save_action"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">保存</a>
+                    </td>
+                </tr>
+</table>
+ <input type="hidden" name="id" id="id" value="<?php echo $this->requestId; ?>" />
+</form>
+<input type="hidden" name="back_url" id="back_url" value="/enterprise/apipermission/index" />
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">确 定</a>
+</div>
+<script type="text/javascript">
+var selInitDefault = <?php echo ($this->selAuth)?(json_encode($this->selAuth)):'[]'; ?>;
+</script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/auth.common.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/auth.api.js"></script>

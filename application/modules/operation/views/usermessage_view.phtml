@@ -1,0 +1,153 @@
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.ui.timepicker.addon.js"></script>
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('查看消息' ,'/operation/usermessage/index'); ?></h3>
+</h3>
+<form action="" id="check_form">
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th>消息内容</th>
+        <th></th>
+    </tr>
+    <?php
+        $message = new stdClass();
+        $info = $this->info;
+        if(isset($info['original_message'])){
+            $message = json_decode($info['original_message']);
+        }
+        $title = isset($message->title)?$message->title:'';
+        $text = isset($message->text)?$message->text:'';
+        $go  = isset($message->go)?$message->go:'';
+        $ex  = isset($message->ex)?$message->ex:'';
+        $ex_arr = array();
+        $ex_other_arr = array();
+        if(is_array($ex) && count($ex)){
+            $filterArr = array('activity_android', 'activity_ios', 'app', 'url', 'custom_go');
+            foreach($ex as $item){
+                foreach($item as $k => $v){
+                    if(!in_array($k, $filterArr)){
+                        $ex_other_arr[] = array(
+                            'key' => $k,
+                            'value' => $v
+                       );
+                    }
+                    $ex_arr[$k] = $v;
+                }
+            }
+        }
+        if(!isset($ex_arr[$go])){
+            $ex_arr[$go] = '';
+        }
+    ?>
+    <tr>
+        <td>标题：</td>
+        <td id="feedback_id">
+           <?php echo $title; ?>
+        </td>
+    </tr>
+    <tr>
+        <td>消息内容：</td>
+        <td>
+            <?php echo $text; ?>
+        </td>
+    </tr>
+    <tr>
+         <td>点击行为：</td>
+         <td class="system_drop">
+              <?php if($go == 'none'): ?>
+                <div><b>无</b></div>
+                <div>无点击行为</div>
+              <?php elseif($go == 'app'): ?>
+                <div><b>启动应用</b></div>
+                <div>点击通知，将直接按正常方式启动遥控e族应用，不打开指定页面.</div>
+              <?php elseif($go == 'activity'): ?>
+                <div><b>打开应用页</b></div>
+                <div>
+                    Android：<?php echo $ex_arr[$go.'_android']; ?> <br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;iOS：<?php echo $ex_arr[$go.'_ios']; ?>
+                </div>
+              <?php elseif($go == 'url'): ?>
+                <div><b>打开网页</b></div>
+                <div>
+                    <?php echo $ex_arr[$go]; ?>
+                </div>
+              <?php elseif($go == 'custom_go'): ?>
+                <div><b>自定义行为</b></div>
+                <div>
+                    <?php echo $ex_arr[$go]; ?>
+                </div>
+              <?php endif; ?>
+         </td>
+    </tr>
+    <tr>
+         <td>扩展设置：</td>
+         <td class="system_drop">
+                 <div>
+                <?php if(count($ex_other_arr)==0): ?>
+                     -
+                <?php endif; ?>
+                <?php foreach($ex_other_arr as $i=>$item): ?>
+                    <?php echo $i+1; ?>.<?php echo $item['key']; ?> - <?php echo $item['value']; ?> 
+                    <br />
+                <?php endforeach; ?>
+                </div>
+         </td>
+    </tr>
+    <tr>
+        <th>推送设置</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>推送范围：</td>
+        <td class="system_drop" id="message_user_type">
+              <?php if($info['user_type'] == 'all'): ?>
+                <div><b>所有用户</b></div>
+                <div></div>
+              <?php else: ?>
+                <div><b>特定用户</b></div>
+                <div>
+<?php
+    $push_rule = json_decode($info['push_rule']);
+?>
+                <?php foreach($push_rule as $i=>$item): ?>
+                    <?php echo $i+1; ?>.<?php echo $this->dimensions[$item->key]; ?>&nbsp;<?php echo $this->conditions[$item->condition]; ?>&nbsp;<?php echo $item->value; ?> 
+                    <br />
+                <?php endforeach; ?>
+                </div>
+              <?php endif; ?>
+        </td>
+    </tr>
+    <tr>
+        <td>推送时间：</td>
+        <td class="system_drop" id="start_time">
+              <?php if($info['start_time'] == '0000-00-00 00:00:00'): ?>
+                <div><b>立即发送</b></div>
+                <div></div>
+              <?php else: ?>
+                <div><b>定时发送</b></div>
+                <div><?php echo $info['start_time']; ?></div>
+              <?php endif; ?>
+        </td>
+    </tr>
+<tr>
+        <td>离线消息：</td>
+        <td class="system_drop" id="expire_time">
+              <?php if($info['is_offline']): ?>
+                <div>离线保留，设备上线后仍可收到消息. 设置保存时间：&nbsp;<?php echo $info['offline_value']; ?>&nbsp;<?php echo $this->units[$info['offline_unit']]; ?></div>
+              <?php else: ?>
+                <div> 不保存，终端离现时的消息将被忽略</div>
+              <?php endif; ?>
+        </td>
+    </tr>
+ </table>
+</form>
+<div class="mt36 mb24 tr">
+    <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;" class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<input type="hidden" value="usermessage" id="controller_name" />
+<input type="hidden" value="view" id="action_name" />
+<script type="text/javascript" src="<?php echo $this->static;?>/js/message_center.js"></script>

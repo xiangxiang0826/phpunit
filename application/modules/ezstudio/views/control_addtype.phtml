@@ -1,0 +1,122 @@
+<!--页面位置-->
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<h3 class="location f14"><?php echo $this->menu('添加控件类型','/ezstudio/control/type'); ?></h3>
+	<form class="cmxform"  action="/ezstudio/control/addtype" method="post" id="form_add_action">
+            <table class="detail_tabel psw_table f14 mt20">
+                <tr>
+                    <td>类型名称：</td>
+                    <td>
+                        <input type="text" class="cpy_name"  placeholder="请输入功能名称" id="name" name="name" class="required"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>备注：</td>
+                    <td>
+                    	<textarea rows="6" cols="50" class="text_cls" name="remark"></textarea>
+                     </td>
+                </tr>
+                <tr>
+                    <td>状态：</td>
+                    <td class="system_drop">
+                    	<select id="status" class="cpy_style product_assort" name ="status">
+                          <?php foreach ($this->status_map as $key => $v) :?>
+                               <option value="<?php echo $key;?>"><?php echo $v;?></option>
+                          <?php endforeach;?>
+                       </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a id="save_action"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">保存</a>
+                    </td>
+                </tr>
+</table>
+</form>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">确 定</a>
+</div>
+<div id="tips_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script language="javascript" type="text/javascript">
+    $(function() {
+    	$( "#tips_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "确定": function() {
+                	$( this ).dialog( "close" );
+        		}
+            }
+        });
+        
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        $("#close_message").on("click",function() {
+            $( "#message_dialog" ).dialog( "close" );
+			location.href = '/ezstudio/control/type';
+        });
+	
+    	$('#form_add_action').validate({
+    		rules: {
+    			'name': {
+    				required: true,
+    				minlength: 2,
+    				maxlength:150
+    			},
+    			'remark': {
+    				minlength: 2,
+    				maxlength:150
+    			}
+    		},
+    		messages: {   //自定义提示信息
+    			
+    		}
+    	});
+    	$('#save_action').click(function () {
+			if($('#form_add_action').valid()) {
+				$('#form_add_action').ajaxSubmit({
+					url:'/ezstudio/control/addtype', //提交给哪个执行
+					type:'POST',
+					dataType: 'json',
+					success: function (result) {
+						if(result.status == 200) {
+							$( "#message_dialog" ).dialog( "open" );
+						} else if (result.msg == 505) {
+                            $('#message_dialog .message_text').text('亲，你没有这个操作的权限！');
+                            $("#message_dialog").dialog("open");
+                		} else {
+							$('#tips_msg').text(result.msg);
+							$( "#tips_dialog" ).dialog( "open" );
+						}
+					}
+				});
+				return false;
+			}
+		});
+})
+</script>

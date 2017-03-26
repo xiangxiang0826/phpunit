@@ -1,0 +1,64 @@
+<h3 class="location f14">网站<?php echo $this->menu(!isset($this->block_info['blk_id']) ? '增加区块' : '更新区块','template/block/index'); ?></h3>
+<form id="form" class="cmxform">
+	<table class="detail_tabel psw_table f14 mt20">
+		<tbody>
+		<tr><th colspan="2" class="mr10">[<?php echo Cms_L::_('tip'); ?>] <?php echo Cms_L::_('blk_html_path_tip'); ?> </th></tr>
+		<tr>
+			<td class="w128"><?php echo Cms_L::_('block_name'); ?>: </td>
+			<td>
+				<input class="cpy_name"  type="text" id="name" name="data[name]" value="<?php if(isset($this->block_info)) echo $this->block_info['name']; ?>" placeholder="<?php echo Cms_L::_('block_name'); ?>" size="30" data-validate="{regexp:[/^[^'\x22]+$/, '<?php echo Cms_L::_('invalid_format'); ?>']}" />
+				<input type="hidden" id="id" name="data[blk_id]" value="<?php if(isset($this->block_info)) echo $this->block_info['blk_id']; ?>" />*
+			</td>
+		</tr>
+		<tr>
+			<td align="right" valign="top"><?php echo Cms_L::_('block_content'); ?>: </td>
+			<td>
+				<textarea class="text_cls wp60" cols="80" rows="10" id="content" name="data[content]" placeholder="<?php echo Cms_L::_('block_content'); ?>" data-validate="{require:[true, '<?php echo Cms_L::_('require'); ?>']}"><?php if(isset($this->block_info)) echo $this->escape($this->block_info['content']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo Cms_L::_('host'); ?>: </td>
+			<td>
+				<input type="text" class="cpy_name" name="data[host]" value="<?php if(isset($this->block_info)) echo $this->escape($this->block_info['host']); else echo $this->site_info['host'];?>" size="29" />
+				<span class="warn"> * <?php echo Cms_L::_('host_tip'); ?></span>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('html_path'); ?>: </td>
+			<td>
+				<input type="text"  class="cpy_name"  name="data[html_path]" value="<?php if(isset($this->block_info)) echo $this->escape($this->block_info['html_path']); else echo $this->site_info['html_path'];?>"/>
+				<span class="warn"> * <?php echo Cms_L::_('html_path_tip'); ?></span>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('file_path'); ?>: </td>
+			<td>
+				/<?php echo Cms_Block::getFolder(); ?>/<input type="text" class="cpy_name"  name="data[file_path]" value="<?php if(isset($this->block_info)) echo $this->escape($this->block_info['file_path']); ?>" data-validate="{regexp:[/^[a-z\d\/_-]+?\.html$/i, '<?php echo Cms_L::_('file_path_format_error'); ?>']}" />
+				<span class="warn"> * <?php echo Cms_L::_('file_path_tip'); ?></span>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+	<div class="mt36 mb24 tr">
+                <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+                <a  onfocus="blur();" href="javascript:void(0)" id="submitButton" class="f16 clF tc search_btn" ><?php echo Cms_L::_('submit'); ?></a>
+    </div>
+</form>
+<script>
+var site_id = <?php echo $this->site_id; ?>;
+
+$(function(){
+	$.form_submit({
+		url : '/template/block/save/site_id/' + site_id
+	});
+	
+	if($('#name').val()) {
+		$('#content').focus();
+	} else {
+		$('#name').focus()
+	}
+	$('#cancel_btn').click(function () {
+		history.go(-1);
+	});
+});
+</script>

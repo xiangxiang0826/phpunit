@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<dataset>
+    <EZ_ANNOUNCE  title="dbtest" content="I like it!" enterprise_ids="1,7,12" ctime="2010-04-26 12:14:20" mtime="2010-04-26 12:14:20" actual_time="2010-04-26 12:14:20" sender="admin" status="finished"/>
+</dataset>

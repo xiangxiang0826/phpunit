@@ -1,0 +1,123 @@
+<h3 class="location f14">系统<?php echo $this->menu('字段管理','/template/template/index'); ?></h3>
+<form id="form">
+	<table class="detail_tabel psw_table f14 mt20">
+		<tr>
+			<td width="200" align="right"><?php echo Cms_L::_('input_label'); ?>:</td>
+			<td width="400">
+				<input  class="cpy_name" type="text" id="input_label" name="data[input_label]" value="<?php if(isset($this->field_info)) echo $this->escape($this->field_info['input_label']); ?>" data-validate="{require:[true, '<?php echo Cms_L::_('field_name_require'); ?>']}">
+				<input type="hidden" id="tpl_id" name="data[tpl_id]" value="<?php echo $this->tpl_id; ?>" />
+				<input type="hidden" id="id" name="data[field_id]" value="<?php if(isset($this->field_info)) echo $this->field_info['field_id']; ?>" />* <?php echo Cms_L::_('input_name_tip'); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('input_type'); ?>:</td>
+			<td>
+				<select id="input_type" name="data[input_type]" class="cang_assort">
+					<option value="textarea"<?php if(isset($this->field_info) && $this->field_info['input_type']=='textarea'): ?> selected="selected"<?php endif;?>><?php echo Cms_L::_('textarea_input'); ?></option>
+					<option value="text"<?php if(isset($this->field_info) && $this->field_info['input_type']=='text'): ?> selected="selected"<?php endif;?>><?php echo Cms_L::_('text_input'); ?></option>
+					<option value="select"<?php if(isset($this->field_info) && $this->field_info['input_type']=='select'): ?> selected="selected"<?php endif;?>><?php echo Cms_L::_('select_input'); ?></option>
+					<option value="fulltext"<?php if(isset($this->field_info) && $this->field_info['input_type']=='fulltext'): ?> selected="selected"<?php endif;?>><?php echo Cms_L::_('fulltext_input'); ?></option>
+				</select>
+			</td>
+		</tr>
+		<tr<?php if(!isset($this->field_info) || (isset($this->field_info) && $this->field_info['input_type']!='select')): ?> style="display:none;"<?php endif; ?>>
+			<td align="right"><?php echo Cms_L::_('input_option'); ?>:</td>
+			<td>
+				<textarea class="text_cls wp60" id="input_option" name="data[input_option]" rows="6" cols="60"><?php if(isset($this->field_info)) echo $this->escape($this->field_info['input_option']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('input_value'); ?>:</td>
+			<td>
+				<textarea  class="text_cls wp60"  id="input_value" name="data[input_value]" rows="6" cols="60"><?php if(isset($this->field_info)) echo $this->escape($this->field_info['input_value']); ?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('input_size'); ?>:</td>
+			<td>
+				<?php echo Cms_L::_('width'); ?>：<input  class="cpy_name" type="text" id="input_width" name="data[input_width]" value="<?php echo isset($this->field_info) ? $this->field_info['input_width'] : 550; ?>" size="3" data-validate="{number:[true, '<?php echo Cms_L::_('input_width_number'); ?>']}" />
+				<?php echo Cms_L::_('height'); ?>：<input  class="cpy_name" type="text" id="input_height" name="data[input_height]" value="<?php echo isset($this->field_info) ? $this->field_info['input_height'] : 30; ?>" size="3" data-validate="{regexp:[/^[\d]+$/, '<?php echo Cms_L::_('input_height_number'); ?>']}" />
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('order_edit'); ?>:</td>
+			<td>
+				<input  class="cpy_name" type="text" id="order_edit" name="data[order_edit]" size="3" value="<?php echo isset($this->field_info) ? $this->field_info['order_edit'] : 0; ?>" data-validate="{number:[true, '<?php echo Cms_L::_('order_edit_number'); ?>']}" />
+			<?php echo Cms_L::_('order_edit_tip'); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('is_search'); ?>:</td>
+			<td>
+				<input type="radio" name="data[is_search]" value="N"<?php if(!isset($this->field_info) || $this->field_info['is_search'] == 'N'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('no'); ?>
+				<input type="radio" name="data[is_search]" value="Y"<?php if(isset($this->field_info) && $this->field_info['is_search'] == 'Y'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('yes'); ?>
+			<?php echo Cms_L::_('is_search_tip'); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('is_list'); ?>:</td>
+			<td>
+				<input type="radio" name="data[is_list]" value="N"<?php if(!isset($this->field_info) || $this->field_info['is_list'] == 'N'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('no'); ?>
+				<input type="radio" name="data[is_list]" value="Y"<?php if(isset($this->field_info) && $this->field_info['is_list'] == 'Y'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('yes'); ?>
+			<?php echo Cms_L::_('is_list_tip'); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('is_unique'); ?>:</td>
+			<td>
+				<input type="radio" name="data[is_unique]" value="N"<?php if(!isset($this->field_info) || $this->field_info['is_unique'] == 'N'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('no'); ?>
+				<input type="radio" name="data[is_unique]" value="Y"<?php if(isset($this->field_info) && $this->field_info['is_unique'] == 'Y'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('yes'); ?>
+			<?php echo Cms_L::_('is_unique_tip'); ?>
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo Cms_L::_('is_null'); ?>:</td>
+			<td>
+				<input type="radio" name="data[is_null]" value="N"<?php if(!isset($this->field_info) || $this->field_info['is_null'] == 'N'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('no'); ?>
+				<input type="radio" name="data[is_null]" value="Y"<?php if(isset($this->field_info) && $this->field_info['is_null'] == 'Y'): ?> checked="checked"<?php endif; ?> /><?php echo Cms_L::_('yes'); ?>
+			<?php echo Cms_L::_('is_null_tip'); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('field_name_db'); ?>:</td>
+			<td>
+				<input  class="cpy_name" type="text" id="field_name" name="data[field_name]" value="<?php if(isset($this->field_info)) echo $this->field_info['field_name']; ?>"<?php if(isset($this->field_info)): ?> readonly="readonly"<?php endif; ?> data-validate="{regexp:[/^[a-z\d_]+$/, '<?php echo Cms_L::_('field_name_not_valid'); ?>']}" class="easyui-tooltip" data-options="position:'right'" title="<?php echo Cms_L::_('must_alpha'); ?>" />
+			* <?php echo Cms_L::_('field_name_db_tip'); ?>
+			</td>
+		</tr>
+		<tr>
+			<td align="right"><?php echo Cms_L::_('field_type'); ?>:</td>
+			<td>
+				<select id="field_type" name="data[field_type]" class="cang_assort">
+					<option value="text"<?php if(isset($this->field_info) && $this->field_info['field_type']=='text'): ?> selected="selected"<?php endif;?>>text</option>
+					<option value="longtext"<?php if(isset($this->field_info) && $this->field_info['field_type']=='longtext'): ?> selected="selected"<?php endif;?>>longtext</option>
+					<option value="char"<?php if(isset($this->field_info) && $this->field_info['field_type']=='char'): ?> selected="selected"<?php endif;?>>char</option>
+					<option value="int"<?php if(isset($this->field_info) && $this->field_info['field_type']=='int'): ?> selected="selected"<?php endif;?>>int</option>
+				</select>* <?php echo Cms_L::_('field_type_tip'); ?>
+			</td>
+		</tr>
+		<tr><td><a id="submitButton"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)"><?php echo Cms_L::_('submit'); ?></a></td>
+          <td></td>
+        </tr>
+	</table>
+</form>
+<script>
+var site_id = <?php echo $this->site_id; ?>;
+
+$(function(){
+	$.form_submit({
+		url:'/template/template/savefield/site_id/' + site_id
+	});
+	
+	$('#input_type').change(function(){
+		var input_option = $(this).closest('tr').next('tr');
+		if($(this).val() == 'select') {
+			input_option.show();
+		} else {
+			input_option.hide();
+		}
+	});
+
+	$('#input_label').focus();
+});
+</script>

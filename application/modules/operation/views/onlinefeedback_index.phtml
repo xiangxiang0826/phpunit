@@ -1,0 +1,165 @@
+<h3 class="location f14">
+	<?php
+	    if($this->search['status'] =='toreply') {
+	    	echo $this->menu('待回复', '/operation/onlinefeedback/index');
+	    } elseif ($this->search['status']=='replied') {
+	    	echo $this->menu('已回复', '/operation/onlinefeedback/index');
+	    } else {
+	    	echo $this->menu('全 部', '/operation/onlinefeedback/index');
+        } 	    
+	?>
+</h3>
+<div class="product_detail mt22">
+	<div class="product_detail_search clearfix">
+		<form action="/operation/onlinefeedback/index" method="get"
+			id="from_feedback">
+			<div class="product_detail_search clearfix mt22 search_div">
+				<div class="fl system_drop clearfix">
+					<select class="cpy_style cang_assort" id="tag_assort"
+						name='search[tag]' style="width: 120px;">
+						<option value=''>按标签筛选</option>
+						<?php foreach ($this->tags as $v):?>
+						<option value="<?php echo $v['id']?>"
+							<?php if(isset($this->search['tag']) && $this->search['tag']==$v['id']):?>
+							selected=selected <?php endif;?>>
+							<?php echo $v['name'];?>
+						</option>
+						<?php endforeach;?>
+					</select>
+				</div>
+
+				<div class="fl">
+					<input type="text" id="mobile" class="cpy_name  w150"
+						name="search[mobile]"
+						value="<?php if(isset($this->search['mobile'])):?><?php echo $this->search['mobile'];?><?php endif;?>"
+						class="cpy_name" style="width: 120px;" id="cpy_mobile"
+						placeholder='手机号查询'>
+				</div>
+				<div class="fl">
+					<input type="text" id="email" class="cpy_name  w150"
+						name="search[email]"
+						value="<?php if(isset($this->search['email'])):?><?php echo $this->search['email'];?><?php endif;?>"
+						class="cpy_name" style="width: 120px;" id="cpy_email"
+						placeholder='邮箱查询'>
+				</div>
+				<input type="hidden" name="search[status]" id="hidden_status"
+					value="<?php if(isset($this->search['status'])) echo $this->search['status']; ?>" />
+				<div class="chart_search f14 fr">
+					<div class="console_search_wrap fr">
+						<a class="search_icon_btn f16 clF tc ml10" onFocus="blur();"
+							id="search" href="javascript:;"><i class="find_icon"></i>查 询</a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="chart_index_wrap clearfix product_detail_search"
+		style="margin-top: 24px;">
+		<div class="chart_index fl f14">
+			<span status="toreply"
+				<?php if($this->search['status']=='toreply'):?> class="on"
+				<?php endif;?>>待回复</span> <span status="replied"
+				<?php if($this->search['status']=='replied'):?> class="on"
+				<?php endif;?>>已回复</span> <span status=""
+				<?php if(empty($this->search['status'])):?> class="on"
+				<?php endif;?>>全 部</span>
+		</div>
+	</div>
+	<div class="product_detail_display">
+		<div class="product_table mt24 f14">
+			<table class="table_s tc tc_left auto_table_len " width="100%"
+				border="0">
+				<thead>
+					<tr>
+						<td width='60px'>序号</td>
+						<td>反馈内容</td>
+						<td width='150px'>反馈时间</td>
+						<td width='150px'>最后回复</td>
+						<td width='60px' style="text-align: right">回复数</td>
+						<td width='60px' style="text-align: center">操作</td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php if(!empty($this->items)):?>
+					<?php foreach($this->items as $v):?>
+					<tr>
+						<td><?php echo $v['no'];?></td>
+						<td title=<?php echo $v['title'];?>><?php echo $v['title'];?></td>
+						<td><?php echo $v['ctime'];?></td>
+						<td><?php echo $v['reply_time'];?></td>
+						<td style="text-align: right"><?php echo $v['reply_count'];?></td>
+						<td class="cl0b9600" style="text-align: center"><a
+							href="/operation/onlinefeedback/detail/id/<?php echo $v['id'];?>"
+							class="check_detail cl0b9600">回复</a></td>
+					</tr>
+					<?php endforeach;?>
+					<?php else:?>
+					<tr>
+						<td colspan='6' style="text-align: center">暂无数据</td>
+					</tr>
+					<?php endif;?>
+				</tbody>
+			</table>
+		</div>
+		<?php if(!empty($this->paginator) && $this->paginator->count() > 1):?>
+		<?php echo $this->paginationControl($this->paginator, 'Elastic', 'pagelist.phtml', array('base_url'=>$this->base_url)); ?>
+		<?php endif;?>
+	</div>
+</div>
+
+<script type="text/javascript"
+	src="<?php echo $this->static;?>/js/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript"
+	src="<?php echo $this->static;?>/js/jquery.ui.timepicker.addon.js"></script>
+
+<script type="text/javascript">
+$(function(){
+	
+  	$("#for_pro").dropkick({
+		  change: function (value, label) {
+		 	 $("#pid").val(value);
+		  }
+	});
+
+  	$("#for_type").dropkick({
+		  change: function (value, label) {
+		 	 $("#type").val(value);
+		  }
+	});
+
+  	$("#for_style").dropkick({
+		  change: function (value, label) {
+		 	 $("#status").val(value);
+		  }
+	});
+
+	$("#search").click(function(){
+		$("#from_feedback").submit();
+	});
+});
+
+$('span[status]').click(function () {
+	var status = $(this).attr('status');
+	var tag = Number($('#tag_assort').val());
+	var mobile = $('#mobile').val();
+	var email = $('#email').val();
+	$('#hidden_status').val('replied');
+	location.href = '/operation/onlinefeedback/index?search[tag]='+ tag +'&search[mobile]='+ mobile +'&search[email]='+email +'&search[status]='+status;
+});
+
+function noPermitInput(e){
+       var evt = window.event || e ;    
+        if(isIE()){    
+            evt.returnValue=false; //ie 禁止键盘输入    
+        }else{    
+            evt.preventDefault(); //fire fox 禁止键盘输入    
+        }       
+   }    
+function isIE() {    
+	if (window.navigator.userAgent.toLowerCase().indexOf("msie") >= 1){
+		return true;
+	}else{
+		return false;
+	}
+}
+</script>

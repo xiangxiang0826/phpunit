@@ -1,0 +1,108 @@
+
+<!--页面位置-->
+<?php $title = $this->item['name']?('('.$this->item['name'].')'):''; ?>
+<h3 class="location f14"><?php echo $this->menu('模板编辑'.urldecode($title), '/enterprise/apipermission/template'); ?></h3>
+<form class="cmxform"  action="/enterprise/apipermission/edittemplate" method="post" id="form_template">
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th><?php echo $this->t('base_info');?></th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>模板名称：</td>
+        <td>
+            <input type="text" class="cpy_name" placeholder="请输入模板名称" value="<?php echo $this->item['name']?>" id="name" name="name" class="required"/>
+         </td>
+    </tr> 
+    <tr>
+        <td>模板标签：</td>
+        <td>
+            <input type="text" class="cpy_name" placeholder="请输入标签名称" value="<?php echo $this->item['label']?>" id="label" name="label" class="required"/>
+        </td>
+    </tr>
+    <tr>
+        <th>可授权权限</th>
+        <th></th>
+    </tr>
+    <tr id="auth_ids">
+        <td colspan="2" style="text-align:left;line-height: 50px;padding-left:80px;">
+<?php if(!empty($this->allAuth)):?> 
+<?php foreach($this->allAuth as $k => $v): ?>
+    <?php if($k && ($k % 6)==0): ?>
+            <br />
+    <?php endif; ?>
+	<input type="checkbox" name="ids[]" value="<?php echo $v['id']; ?>"><?php echo $v['name']; ?>&nbsp;&nbsp;
+<?php endforeach;?>
+<?php else: ?>
+        暂无
+<?php endif;?>
+		</td>
+    </tr>
+    <tr>
+        <td  colspan="2">
+            <input type="radio" name="opt" class="selOption" value="selAll">全选&nbsp;&nbsp;
+            <input type="radio" name="opt" class="selOption" value="selNone">全不选&nbsp;&nbsp;
+		</td>
+    </tr>
+    <tr>
+        <th>内部权限</th>
+        <th align="left">(<font color="red">请谨慎使用此组权限</font> ，<a href="javascript::void()" id="show_intranet">点击打开或隐藏</a>）</th>
+    </tr>
+    <tr id="intranet_ids">
+        <td colspan="2" style="text-align:left;line-height: 50px;padding-left:80px;">
+<?php if(!empty($this->intranetAuth)):?> 
+<?php foreach($this->intranetAuth as $k => $v): ?>
+    <?php if($k && ($k % 6)==0): ?>
+            <br />
+    <?php endif; ?>
+	<input type="checkbox" name="ids[]" value="<?php echo $v['id']; ?>"><?php echo $v['name']; ?>&nbsp;&nbsp;
+<?php endforeach;?>
+<?php else: ?>
+        暂无
+<?php endif;?>
+		</td>
+    </tr>
+    <tr>
+        <th>公共权限</th>
+        <th align="left">(<font color="red">已自动获取</font>，<a href="javascript::void()" id="show_common">点击打开或隐藏</a>）</th>
+    </tr>
+    <tr id="common_ids" style="display:none;">
+        <td colspan="2" style="text-align:left;line-height: 50px;padding-left:80px;">
+<?php if(!empty($this->commonAuth)):?> 
+<?php foreach($this->commonAuth as $k => $v): ?>
+    <?php if($k && ($k % 6)==0): ?>
+            <br />
+    <?php endif; ?>
+            <input type="checkbox" name="common_ids[]" value="<?php echo $v['id']; ?>" checked="checked" disabled="diabled"><?php echo $v['name']; ?>&nbsp;&nbsp;
+<?php endforeach;?>
+<?php else: ?>
+        暂无
+<?php endif;?>
+		</td>
+    </tr>
+</table>
+<input type="hidden" value="<?php echo $this->requestId?>" name="id" id="id">
+<div class="mt36 mb24 tr">
+    <a  onfocus="blur();" href="javascript:void(0)" id="back" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+    <a  onfocus="blur();" href="javascript:void(0)" id="save" class="f16 clF tc search_btn" >提 交</a>
+</div>
+</form>
+<input type="hidden" name="back_url" id="back_url" value="/enterprise/apipermission/template" />
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">权限更新成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)">确 定</a>
+</div>
+<script>
+var selInitDefault = <?php echo ($this->selAuth)?(json_encode($this->selAuth)):'[]'; ?>;
+$(function(){
+    selInit(selInitDefault, onload=1);
+    $('#show_common').click(function(){
+        $('#common_ids').toggle();
+    });
+    $('#show_intranet').click(function(){
+        $('#intranet_ids').toggle();
+    });
+});
+</script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/auth.common.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/auth.template.js"></script>

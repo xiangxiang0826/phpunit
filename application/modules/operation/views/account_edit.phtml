@@ -1,0 +1,302 @@
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.ui.timepicker.addon.js"></script>
+
+<!--页面位置-->
+<?php $menuName = ($this->messageId)?'修改消息':'添加消息'; ?>
+<h3 class="location f14"><?php echo $this->menu($menuName,'/operation/account/index'); ?></h3>
+</h3>
+<form action="" id="message_form">
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th>消息内容</th>
+        <th></th>
+    </tr>
+<?php
+    $message = new stdClass();
+    $info = $this->info;
+    if(isset($info['original_message'])){
+        $message = json_decode($info['original_message']);
+    }
+    $title = isset($message->title)?$message->title:'';
+    $text = isset($message->text)?$message->text:'';
+    $go = isset($message->go)?$message->go:'';
+    $ex = isset($message->ex)?$message->ex:'';
+    $ex_arr = array();
+    $ex_other_arr = array();
+    if(is_array($ex) && count($ex)){
+        $filterArr = array('activity_android', 'activity_ios', 'app', 'url', 'custom_go');
+        foreach($ex as $item){
+            foreach($item as $k => $v){
+                if(!in_array($k, $filterArr)){
+                    $ex_other_arr[] = array(
+                        'key' => $k,
+                        'value' => $v
+                   );
+                }
+                $ex_arr[$k] = $v;
+            }
+        }
+    }
+    if($go && !isset($ex_arr[$go])){
+        $ex_arr[$go] = '';
+    }
+?>
+    <tr>
+        <td>标题：</td>
+        <td id="feedback_id">
+           <input type="text" name="message[original_message][title]"  class="cpy_name"  style="width:754px;"  id="title_input" value="<?php if(!empty($title)) { echo $title;}?>" placeholder="（20个字符）" />
+        </td>
+    </tr>
+    <tr>
+        <td>消息内容：</td>
+        <td>
+            <textarea style="width:754px;height:80px;margin-top:5px;" id="remark" name="message[original_message][text]" class="text_cls" placeholder="（50个字符）"><?php if(!empty($text)) { echo $text;}?></textarea>
+        </td>
+    </tr>
+    <tr>
+         <td>消息链接：</td>
+         <td class="system_drop">
+              <input type="text" name="message[original_message][url]" class="cpy_name" style="width:754px;" value="" placeholder="请填写有效的URL地址" />
+         </td>
+    </tr>
+    <tr>
+        <td>扩展设置：</td>
+        <td class="system_drop" id="message_extend">
+              <br />
+              <span id="span_extend" class='extend_item'>
+                  <ol id='extend'>
+                      <li>
+                          <div class="clearfix" style="padding-top:5px;">
+                                <div class="fl clearfix">
+                                    <input type="text" name="message[original_message][extend][0][key]"  class="cpy_name" style="width:368px;"   value=""  placeholder="请输入key" />
+                                </div>
+                                <div class="fl clearfix" style="padding-left:4px;">
+                                    <input type="text" name="message[original_message][extend][0][value]"  class="cpy_name" style="width:368px;"   value=""  placeholder="请输入value" />
+                                </div>
+                               &nbsp;
+                               <a href="javascript:;" class="delExtend" name="del[extend][0][del]" style="display:none;">删除</a>
+                          </div>
+                      </li>
+                 </ol>
+                 <br />
+                 <a href="javascript:;" class="f12 clF tc search_btn fl " id="addExtend">添加扩展</a>
+                 <br /><br />
+             </span>
+        </td>
+    </tr>
+    <tr>
+        <th>推送设置</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>推送范围：</td>
+        <td class="system_drop" id="message_user_type">
+              <br />
+              <input type="radio"  class="user_type" name="message[user_type]" checked="checked" value="all" /> 所有用户
+              <input type="radio"  class="user_type"  name="message[user_type]" value="special" /> 特定用户
+              <br />
+              <span id="span_all" class='user_type_item' style="visibility:visible;"></span>
+              <br />
+              <span id="span_special" class='user_type_item' style="visibility:hidden;">
+                  <!--设置html模板-->
+                  <div id="weiduTemplate" style="display:none;">&lt;li&gt;
+  &lt;div class="clearfix"&gt;
+		&lt;div class="fl system_drop clearfix"&gt;
+			  &lt;select name="message[push_rule][0][key]" id="assort[push_rule][0][key]" class="cpy_style cang_assort assort[push_rule][0][key]"  style="width: 120px;"&gt;
+				&lt;option value="0"&gt;请选择维度&lt;/option&gt;
+				<?php foreach($this->dimensions as $k => $v): ?>
+				&lt;option value="<?php echo $k; ?>"&gt;<?php echo $v; ?>&lt;/option&gt;
+				<?php endforeach; ?>
+			  &lt;/select&gt;
+		 &lt;/div&gt;
+		&lt;div class="fl system_drop clearfix" style="padding-left:5px;"&gt;
+			  &lt;select name="message[push_rule][0][condition]" id="assort[push_rule][0][condition]" class="cpy_style cang_assort assort[push_rule][0][condition] changeSel"  style="width: 50px;"&gt;
+			  <?php foreach($this->conditions as $k => $v): ?>
+			  &lt;option value="<?php echo $k; ?>"&gt;<?php echo $v; ?>&lt;/option&gt;
+			  <?php endforeach; ?>
+			  &lt;/select&gt;
+		 &lt;/div&gt;
+		&lt;div class="fl system_drop clearfix"  style="padding-left:5px;"&gt;
+            &lt;input type="hidden" name="message[push_rule][0][value]"  data="" /&gt;
+            &lt;input type="text" name="message[push_rule][0][showvalue]" placeholder="请先选择维度" readonly="readonly"  class="cpy_name wp50 showvalue" style="width:500px;"&gt;
+		&lt;/div&gt;
+		 &nbsp;
+		 &lt;a href="javascript:;" class="delWeidu" name="del[con][0][del]" style="display:none;"&gt;删除&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/li&gt;</div>
+                  <ol id='weidu'>
+                      <li>
+                          <div class="clearfix">
+                                <div class="fl system_drop clearfix">
+                                      <select name="message[push_rule][0][key]" id="assort[push_rule][0][key]" class="cpy_style cang_assort assort[push_rule][0][key] changeSel"  style="width: 120px;">
+                                        <option value="0">请选择维度</option>
+                                        <?php foreach($this->dimensions as $k => $v): ?>
+                                        <option value="<?php echo $k; ?>"><?php echo $v; ?></option>
+                                        <?php endforeach; ?>
+                                      </select>
+                                 </div>
+                                <div class="fl system_drop clearfix" style="padding-left:5px;">
+                                      <select name="message[push_rule][0][condition]" id="assort[push_rule][0][condition]" class="cpy_style cang_assort assort[push_rule][0][condition]"  style="width: 50px;">
+                                      <?php foreach($this->conditions as $k => $v): ?>
+                                      <option value="<?php echo $k; ?>"><?php echo $v; ?></option>
+                                      <?php endforeach; ?>
+                                      </select>
+                                 </div>
+                                <div class="fl system_drop clearfix"  style="padding-left:5px;">
+                                    <input type="hidden" name="message[push_rule][0][value]" data="" />
+                                    <input type="text" name="message[push_rule][0][showvalue]" placeholder="请先选择维度" readonly="readonly"  class="cpy_name wp50 showvalue" style="width:500px;">
+                                </div>
+                                 &nbsp;
+                                 <a href="javascript:;" class="delWeidu" name="del[con][0][del]" style="display:none;">删除</a>
+                          </div>
+                      </li>
+                 </ol>
+                 <br />
+                 <a href="javascript:;" class="f12 clF tc search_btn fl " id="addWeidu">添加筛选条件</a>
+                 <br /><br />
+                 <font color="#FF6600">* 最多筛选五个条件，慎重设置同一维度的交叉互斥条件</font>
+                 <br /><br />
+             </span>
+        </td>
+    </tr>
+    <tr>
+        <td>推送时间：</td>
+        <td class="system_drop" id="start_time">
+              <br />
+              <input type="radio"  class="send_type" name="message[send_type]" checked="checked" value="real_time" /> 立即发送
+              <input type="radio"  class="send_type"  name="message[send_type]" value="regular_time" /> 定时发送
+              <br />
+              <span id="span_real_time" class="send_type_item" style="display: block;">
+                  选择立即发送，则消息审核通过后即进行推送.
+                  <br />
+                  <br />
+              </span>
+              <span id="span_regular_time" class="send_type_item" style="display: none;">
+                  <input type="text" name="message[start_time]" placeholder="请选择定时发送的时间"  class="time_pick" style="width:15%" id="start_time_input" readonly />
+                  <br />
+                  <br />
+              </span>
+              
+        </td>
+    </tr>
+ </table>
+</form>
+
+<div class="mt36 mb24 tr">
+    <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+    <a  onfocus="blur();" href="javascript:void(0)" id="edit_btn" class="f16 clF tc search_btn" >提 交</a>
+    <a href="javascript:;" class="f16 clF tc search_btn fl " id="test_send_btn">测试发送</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;" class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<div id="test_message" style="display:none;"  title=" 测试发送">
+   <form class="cmxform"  action="" method="post" id="test_msg_form">
+   <h1 class="send_title">选择进行消息发送的测试账号</h1>
+     <table class="detail_tabel  send_table f14 mt10">
+                <tr>
+                    <td style="width: 80px;padding-left:0">邮箱/手机：</td>
+                    <td>
+                        <input type="text" class="cpy_name"  name="user_name"  placeholder="请输入邮箱/手机"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 80px;padding-left:0">密码：</td>
+                    <td>
+                        <input type="password" class="cpy_name"  name="password"    placeholder="请输入密码"/>
+                    </td>
+                </tr>
+       </table>
+    </form>
+    <p class="message_text" style="color:red;"></p>
+    <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+	<div class="ui-dialog-buttonset">
+	<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="button" role="button" id="cancle_btn">
+	<span class="ui-button-text" >取消</span>
+	</button>
+	<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="button" role="button" id="true_btn">
+	<span class="ui-button-text" >确定</span>
+	</button>
+	</div>
+</div>
+</div>
+<div id="product_list_div" style="display:none;" title="选择产品">
+</div>
+<div id="app_list_div" style="display:none;" title="选择APP">
+	
+</div>
+<div id="platform_list_div" style="display:none;" title="选择平台">
+	
+</div>
+<input type="hidden" value="account" id="controller_name" />
+<?php if($this->messageId): ?>
+<input type="hidden" value="edit" id="action_name" />
+<?php else: ?>
+<input type="hidden" value="add" id="action_name" />
+<?php endif; ?>
+
+<script type="text/javascript" src="<?php echo $this->static;?>/js/hashmap.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/json2.js"></script>
+<script>
+ var products_map = new HashMap();
+ var apps_map = new HashMap();
+ var platforms_map = new HashMap();
+ 
+ if($('.receive_type').is(':checked')) {
+	 var v = $('.receive_type').filter(':checked').val();
+	 if (v == 'special') {
+		 $('#products_list_tr').show();
+	 }
+ }
+</script>
+<?php if($this->messageId): ?>
+<script>
+// 处理推送规则
+var user_type = '<?php echo $info['user_type']; ?>';
+<?php
+    if(!(isset($info['push_rule']) && $info['push_rule'])){
+       $info['push_rule'] = '[]'; 
+    }
+?>
+var rules = <?php echo $info['push_rule']; ?>;
+
+// 处理扩展字段
+<?php
+    if(empty($ex_other_arr)){
+       $ex_other = '[]'; 
+    }else{
+        $ex_other = json_encode($ex_other_arr);
+    }
+?>
+var ex_others = <?php echo $ex_other; ?>;
+<?php
+    if(empty($ex_arr)){
+       $ex_arr_json = '[]'; 
+    }else{
+        $ex_arr_json = json_encode($ex_arr);
+    }
+?>
+var ex_arr = <?php echo $ex_arr_json; ?>;
+var local_click_name = '';
+//处理推送时间
+var send_type = '<?php echo $info['send_type']; ?>';
+var start_time = '<?php echo ($info['start_time'] && $info['start_time'] !=='0000-00-00 00:00:00')?$info['start_time']:''; ?>';
+var controller = $('#controller_name').val()?$('#controller_name').val():'';
+if(controller == 'usermessage'){
+    //只有usermessage特有
+    var go = "<?php echo $go; ?>";
+    var is_appbox = '<?php echo $info['is_appbox']; ?>';
+}
+
+//处理离线时间的判断
+if(controller == 'account'){
+    var url = '<?php echo isset($ex_arr['url'])?$ex_arr['url']:''; ?>';
+}else{
+    //处理离线，目前usermessage和custom才有
+    var is_offline = '<?php echo $info['is_offline']; ?>';
+    var offline_value = '<?php echo $info['offline_value']; ?>';
+    var offline_unit = '<?php echo $info['offline_unit']; ?>';
+}
+</script>
+<?php endif; ?>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/message_center.js"></script>

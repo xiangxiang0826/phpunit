@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <EZ_CHANNEL_CONTENT id="1" title="title1" ctime="2014-11-18 14:09:17" mtime="0000-00-00 00:00:00" image="http://www.abc.com/1.jpg" content="content" source="网易" publish_source="oss" status="enable" if_notice="yes" url="http://www.163.com"/>
+    <EZ_CHANNEL_CONTENT id="2" title="title2" ctime="2014-11-18 14:09:17" mtime="0000-00-00 00:00:00" image="http://www.abc.com/1.jpg" content="content1" source="腾讯" publish_source="oss" status="enable" if_notice="yes" url="http://www.qq.com"/>
+    <EZ_CHANNEL_CONTENT id="3" title="title3" ctime="2014-11-18 14:09:17" mtime="0000-00-00 00:00:00" image="http://www.abc.com/1.jpg" content="content3" source="腾讯" publish_source="oss" status="enable" if_notice="yes" url="http://www.qq.com"/>
+    <EZ_CHANNEL_CONTENT id="4" title="title4" ctime="2014-11-18 14:09:17" mtime="0000-00-00 00:00:00" image="http://www.abc.com/1.jpg" content="content4" source="腾讯" publish_source="oss" status="enable" if_notice="yes" url="http://www.qq.com"/>
+</dataset>

@@ -1,0 +1,300 @@
+<!--页面位置-->
+<link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/jquery.mCustomScrollbar.min.css" />
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.mCustomScrollbar.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.queue.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/fileprogress.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/handlers.js"></script>
+
+<h3 class="location f14"><?php echo $this->menu('编辑权限', '/system/usergroup/index'); ?></h3>
+<div class="product_detail_search clearfix">
+    <div class="product_detail_search clearfix">
+        <div class="fl system_drop clearfix ml10">
+            <label class="fl mt4"><b><?php echo $this->group_info['name']; ?></b>：<?php echo $this->group_info['description']; ?></label>
+         </div>
+    </div>
+                           
+</div>
+<!--START：copy from cbs-->
+<style>
+.table,.mainTable{
+	border-collapse:separate;
+}
+</style>
+<form id="form_add_action" name="form2"  action="/system/usergroup/privilege/gid/<?php echo $this->gid; ?>" method="post">
+    <table width="100%"   border="0" cellpadding="0" cellspacing="1"   class="mainTable" >
+<?php foreach($this->root as $key => $row): ?>
+<?php if(count($row)): ?>
+        <tr class="altBg1">
+            <td  colspan="10"  > &nbsp;&nbsp;<input type="checkbox" name="module_id[]" value="<?php echo $key?>" <?php if(isset($this->group_module[$key])):?>checked="checked"<?php endif;?>><strong><?php echo $row['name']; ?></strong></td>
+        </tr>
+        <tr>
+            <td colspan="10"  class="altBg2"  >
+                <?php $u=0; ?>
+                <table   border="0" cellpadding="0" width="100%"  >
+                <?php foreach($this->second_root[$row['id']] as $key2 => $row2): ?>
+                <?php if(isset($this->last_root[$row2['id']])): ?>
+                    <?php $u++; ?>
+                    <?php if($u == 0): ?>
+                    <tr>
+                    <?php endif; ?>
+                        <td class="altBg2"   valign="top"   width="330">
+                            <table   border="0" cellpadding="0" cellspacing="1" width="100%" style="margin:0" class="mainTable atomTable"   bgcolor="#e0dcdc">
+                                <tr>
+                                    <td colspan="10" class="altBg1 " style="height:20px;"  >
+                                        <div class="floatLeft strong" >&nbsp;+
+                                        <input name="auth_id[]"  id="<?php echo $row2['id']; ?>"  type="checkbox" value="<?php echo $row2['id']; ?>"
+										<?php if(in_array($row2['id'], $this->user_permission_arr)): ?>
+											checked="checked" 
+										<?php endif; ?>
+										>
+                                        <?php echo $row2['name']; ?></div>
+                                        <div class="floatRight">
+                                        <?php if(in_array($row2['id'], $this->user_permission_arr)): ?>
+											<?php $checked = ''; ?> 
+                                        <?php else: ?>
+                                            <?php $checked = ''; ?> 
+										<?php endif; ?>
+                                        <input name="is_submod_checked" id="submod_<?php echo $row2['i18n_name']; ?>_<?php echo $row2['id']; ?>"
+                                           onclick="submod_checked_all(this.id)"  value="checked"  type="checkbox"/>
+                                        <label for="submod_<?php echo $row2['i18n_name']; ?>_<?php echo $row2['id']; ?>">全选</label>
+                                         </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="10"  class="altBg2">
+                    <?php if(isset($this->last_root[$row2['id']])): ?>
+                           <?php $i = 0; ?>
+                           <?php $this->last_root[$row2['id']] = $this->sort($this->last_root[$row2['id']], 'type', 'desc'); ?>
+                           <?php foreach($this->last_root[$row2['id']] as $key3 => $row3): ?>
+&nbsp;<input name="auth_id[]"  submod_id="submod_<?php echo $row2['i18n_name']; ?>_<?php echo $row2['id']; ?>" id="<?php echo $row3['id']; ?>"  type="checkbox" value="<?php echo $row3['id']; ?>"
+										<?php if(in_array($row3['id'], $this->user_permission_arr)): ?>
+											checked="checked" 
+										<?php endif; ?>
+                                >
+                           <?php
+                           if($row3['type'] == 'action'): 
+                               $actionName = '(动作)';
+                           else:    
+                               $actionName = '';
+                           endif;
+                           ?>
+                                &nbsp; <label for="<?php echo $row3['id']; ?>"><?php echo $row3['name']; ?><?php echo $actionName; ?></label><br />
+                           <?php $i++; ?>
+                           <?php endforeach; ?>
+                   <?php endif; ?>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    <?php if($u % 3 == 0): ?>    
+                    </tr>
+                    <?php endif; ?>
+             <?php else: ?>
+                    <?php if($row2['type'] == 'menu'): ?>
+                    <?php $u++; ?>
+                    <?php if($u == 0): ?>
+                    <tr>
+                    <?php endif; ?>
+                        <td class="altBg2" valign="top" width="330">
+                            <table border="0" cellpadding="0" cellspacing="1" width="100%" style="margin:0" class="mainTable atomTable" bgcolor="#e0dcdc">
+                                <tbody>
+                                <tr>
+                                    <td colspan="10" class="altBg1 " style="height:20px;">
+                                        <div class="floatLeft strong">&nbsp;+
+                                        <input name="auth_id[]"  id="<?php echo $row2['id']; ?>"  type="checkbox" value="<?php echo $row2['id']; ?>"
+										<?php if(in_array($row2['id'], $this->user_permission_arr)): ?>
+											checked="checked" 
+										<?php endif; ?>
+										>
+                                        <?php echo $row2['name']; ?></div>
+                                        <div class="floatRight">
+                                        <?php if(in_array($row2['id'], $this->user_permission_arr)): ?>
+											<?php $checked = ''; ?> 
+                                        <?php else: ?>
+                                            <?php $checked = ''; ?> 
+										<?php endif; ?>
+                                         </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <?php if($u % 3 == 0): ?>    
+                        </tr>
+                        <?php endif; ?>  
+                  <?php endif; ?>
+                    <?php endif; ?>
+                        <?php endforeach; ?>
+                </table>
+            </td>
+        </tr>
+<?php endif; ?>
+<?php endforeach; ?>
+    </table>
+</form>
+</table>
+            <div class="mt36 mb24 tr">
+                <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+                <a id="save_action"  onfocus="blur();" href="javascript:void(0)" id="sub_btn" class="f16 clF tc search_btn" >提 交</a>
+            </div>
+<style>
+/** 为权限列表增加 **/
+.floatLeft{float:left; }
+.floatRight{float:right; }
+tr,td{	font-size:12px; font-family:Arial, Helvetica, sans-serif, "宋体"; }
+
+.input{border:1px solid #d5d8c7; background:#fdfff5;height:20px; width:500px;color:#669966;line-height:20px; }
+
+.mainTable{ background:#d8dbdd; width:100%; margin-top:10px;}
+.mainTable td{ padding:2px 2px 2px 5px; }
+.mainTable td  #ued_problem_type_id{width: 216px  !important;}
+
+.mainHeader{  BACKGROUND: url(../images/sub_menu_bg.gif) center repeat-x #FFFFFF; background-position:  1px 1px;font-size:12px; color:#47505a; font-weight:bold;height:23px;}
+.mainSubHeader{background:#f7f7f7; color:#47505a;height:25px; font-weight:bold  }
+.altBg1{ background:#f9f9f9; height:25px; color:#47505a;}
+.altBg2{background:#FFFFFF; height:25px;color:#47505a}
+.altBg3{background:#F2FEE2; height:25px;color:#47505a;}
+.altBg4{ background:#efefef;}
+</style>
+<!--END：copy from cbs-->
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice">数据保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">确 定</a>
+</div>
+<div id="tips_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<input type="hidden" value="<?php echo $this->user_permission_ids; ?>" id="check_arr" name="check_arr" />
+<script language="javascript" type="text/javascript">
+    $(function() {
+    	$( "#tips_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "确定": function() {
+                	$( this ).dialog( "close" );
+        		}
+            }
+        });
+        
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        $("#close_message").on("click",function() {
+            $( "#message_dialog" ).dialog( "close" );
+            if($('#sys_notice').text() == "数据保存成功！"){
+               window.location.href = '/system/usergroup/index'; 
+            }
+        });
+	
+    	$('#form_add_action').validate({
+    		rules: {
+    			'auth_id': {
+    				required: true,
+    			}
+    		},
+    		messages: {   //自定义提示信息
+    			
+    		}
+    	});
+    	$('#save_action').click(function () {
+			if($('#form_add_action').valid()) {
+                var url = '/system/usergroup/privilege';
+                var gid = '<?php echo $this->gid; ?> '
+                url = gid?(url+'/gid/'+gid):url;
+				$('#form_add_action').ajaxSubmit({
+					url:url, //提交给哪个执行
+					type:'POST',
+					dataType: 'json',
+					success: function (result) {
+						if(result.status == 200) {
+							$( "#message_dialog" ).dialog( "open" );
+						} else if (result.msg == 505) {
+	                        $('#message_dialog .message_text').text('亲，你没有这个操作的权限！');
+	                        $("#message_dialog").dialog("open");
+	                    } else {
+							$('#tips_msg').text(result.msg);
+							$( "#tips_dialog" ).dialog( "open" );
+						}
+					}
+				});
+				return false;
+			}
+		});
+        
+        $('#cancel_btn').click(function () {
+			history.go(-1);
+		});
+        
+        // 初始化选择项
+        var init = function(){
+            $('input[name="auth_id[]"]').each(function(){
+                var check_arr = $('#check_arr').val();
+                var check_auth = check_arr.split(',');
+                for(i=0,count = check_auth.length; i<count; i++){
+                    var item = check_auth[i];
+                    if(item == $(this).attr('id')){
+                        $(this).prop('checked', true);
+                    }
+                }
+            });
+            // 判断是否全部选择上了，如果全部选择了，则勾选上 “全选”
+            $('.atomTable').each(function(){
+                var num = $(this).find('tr:odd').find('td').find('input:checkbox[name="auth_id[]"]').not("input:checked").length;
+                if(num == 0){
+                    $(this).find('tr:even').find('input:odd').prop('checked', true);
+                }
+                $(this).find('tr:odd').find('td').find('input').click(function(){
+                    if($(this).prop('checked') == false){
+                        $(this).parent('td').parent('tr').prev().find('td').find('input:odd').prop('checked', false);
+                    }else{
+                       var num = $(this).parent('td').find('input:checkbox[name="auth_id[]"]').not("input:checked").length;
+                        if(num == 0){
+                            $(this).parent('td').parent('tr').prev().find('td').find('input:odd').prop('checked', true);
+                        }
+                    }
+                });
+            });
+        }
+        init();
+});
+
+function submod_checked_all(submod_id){
+    var trArr = document.getElementsByTagName("input");
+    var check_status = false;
+    var obj = $('#'+submod_id);
+    // alert(obj.prop('checked'));
+    if(obj.prop('checked') == true){
+        check_status = true;
+    }
+    for(var i=0;i<trArr.length;i++){
+        if (trArr[i].getAttribute("submod_id") == submod_id){
+            $(trArr[i]).prop('checked', check_status);
+        }
+    }
+}
+</script>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title><?php echo $this->translate('site_name'); ?></title>
+<?php echo $this->render('static.phtml');?>
+</head>
+<body>
+<div class="header">
+    <div class="header-content">
+        <?php echo $this->render('header.phtml');?>
+   </div>
+</div>
+<div class="body clearfix">
+<!--备注信息-->
+<div id="aside-menu" class="aside">
+      <?php /** echo $this->render('left-menu.phtml'); **/ ?>
+</div><!-- #EndLibraryItem -->
+<div id="main-body" class="main">
+<div class="content clearfix">
+
+</div>
+   </div>
+    </div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">亲，您暂时没有此页面的权限哦!</p>
+</div>
+
+<script >
+    $(document).ready(function() {
+        $("#message_dialog").dialog({
+            autoOpen : false,
+            width : 540,
+            height : 240,
+            show : {
+                effect : "blind",
+                duration : 300
+            },
+            hide : {
+                effect : null,
+                duration : 500
+            },
+            buttons : {
+                "取消" : function() {
+                    $(this).dialog('close');
+                },
+                "确定" : function() {
+                    history.go(-1);
+                }
+            },
+            dialogClass : "my_message_dialog",
+            modal : true
+        });
+        $("#message_dialog").dialog("open");
+    });
+</script>
+</body>
+</html>

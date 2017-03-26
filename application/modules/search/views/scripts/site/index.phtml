@@ -1,0 +1,220 @@
+<style type="text/css">
+.syn-state {margin:10px; line-height:30px;}
+</style>
+<div class="search-box">
+	<form id="searchForm">
+		<?php echo Cms_L::_('page_title'); ?>：<input type="text" name="S[title]" value="" placeholder="" />
+		<?php echo Cms_L::_('page_keyword'); ?>：<input type="text" name="S[keyword]" value="" placeholder="" />
+		URL：<input type="text" name="S[url]" value=""  />
+		<?php echo Cms_L::_('module'); ?>：<select id="module" name="S[module]">
+			<option value=""></option>
+			<?php foreach($this->module_all as $module): ?>
+			<option value="<?php echo $module?>"<?php if(isset($this->search['module']) && $this->search['module'] == $module): ?> selected="selected"<?php endif; ?>><?php echo $module?></option>
+			<?php endforeach; ?>
+		</select>
+		<select id="type" name="S[type]" style="width:80px;"></select>
+		ID:<input type="text" name="S[entity_id]" value="<?php if(isset($this->search['entity_id'])) echo $this->search['entity_id']; ?>" size="5" />
+		<?php echo Cms_L::_('name'); ?>：<input type="text" name="S[entity_name]" value="" placeholder="<?php echo Cms_L::_('relevant_name'); ?>" />
+		<br />
+		<?php echo Cms_L::_('html_content'); ?>：<input type="text" id="searchHtml" class="easyui-tooltip" title="<?php echo Cms_L::_('search_rule'); ?>" name="S[html]" value="<?php if(isset($this->search['html'])) echo $this->search['html']; ?>" placeholder="Video Converter :OR: DVD Creator" size="40" />
+		<select name="S[state]">
+			<option value=""><?php echo Cms_L::_('state'); ?></option>
+			<option value="able"<?php if(isset($this->search['state']) && $this->search['state'] == 'able'): ?> selected="selected"<?php endif; ?>><?php echo Cms_L::_('able'); ?></option>
+			<option value="disable"<?php if(isset($this->search['state']) && $this->search['state'] == 'disable'): ?> selected="selected"<?php endif; ?>><?php echo Cms_L::_('disable'); ?></option>
+			<option value="deleted"<?php if(isset($this->search['state']) && $this->search['state'] == 'deleted'): ?> selected="selected"<?php endif; ?>><?php echo Cms_L::_('deleted'); ?></option>
+		</select>
+		<button type="submit" id="siteSearch"><?php echo Cms_L::_('search'); ?></button>
+		<?php if($this->badword_all): ?>
+		<button type="button" id="checkBadword"><?php echo Cms_L::_('check_badword'); ?></button>
+		<?php endif; ?>
+	</form>
+</div>
+<div class="data-box">
+	<table id="datagrid" title="<?php echo Cms_L::_('page_list'); ?>" style="width:auto;"  
+            data-options="pagination:'true',
+						pageList:[15,30], 
+						pageSize:'15',
+						striped:'true',
+						fitColumns:'true'">  
+		
+	</table>
+</div>
+<script>
+var $datagrid = $('#datagrid');
+var site_id = <?php echo $this->site_id; ?>;
+var badword_all = <?php echo json_encode($this->badword_all); ?>;
+
+$(function(){
+	$datagrid.datagrid({
+		toolbar : [
+			{text:'<?php echo Cms_L::_('syn_page'); ?>', iconCls:'icon-ok', handler:function(){syn_page();}},
+			{text:'<?php echo Cms_L::_('create_selected'); ?>', iconCls:'icon-ok', handler:function(){create_selected();}},
+		],
+		columns : [[
+			{field:'id', checkbox:true},
+			{field:'tpl_id', title:'<?php echo Cms_L::_('tpl_id'); ?>', sortable:'true', width:30},
+			{field:'url', title:'URL', width:100, sortable:'true', formatter:function(val, row, idx){
+				return '<a href="public/template/html/tpl_id/' + row.tpl_id + '/page_id/' + row.page_id + '" target="_blank">' + row.url + '</a>';
+			}},
+			{field:'update_time', title:'<?php echo Cms_L::_('update_name'); ?>', width:100},
+			{field:'action', title:'<?php echo Cms_L::_('action'); ?>', width:100, formatter:function(val, row, idx){
+				var html;
+				html = '<a href="javascript:;" onclick="edit_page(' + row.tpl_id + ',' + row.page_id + ')"><?php echo Cms_L::_('edit'); ?></a>';
+				switch(row.state) {
+					case 'disable':			//可以删除和启用
+						html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="delete_page(' + row.tpl_id + ',' + row.page_id + ')"><?php echo Cms_L::_('delete'); ?></a>';
+						html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="able_page(' + row.tpl_id + ',' + row.page_id + ')" class="warn"><?php echo Cms_L::_('able'); ?></a>';
+						break;
+					case 'deleted':			//只可启用和禁用
+						html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="able_page(' + row.tpl_id + ',' + row.page_id + ')" class="warn"><?php echo Cms_L::_('recover'); ?></a>';
+						html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="disable_page(' + row.tpl_id + ',' + row.page_id + ')"><?php echo Cms_L::_('disable'); ?></a>';
+						break;
+					default:
+						html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="delete_page(' + row.tpl_id + ',' + row.page_id + ')"><?php echo Cms_L::_('delete'); ?></a>';
+						html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="disable_page(' + row.tpl_id + ',' + row.page_id + ')"><?php echo Cms_L::_('disable'); ?></a>';
+						html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="create_html(' + row.tpl_id + ',' + row.page_id + ')"><?php echo Cms_L::_('create'); ?></a>';
+				}
+				
+				html += '&nbsp;|&nbsp;<a href="template/page/preview/site_id/' + site_id + '/tpl_id/' + row.tpl_id + '/page_id/' + row.page_id + '" target="_blank"><?php echo Cms_L::_('preview'); ?></a>';
+				if(row.module == 'article' && row.type == 'content') {
+					html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="edit_content(' + row.entity_id + ')"><?php echo Cms_L::_('edit_content'); ?></a>';
+				}
+				
+				return html;
+			}}
+		]]
+	});
+	
+	//搜索
+	$('#searchForm').form({
+		onSubmit:function(data){
+			$datagrid.datagrid({url : 'search/site/data/site_id/<?php echo $this->site_id; ?>/?' + $('#searchForm').serialize()});
+			return false;
+		}
+	});
+
+	//模版联动
+	$('#module').change(function(){
+		var mod = $(this).val();
+		if(!mod){
+			$('#type').html('<option value=""><?php echo Cms_L::_('select_type'); ?></option>');
+			return false;
+		}
+		
+		$('#type').load('template/template/gettype', {mod:mod, site_id:site_id});
+	});
+	
+	//自动搜索
+	<?php if(isset($this->search)): ?>
+	$('#module').change();
+	$('#siteSearch').click();
+	<?php endif; ?>
+	
+	<?php if($this->badword_all):?>
+	$('#checkBadword').click(function(){
+		$.messager.confirm('<?php echo Cms_L::_('tip'); ?>', '<?php echo Cms_L::_('check_confirm'); ?>', function(is_del){
+			if(is_del) {
+				var html = [];
+				$.each(badword_all, function(idx, val){
+					html.push(val);
+				});
+				
+				$('#searchHtml').val(html.join(':REGEXP:'));
+				$('#siteSearch').click();
+			}
+		});
+	});
+	<?php endif; ?>
+});
+
+//同步页面
+function syn_page(){
+	$.messager.confirm('<?php echo Cms_L::_('tip'); ?>', '<?php echo Cms_L::_('syn_confirm'); ?>', function(is_del){
+		if(is_del){
+			$.overlay.open({content:'<?php echo Cms_L::_('syn...'); ?>', width:200});
+			syn();
+		}
+	});
+}
+
+function syn(curr){
+	curr || (curr = 0);
+	$.get('search/site/update', {site_id:site_id, curr:curr}, function(data){
+		if(data.state == 'ok' && data.done == false){
+			$.overlay.set_content('<span class="syn-state"><span class="warn">' + data.tpl_name + '</span> <?php echo Cms_L::_('syn_done'); ?></span>');
+			syn(data.curr);
+		}else{
+			$.overlay.close();
+		}
+	}, 'json');
+}
+
+//生成选中页面
+function create_selected(){
+	$.create_html.multi_tpl_page(site_id, $datagrid);
+}
+
+//编辑页面
+function edit_page(tpl_id, page_id){
+	$.nav_tab.add('<?php echo Cms_L::_('edit_page'); ?>-[' + tpl_id + '][' + page_id + ']', 'template/page/edit', {tpl_id:tpl_id, page_id:page_id, site_id:site_id});
+}
+
+//生成页面
+function create_html(tpl_id, page_id) {
+	$.create_html.page(site_id, tpl_id, page_id);
+}
+
+//禁用页面
+function disable_page(tpl_id, page_id){
+	$.post('template/page/state', {site_id:site_id, tpl_id:tpl_id, page_id:page_id, state:'disable'}, function(data){
+		$datagrid.datagrid('reload');
+	}, 'json');
+}
+
+//启用页面
+function able_page(tpl_id, page_id){
+	$.post('template/page/state', {site_id:site_id, tpl_id:tpl_id, page_id:page_id, state:'able'}, function(data){
+		if(data.state == 'ok'){
+			$datagrid.datagrid('reload');
+		}else{
+			if(data.state == 'error'){
+				var msg = [];
+				if(typeof data.title != 'undefined') {
+					$.each(data.title, function(i, n){
+						msg.push('<a href="javascript:;" onclick="$.template_page.edit(' + n.tpl_id + ',' + n.page_id + ',\'<?php echo Cms_L::_('edit_page'); ?>\');"><?php echo Cms_L::_('title_dup_page'); ?></a>');
+					});
+				}
+
+				if(typeof data.url != 'undefined') {
+					$.each(data.url, function(i, n){
+						msg.push('<a href="javascript:;" onclick="$.template_page.edit(' + n.tpl_id + ',' + n.page_id + ',\'<?php echo Cms_L::_('edit_page'); ?>\');"><?php echo Cms_L::_('url_dup_page'); ?></a>');
+						focus = 'url';
+					});
+				}
+				
+				data.msg += '<div><span style="margin:20px;">' + msg.join('</span><span style="margin:20px;">') + '</span></div>';
+			}
+
+			$.messager.alert('<?php echo Cms_L::_('tip'); ?>', data.msg, data.state);
+		}
+	}, 'json');
+}
+
+//删除页面
+function delete_page(tpl_id, page_id) {
+	$.messager.confirm('<?php echo Cms_L::_('tip'); ?>', '<?php echo Cms_L::_('delete_confirm'); ?>', function(is_del){
+		if(is_del) {
+			$.post('template/page/delete', {site_id:site_id, tpl_id:tpl_id, page_id:page_id}, function(data){
+				if(data.state == 'ok'){
+					$datagrid.datagrid('reload');
+				}
+			}, 'json');
+		}
+	});
+}
+
+//编辑内容，现在只限于文章
+function edit_content(entity_id) {
+	$.nav_tab.add('<?php echo Cms_L::_('edit_content'); ?> - [' + entity_id + '] - ' + site_id, 'article/index/edit', {id:entity_id, site_id:site_id});
+}
+</script>

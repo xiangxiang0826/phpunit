@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>遥控一族</title>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+<link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body>
+<div class="wrap">
+	<section class="head-wrap">
+    	<img class="img-responsive" src="images/bg_ylez_logo.png" alt="遥控一族">
+        <h1 class="sr-only">智慧家庭云操作系统</h1>
+    </section>
+    <div class="index-conten">
+    	<div class="logo-wrap"><img src="images/icon_ylez_logo.png" alt="LOGO"></div>
+        <p class="index-p">超级APP IOS版</p>
+        <a class="btn-a" onclick="openurl('itms-services://?action=download-manifest&url=https://www.1719.com/mobile/{ENTERPRISE_LABEL}.plist');">点击下载</a>
+    </div>
+</div>
+</body>
+</html>

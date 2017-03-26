@@ -1,0 +1,269 @@
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+                     	<form action="/product/device/applyid" method="get"  id="search_form">
+                           <div class="product_detail_search clearfix">
+                                <div class="fl system_drop clearfix">
+                                   <select id="enterprise_id" class="cpy_style cang_assort" name ="search[enterprise_id]" style="width: 185px;">
+                                       <option value="0">所有厂商</option>
+                                       <?php foreach($this->enterprise_list as $enterprise):?>
+                                        <option value="<?php echo $enterprise['id']?>" <?php if($enterprise['id'] == $this->search['enterprise_id']):?> selected="selected"<?php endif?>><?php echo mb_strimwidth($enterprise['company_name'],0,26,'...')?></option>
+                                        <?php endforeach;?>
+                                   </select>
+                               </div>
+                               <div class="fl system_drop clearfix">
+                                    <select id="product_id" class="cpy_style product_assort" name ="search[product_id]" style="width: 120px;">
+                                        <option value="">所有产品</option>
+                                        <?php foreach($this->product_list as $product):?>                                        
+                                       <?php if($product['id'] != 0):?>
+                                        	<option value="<?php echo $product['id']?>" <?php if($product['id'] === $this->search['product_id']):?> selected="selected"<?php endif?>><?php echo mb_strimwidth($product['name'],0,16,'...')?></option>
+                                        <?php endif;?>
+                                        <?php endforeach;?>
+                                    </select>
+                                </div>
+                                <div class="fl system_drop clearfix">
+                                    <select id="supply_type" class="cpy_style product_assort" name ="search[supply_type]" style="width: 80px;">
+                                        <option value="0">所有类型</option>
+                                        <?php foreach($this->apply_type_map as $key=>$type):?>
+                                        <option value="<?php echo $key?>" <?php if($key == $this->search['supply_type']):?> selected="selected"<?php endif?>><?php echo $type?></option>
+                                        <?php endforeach;?>
+                                    </select>
+                                </div>
+                               <div class="fl system_drop clearfix">
+                                   <input type="text" class="cpy_name w150" id="batch"  name ="search[batch]" value="<?php echo isset($this->search['batch']) ? $this->search['batch'] : ''?>" placeholder="搜索批次号码">
+                               </div>
+                                <div class="console_search_wrap fr"><a class="search_icon_btn f16 clF tc" onFocus="blur();" href="javascript:;" id="search"><i class="find_icon"></i>查 询</a></div>
+                           </div>
+                           </form>
+                           <div class="product_detail_display">
+									<div class="product_table mt24 f14">
+                                       <table class="table_s tc tc_left" width="100%" border="0">
+                                         <thead>
+                                          <tr>                          
+                                            <td width="100px">批次</td>
+                                            <td>厂商</td>
+                                            <td>产品</td>
+                                            <td>品类</td>
+                                            <td width="60px">申请时间</td>
+                                            <td style="text-align: right;width:60px;">数量</td>
+                                            <td width="60px">类型</td>
+                                            <td width="60px">状态</td>
+                                            <td style="text-align: center;width:60px;">操作</td>
+                                          </tr>
+                                         </thead>
+                                         <tbody>
+                                         <?php if($this->apply_list):?>
+                                         	<?php foreach($this->apply_list as $item):?>
+                                         	<tr>
+                                            <td><?php echo $item['batch']?></td>
+                                            <td><?php echo isset($this->enterprise_list[$item['enterprise_id']]) ? $this->enterprise_list[$item['enterprise_id']]['company_name'] : '厂商已删除'?></td>
+                                            <td><?php echo $this->product_list[$item['product_id']]['name']?></td>
+                                            <td><?php echo $this->category_list[$this->product_list[$item['product_id']]['category_id']]['name']?></td>
+                                            <td><?php echo $item['ctime']?></td>
+                                            <td style="text-align: right;"><?php echo $item['supply_number']?></td>
+                                        <?php if($this->apply_type_map[$item['supply_type']] == '测试'): ?>
+                                            <td style="color:red;"><?php echo $this->apply_type_map[$item['supply_type']]?></td>
+                                        <?php else: ?>
+                                            <td><?php echo $this->apply_type_map[$item['supply_type']]?></td>
+                                        <?php endif; ?>
+<?php if($item['status'] == Model_DeviceManager::AUDIT_PENDING): ?>
+                                            <!--待审核状态-->
+                                            <td style="color:red;">待审核</td>
+                                            <td class="cl0b9600" style="text-align: center;">
+                                              	<a  href="javascript:void(0)" audit_id="<?php echo $item['id']?>" class="check_detail cl0b9600">审核</a>
+                                            </td>
+<?php elseif($item['status'] == Model_DeviceManager::AUDIT_SUCCESS): ?>
+       <?php if($item['run_status'] == Model_DeviceManager::STATUS_PROCESSING): ?>
+                                            <!--生成中状态-->
+                                            <td>生成中</td>
+                                            <td style="text-align: center;">
+                                            <a  href="javascript:void(0)" audit_id="<?php echo $item['id']?>" class="check_detail cl0b9600">-</a>
+                                            </td>
+       <?php elseif($item['run_status'] == Model_DeviceManager::STATUS_PENDING): ?>
+                                            <!--待生成状态-->
+                                            <td>待生成</td>
+                                            <td class="cl0b9600" style="text-align: center;">
+                                            <a  href="javascript:void(0)" audit_id="<?php echo $item['id']?>" class="check_detail cl0b9600">生成</a>
+                                            </td>
+       <?php elseif($item['run_status'] == Model_DeviceManager::STATUS_COMPLETE): ?>
+                                            <!--可用状态-->
+                                            <td>可用</td>
+                                            <td class="cl0b9600" style="text-align: center;">
+                                            <a  target="_blank" href="<?php echo "{$this->upload_cfg['baseUrl']}{$item['path']}"?>" class="check_detail cl0b9600">下载</a>
+                                            </td>
+       <?php elseif($item['run_status'] == Model_DeviceManager::STATUS_FAILED): ?>
+                                            <!--生成失败状态-->
+                                            <td>生成失败</td>
+                                            <td class="cl0b9600" style="text-align: center;">
+                                            <a  href="javascript:void(0)" audit_id="<?php echo $item['id']?>" class="check_detail cl0b9600">重新生成</a>
+                                            </td>                        
+       <?php else: ?>
+                                            
+       <?php endif; ?>
+<?php else: ?>
+                                            <td>审核不通过</td>
+                                            <td style="text-align: center;">-</td>                           
+<?php endif; ?>
+                                          </tr>
+                                         	<?php endforeach;?>
+                                         	<?php else:?>
+                                         	<tr><td colspan="9" style="text-align: center;">暂无记录</td></tr>
+                                         <?php endif;?>
+                                         </tbody>
+                                   </table>
+                                </div>
+               <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+          </div>
+ </div>
+  <div id="message_dialog" style="display:none;" title="系统提醒">
+  	<form class="cmxform" method="post" id="audit_form">
+  	<input type="hidden" id="audit_id" name="id">
+    <table class="detail_tabel form_table f14">
+        <tr><td>申请批次：</td><td id="detail_supply_batch"></td></tr>
+        <tr><td>产品：</td><td id="detail_supply_product"></td></tr>
+        <tr><td>厂商：</td><td id="detail_supply_enterprise"></td></tr>
+        <tr><td>申请类型：</td><td id="detail_supply_type"></td></tr>
+        <tr><td>申请数量：</td><td id="detail_supply_number"></td></tr>
+        <tr><td>审核结论：</td><td>
+        <input type="radio" name="audit_status" value="audit_success" checked="checked"> 通过 
+        <input type="radio" name="audit_status" value="audit_failed">不通过</td></tr>
+        <tr><td>审核意见：</td><td>
+        <textarea id="detail_supply_remark" cols ="40" rows="5" class="text_cls wp60" name="remark"></textarea>
+        </td></tr>
+        <tr><td>结果通知：</td><td>
+        	<input type="checkbox" name="audit_notice[]" value="sms" checked="checked">短信
+        	<input type="checkbox" name="audit_notice[]" value="email" checked="checked">邮件</td></tr>
+        </table>
+     </form>
+</div>
+<div id="success_dialog" style="display:none;"  title="系统提醒">
+    <p class="message_text">操作成功</p>
+</div>
+<script language="javascript" type="text/javascript">
+	$(function () {
+		var audit_id = '';
+		var apply_type = <?php echo json_encode($this->apply_type_map)?>;
+		var status_map = <?php echo json_encode($this->status_map)?>;
+		var enterprise_list = <?php echo json_encode($this->enterprise_list)?>;
+		var product_list = <?php echo json_encode($this->product_list)?>;
+		$( "#success_dialog" ).dialog({
+		    autoOpen: false,
+            closable:false,
+            closeOnEscape:true,
+		    width: 540,
+		    height: 240,
+		    show: {
+		        effect: "blind",
+		        duration: 300
+		    },
+		    hide: {
+		        effect: null,
+		        duration: 500
+		    },
+		    dialogClass: "my_message_dialog",
+		    modal: true,
+		    buttons: {
+                "确定": function() {
+                	location.reload();
+                }
+		    }
+		});
+
+
+		$('#audit_form').validate({
+    		rules: {
+    			'audit_status': {
+    				required: true
+    			},
+    			'remark': {
+    				maxlength:100,
+    				minlength:2
+    			}
+    		},
+    		messages: {   //自定义提示信息
+    			//old_password: "原密码输入错误",
+    		},
+    		ignore : ''
+    	});	
+		
+		$( "#message_dialog" ).dialog({
+		    autoOpen: false,
+		    width: 660,
+		    height: 520,
+		    show: {
+		        effect: "blind",
+		        duration: 300
+		    },
+		    hide: {
+		        effect: null,
+		        duration: 500
+		    },
+		    dialogClass: "my_message_dialog",
+		    modal: true,
+		    buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+                	if($('#audit_form').valid()) {
+        				$('#audit_form').ajaxSubmit({
+        					url:'/product/device/auditapply', //提交给数据保存接口
+        					type:'POST',
+        					dataType: 'json',
+        					success: function (result) {
+        						location.reload();
+        					}
+        				});
+        				return false;
+        			}
+				}
+            }
+		});
+
+		$('#search').click(function () {
+			$('#search_form').submit();
+		});
+
+		$('a[audit_id]').click(function () {
+			audit_id = $(this).attr('audit_id');
+			$('#audit_id').val(audit_id);
+            if($(this).html() == "-"){
+                return false;
+            }
+            if($(this).html() == "重新生成" || $(this).html() == "生成"){
+                 $(this).html('-');
+                 $(this).parent('td').prev('td').html('生成中');
+                 $.post('/product/device/auditapply',{id:audit_id,audit_status:'audit_success',
+        				remark:$('#detail_supply_remark').val(),audit_notice:[]},function () {
+                 },'json');
+                return false;
+            }
+			$.get('/product/device/applydetail?id='+audit_id,{},function (data) {
+                
+				$("#detail_supply_batch").html(data.result.batch);
+				$("#detail_supply_product").html(product_list[data.result.product_id]['name']);
+				if(typeof(enterprise_list[data.result.enterprise_id]) != 'undefined') {
+					$("#detail_supply_enterprise").html(enterprise_list[data.result.enterprise_id]['company_name']);
+				} else {
+					$("#detail_supply_enterprise").html('厂商已被删除');
+				}
+                $("input:radio[name='audit_status']").prop("checked", false); 
+                if(data.result.status){
+                    $("input:radio[name='audit_status'][value='"+data.result.status+"']").prop('checked','true');
+                }
+                // 初始化表单数据
+                $("#detail_supply_remark").val('');
+                $("input:checkbox[name='audit_notice[]']").prop('checked', true);
+                // 如果没有选中，默认选中第一个
+                if(typeof($("input:radio[name='audit_status']:checked").val()) == 'undefined' || $("input:radio[name='audit_status']:checked").val() == ""){
+                    $("input:radio[name='audit_status']:first").prop('checked', true);
+                }
+                // $("input:checkbox[name='audit_notice[]']").prop("checked", 'true'); 
+				$("#detail_supply_type").html(apply_type[data.result.supply_type]);
+				$("#detail_supply_number").html(data.result.supply_number);
+				$("#detail_supply_remark").val(data.result.remark);
+				$( "#message_dialog" ).dialog( "open" );
+			},'json');
+		});
+	});
+</script>

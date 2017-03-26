@@ -1,0 +1,240 @@
+<script src="<?php echo $this->static;?>/js//libs/highcharts/highcharts.js"></script>
+<script src="<?php echo $this->static;?>/js/libs/highcharts/hightheme.js"></script>
+<script src="<?php echo $this->static;?>/js/jquery-simple-pagination-plugin.js"></script>
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+	<div class="product_detail_search clearfix">
+			<div class="chart_index fl f14">
+				<a href="/operation/index?date=current_month"><span <?php if($this->date=='current_month'):?>class="on"<?php endif;?>>本月</span></a>
+				<a href="/operation/index?date=last_month"><span <?php if($this->date=='last_month'):?>class="on"<?php endif;?>>上月</span></a>
+				<a href="/operation/index?date=seven_days"><span <?php if($this->date=='seven_days'):?>class="on"<?php endif;?>>近7天</span></a>
+				<a href="/operation/index/?date=thirty_days"><span class="last <?php if($this->date=='thirty_days'):?>on<?php endif;?>">近30天</span></a>
+			</div>
+			<div class="chart_search f14 fr">
+				<form action="/operation/index" method="get" id="feedback_basic">
+				<input type="text" name="start_date" value="<?php if(isset($this->start_date)):?><?php echo $this->start_date;?><?php endif;?>" class="time_pick" id="start_date" style="ime-mode:disabled" onkeypress="noPermitInput(event)">
+                <label> - </label>
+				<input type="text" name="end_date" value="<?php if(isset($this->end_date)):?><?php echo $this->end_date;?><?php endif;?>" class="time_pick" id="end_date" style="ime-mode:disabled" onkeypress="noPermitInput(event)">
+                <a type="submit" onFocus="blur();" id="search" class="fromtotime f16 clF tc search_icon_btn" href="javascript:void(0)"><i class="find_icon"></i>查 询</a>
+				</form>
+			</div>
+	</div>
+	<div class="product_table mt24 f14">
+		<div id="chart" class="vertical_nav"></div><br/>
+			<div id="table-container">
+			<table class="tc tc_left" width="100%" border="0">
+			<thead>
+				<tr>                          
+					<td>产品</td>
+					<td style="text-align: right;width:200px">新增用户反馈</td>
+					<td style="text-align: right;width:200px">环比增长</td>
+				</tr>
+			</thead>
+			<tbody>
+			<tr class="fstrong">                          
+				<td >时段数据和</td>
+				<td style="text-align: right;"><?php echo isset($this->data_total['count_new']) ? $this->data_total['count_new'] : 0;?></td>
+				<td style="text-align: right;">
+				<?php if(isset($this->data_total['count_up']) && $this->data_total['count_old'] != 0):?>
+				<span style="<?php if($this->data_total['count_up']):?>color:green;<?php endif;?> <?php if($this->data_total['count_up'] == 'no'):?>color:red;<?php endif;?>">
+				<?php if($this->data_total['count_up'] && $this->data_total['count_old']!='0'):?>+<?php endif;?><?php echo $this->data_total['count_baifen'];?></span>
+				<?php else:?>
+				-
+				<?php endif;?>
+				</td>
+			 </tr>
+			 <?php if(!empty($this->showlist)):?>
+				 <?php foreach($this->showlist as $v):?>
+				  <tr>
+					<td><?php if(isset($v['name'])):?><?php echo $this->escape($v['name']);?><?php endif;?></td>
+					<td style="text-align: right;"><?php echo $v['this'];?></td>
+					<td style="text-align: right;"><span style="<?php if($v['upper'] == 'yes'):?>color:green;<?php endif;?> <?php if($v['upper'] == 'no'):?>color:red;<?php endif;?>">
+					<?php if($v['upper'] == 'yes' && $v['former'] != '0'):?>+<?php endif;?><?php echo $v['load'];?></span></td>
+				  </tr>
+				  <?php endforeach;?>
+			</tbody>
+			<?php endif;?>
+			</table>
+			<?php if(count($this->showlist) > 10):?>
+			<div class="my-navigation" style="margin-bottom:40px;">
+	            <div><span class="ml8">跳至第</span><select class="simple-pagination-select-specific-page"></select><span class="ml8">页</span></div>
+	            <div class="simple-pagination-last"></div>
+	            <div class="simple-pagination-next"></div>
+	            <div class="simple-pagination-page-numbers"></div>
+	            <div class="simple-pagination-previous"></div>
+	            <div class="simple-pagination-first"></div>
+	            <div>共有 <span class="simple-pagination-page-count"></span> 页</div>   
+	        </div>
+	        <?php endif;?>
+		</div>
+	</div>
+</div>
+<div id="tips_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script type="text/javascript">
+$(function(){
+	$( "#tips_dialog" ).dialog({
+        autoOpen: false,
+        width: 555,
+        dialogClass: "my-dialog",
+        modal: true,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        buttons: {
+            "确定": function() {
+            	$( this ).dialog( "close" );
+    		}
+        }
+    });
+    //datepicker
+    (function(){
+    	$("#start_date").datepicker({
+  		  changeMonth: true,
+  		  changeYear: true,
+  		  rangeSelect: true,
+  		  yearRange: '-10:+10',
+  		  maxDate: '+0y +0m -1d',
+  		  onClose: function( selectedDate ) {
+  	        $( "#end_date" ).datepicker( "option", "minDate", selectedDate );
+  	      }
+  	  });
+  	  $("#end_date").datepicker({
+  		  changeMonth: true,
+  		  changeYear: true,
+  		  rangeSelect: true,
+  		  yearRange: '-10:+10',
+  		  maxDate: '+0y +0m -1d',
+  		  onClose: function( selectedDate ) {
+  	        $( "#start_date" ).datepicker( "option", "maxDate", selectedDate );
+  	      }
+  	  });
+    })();
+
+   //select控件位置默认填充当前时间
+   function toDb(num){//两位
+		 if(num<10){
+		  return '0'+num;	 
+		 }	
+		 else{
+		  return ''+num;
+         }
+   };
+   function timeUpdate(){//时间
+		var aImg=document.getElementsByTagName('img');
+		var oDate=new Date();
+		var str=(''+oDate.getFullYear())+"-"+toDb(oDate.getMonth()+1)+"-"+toDb(oDate.getDate())
+	    return str;	
+   }
+   $(".time_pick").val(timeUpdate());
+
+   $(".fromtotime").click(function(){
+		var start_date = new Date($('#start_date').val());
+    	var end_date = new Date($('#end_date').val());
+    	var diff_days = countTimeLength('d',$('#start_date').val(),$('#end_date').val());
+    	if(diff_days > 60) {
+    		$('#tips_msg').text('抱歉，时间跨度不能超过60天！');
+			$( "#tips_dialog" ).dialog( "open" );
+			return false;
+        }
+        $('#feedback_basic').submit();
+   });
+   
+   	<?php if(isset($this->start_date)):?>
+  	$("#start_date").datepicker( 'setDate' , "<?php echo $this->start_date;?>" );
+  	<?php endif;?>
+  	<?php if(isset($this->end_date)):?>
+  	$("#end_date").datepicker( 'setDate' , "<?php echo $this->end_date;?>" );
+  	<?php endif;?>  
+
+  	Highcharts.setOptions({
+        chart: {
+            backgroundColor: {
+                linearGradient: [0, 0, 500, 500],
+                stops: [
+                    [0, 'rgb(255, 255, 255)'],
+                    [1, 'rgb(255, 255, 255)']
+                    ]
+            },
+            borderWidth: 1,
+            borderColor:'#adadad',
+            plotBackgroundColor: 'rgba(255, 255, 255, .9)',
+            plotShadow: false,
+            plotBorderWidth: 1,
+        }
+    });
+    
+ // charts
+  	$('#chart').highcharts({
+        title: {
+            text: '新增用户反馈',
+            x: -20 //center
+        },
+        subtitle: {
+            x: -20
+        },
+        xAxis: {
+            categories: <?php echo preg_replace('/2014\-/', '', $this->charts_date);?>,
+            tickInterval: <?php echo $this->date_step?>,
+            tickmarkPlacement:'on'
+       },
+        yAxis: {
+            title: {
+                text: '数量',
+                x: 10, //center
+                style:{
+                    writingMode:'lr-tb'
+                },
+                rotation : 0,
+                offset : 50 //标题离图表左边的距离
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }],
+            minorGridLineWidth : 0
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: [{
+            name: '新增用户反馈',
+            data: <?php echo $this->charts_data?>}]
+    }); 
+    // end
+
+  	$('#table-container').simplePagination({
+  		items_per_page: 10,
+  		use_page_count: true,
+  		first_content: '第一页',
+        previous_content: '上一页',
+        next_content: '下一页',
+        last_content: '末页'
+  	});
+})
+function noPermitInput(e){
+       var evt = window.event || e ;    
+        if(isIE()){    
+            evt.returnValue=false; //ie 禁止键盘输入    
+        }else{    
+            evt.preventDefault(); //fire fox 禁止键盘输入    
+        }       
+   }    
+function isIE() {    
+	if (window.navigator.userAgent.toLowerCase().indexOf("msie") >= 1){
+		return true;
+	}else{
+		return false;
+	}
+}
+</script>

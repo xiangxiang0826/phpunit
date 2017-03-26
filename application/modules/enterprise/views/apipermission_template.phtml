@@ -1,0 +1,86 @@
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+    <div class="product_detail_search clearfix" style="display:block;">
+        <div class="console_search_wrap fr mr10" style="margin-top:8px">
+            <a class="f16 clF tc search_btn ml16" onfocus="blur();" href="/enterprise/apipermission/addtemplate" id="add">添加模板</a>
+        </div>
+    </div>
+    <div class="product_detail_display">
+        <div class="product_table mt24 f14">
+            <table class="table_s tc tc_left auto_table_len" width="100%" border="0">
+                <thead>
+                    <tr>
+                        <td width="60px"><?php echo $this->t('api_template_id'); ?></td>
+                        <td><?php echo $this->t('api_template_name'); ?></td>
+                        <td width="200px"><?php echo $this->t('api_template_label'); ?></td>
+                        <td width="120px" style="text-align: center;"><?php echo $this->t('api_template_operate'); ?></td>
+                    </tr>
+                </thead>
+                <tbody>
+        <?php if(!empty($this->results['rows'])) :?>
+                 <?php foreach ($this->results['rows'] as $row) {?>
+                    <tr>
+                        <td><?php echo $row['id'];?></td>
+                        <td><?php echo $row['name'];?></td>
+                        <td><?php echo $row['label'];?></td>
+                        <td class="cl0b9600" style="text-align: center;">
+                            <a href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'edittemplate', 'id'=>$row['id']));?>" title="edit" class="check_detail cl0b9600"><?php echo $this->t('api_template_edit');?></a>&nbsp;|
+                           <a href="#" data-href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'deletetemplate', 'id'=>$row['id']));?>" title="deleted" class="manager_detail cl0b9600 update_status"><?php echo $this->t('api_template_deleted');?></a>
+                        </td>
+                    </tr>
+                <?php }?>
+        <?php else:?>
+                     <tr><td colspan="5">暂无记录</td></tr>
+       <?php endif;?>
+                </tbody>
+            </table>
+        </div>
+        <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+    </div>
+</div>
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script>
+$(function(){
+    var url = '';
+    $('.update_status').click(function(){
+        var msg ={
+            'deleted':'<?php echo $this->t('api_template_deleted_notice');?>'
+        };
+        var notice = eval('msg.'+$(this).attr('title'));
+        url = $(this).attr('data-href');
+        $('#tips_msg').text(notice);
+        $( "#confirm_dialog" ).dialog("open");
+        return false;
+    });
+		
+		$( "#confirm_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: "explode",
+                duration: 500
+            },
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+        			window.location.href = url;
+                }
+            }
+        });
+		
+		$('#add').click(function () {
+			location.href = '/enterprise/apipermission/addtemplate';
+		});
+});
+</script>

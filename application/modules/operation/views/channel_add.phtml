@@ -1,0 +1,199 @@
+<h3 class="location f14">
+<?php
+ if(!empty($this->id)) {
+ 	echo $this->menu('编辑资讯' ,'/operation/channel/index');
+ } else {
+    echo $this->menu('添加资讯' ,'/operation/channel/index'); 
+ } 
+ ?>
+</h3>
+
+<style>
+ #content_txt, #title_txt { font-size:13px; }
+ #content_txt i, #title_txt i { font-size:13px; }
+</style>
+
+<form action="<?php echo isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''; ?>" method="post" id="message_form" >
+	<table class="detail_tabel f14 mt20">
+		<tbody>
+			<tr>
+				<th>添加资讯</th>
+				<th></th>
+			</tr>
+			<tr>
+				<td>资讯标题：</td>
+				<td id="feedback_id">
+				    <input id="title_txt" type="text" name="title" class="cpy_name wp60 " style="width: 500px;" value="<?php if(!empty($this->result['title']) ){ echo  $this->result['title'];} ?>" placeholder="（50个字符）"> 
+				</td>
+			</tr>
+			<tr>
+				<td>内容摘要：</td>
+				<td style="vertical-align: top;">
+				<textarea id="content_txt" style="width: 500px; height: 80px; margin-top: 5px;" name="content" placeholder="（240个字符）" class="text_cls"><?php if(!empty($this->result['content']) ){ echo  $this->result['content'];} ?></textarea> 
+				</td>
+			</tr>
+			<tr>
+				<td>内容导图：</td>
+				<td>
+					<span class="fieldset flash" id="fsUploadProgress">
+						<?php if(!empty($this->result['image'])) :?>
+						<img  width="120px" height="100px" src="<?php echo $this->result['image'];?>" />
+						<input name="image" value="<?php echo $this->result['image'];?>" type="hidden" id="app_icon">
+						<?php else: ?>
+						<img src="/static/images/rada.png" width="120px" height="100px" style="display:none;"/>
+                        <input name="image" value=""  type="hidden" id="app_icon">
+						<?php endif;?>
+					</span>
+					<span id="img_upload_status" style="display: none;"></span> 
+					<span style="display: block">（支持jpg/png/gif格式，大小不超过500kb）</span> 
+					<a id="upload_img" class="f14 clF tc search_btn brue_btn ml56">上传图片</a>
+					<input id="btnCancel" type="button" value="取消上传" disabled="disabled" style="display: none" /> 
+				</td>
+			</tr>
+			<tr>
+				<td>资讯链接：</td>
+				<td><input type="text" name="url" class="cpy_name wp60 " style="width: 500px;" value="<?php if(!empty($this->result['url']) ){ echo  $this->result['url'];} ?>" />
+				</td>
+			</tr>
+			<tr>
+				<td>来源站点：</td>
+				<td><input type="text" name="source" class="cpy_name wp60 " style="width: 500px;" value="<?php if(!empty($this->result['source']) ){ echo  $this->result['source'];} ?>" />
+				</td>
+			</tr>
+
+		</tbody>
+	</table>
+	<div class="mt36 mb24 tr">
+        <button class="f16 clF tc search_btn">提交</button> 
+        <button onfocus="blur();" id="cancle_btn" type="button" style="display: inline-block;line-height: 28px;" class="f16 clF fr ml16 tc search_btn grey_btn">取 消</button>
+    </div>
+</form>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice">数据保存成功！</p>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.queue.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/fileprogress.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/handlers.js"></script>
+<script>
+$("#message_dialog").dialog({
+         autoOpen: false,
+         width: 540,
+         height: 240,
+         show: {
+             effect: "blind",
+             duration: 300
+         },
+         hide: {
+             effect: null,
+             duration: 500
+         },
+         dialogClass: "my_message_dialog",
+         modal: true,
+         buttons: {
+             "确定": function() {
+             	$( this ).dialog( "close" );
+             	location.href = document.referrer;
+             }
+         }
+ });
+$('#cancle_btn').click(function(){
+	history.go(-1);
+});
+$.validator.setDefaults({
+    submitHandler: function(form) {
+    	$(form).ajaxSubmit({
+			type:'POST',
+			dataType: 'json',
+			success: function (result) {
+				if(result.status == 200) {
+					$('#sys_notice').data('success', true);
+					$('#sys_notice').text('数据保存成功！');
+				} else if(result.status == 500) {
+					$('#sys_notice').text('系统繁忙，请稍后再试！');
+				} else if(result.msg == 505) {
+					$('#sys_notice').text('亲，你没有这个操作的权限！');
+				} else {
+					$('#sys_notice').text(result.msg);
+				}
+				$( "#message_dialog" ).dialog("open");
+				return ;
+			}
+		});    
+    }
+ });
+$('#message_form').validate({
+	rules: {
+		'title': {
+			required: true,
+			maxlength: 50,
+			minlength: 1
+		},
+		'content': {
+			required: true,
+			maxlength:240,
+			minlength: 1
+		},
+		'url': {
+			required:true,
+			url : true,
+			maxlength:255
+		},
+		'source': {
+			required:true,
+			maxlength:255
+		}
+	}
+});	
+var settings = {
+		flash_url : "<?php echo $this->static;?>/js/libs/swfupload/swfupload.swf",
+		upload_url: "/api/upload/index",
+		post_params: {"type" : "news"},
+		file_size_limit : "500 KB",
+		file_types : "*.png;*.jpg;*.gif",
+		file_types_description : "All Files",
+		file_upload_limit : 50,  //配置上传个数
+		file_queue_limit : 0,
+		custom_settings : {
+			progressTarget : "fsUploadProgress",
+			cancelButtonId : "btnCancel",
+			ProgressStatusId:'img_upload_status'
+		},
+		debug: false,
+		button_window_mode:'Opaque',
+		// Button settings
+		button_image_url: "<?php echo $this->static;?>/images/TestImageNoText_65x29.png",
+		button_width: "65",
+		button_height: "29",
+		button_placeholder_id: "upload_img",
+		button_text: '<span class="falsh_upload_button">上传</span>',
+		button_text_style: '.falsh_upload_button{color:#FFFFFF;}',
+		button_text_left_padding: 16,
+		button_text_top_padding: 5,
+		button_text_top_margin: 10,
+		file_queued_handler : fileQueued,
+		file_queue_error_handler : fileQueueError,
+		file_dialog_complete_handler : fileDialogComplete,
+		upload_error_handler : uploadError,
+		upload_success_handler : function(file, serverData) {
+			try {
+				serverData = eval("("+ serverData +")");
+				var progress_div_id = this.customSettings.progressTarget;
+				var progress = new FileProgress(file, progress_div_id);
+				progress.setComplete();
+				progress.setStatus("上传成功");
+				progress.toggleCancel(false);
+				var img = $('#'+progress_div_id).find('img');
+				img.attr('src', serverData.result.url );
+				img.show();
+				$('#app_icon').val( serverData.result.url);
+			} catch (ex) {
+				this.debug(ex);
+			}
+		},
+		upload_complete_handler : uploadComplete,
+		queue_complete_handler : queueComplete	
+};
+var swfu = new SWFUpload(settings);
+ </script>

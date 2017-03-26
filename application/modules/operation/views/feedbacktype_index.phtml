@@ -1,0 +1,210 @@
+ <link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/treeGrid.css" />
+ <link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/oss.css" />
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div id="table_warp" class="product_detail mt22">
+	<div class="product_detail_search clearfix">
+    	<div class="console_search_wrap fr mr10">
+    		<a  href="javascript:;" class="f16 clF tc search_btn mb10" id="add_category_btn">添加分类</a>
+    </div></div>
+    <div class="mt24 clearfix"></div>
+    <table id="treeGrid" resizeWidth="resizeWidth" resizeHeight="resizeHeight" rowNum="false" height="500" datasource="treeGridDatasource" treeField="name" onCellStyleRender="onCellStyleRender" onCellContentRender="onCellContentRender">
+        <thead>
+        <tr>
+            <th field="id" width="60" align="left">ID</th>
+            <th field="name"  align="left">问题分类</th>
+            <th field="ctime" width="150" align="left">建立时间</th>
+            <th field="number" width="150" align="left">问题数</th>
+            <th field="operate" width="150" align="center">操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+ <div id="category_div"  title="添加分类">
+ <form  class="cmxform"   id="category_form" action="<?php echo $_SERVER['REQUEST_URI']?>">
+    <table class="detail_tabel form_table f14 mt40">
+        <tr>
+            <td style="width:25%">分类名称:</td>
+            <td><input type="text" class="cpy_name" name="name"/  style="width:296px"></td>
+        </tr>  
+        <tr>
+            <td>上级分类:</td>
+            <td id="product_enterprise"  class="system_drop pb14">
+            	<select id="cang_assort" class="cpy_style cang_assort" name="parent_id" style="width:253px" >
+	                       <option value="0">无</option>
+                     <?php foreach ($this->category as $v) {?>
+                                     <option value="<?php echo $v['id'];?>" <?php if($v['id'] == $this->search['category']):?>selected="selected" <?php endif;?>><?php echo $v['levelstr'] . $v['name'];?></option>
+                        <?php }?>
+                </select>
+            </td>
+        </tr> 
+        <tr class="h170">
+            <td>分类描述：</td>
+            <td><textarea class="text_cls" id="description" name="description" cols="40" rows="8"></textarea></td>
+        </tr>
+    </table>
+ </form>
+</div>
+ <div id="message_dialog" style="display:none;" title="系统提醒">
+      <p class="message_text">无法删除，该分类下已包含反馈的问题，请更改后再删除！</p>
+      <a id="close_message"  href="javascript:;" class="f16 clF tc search_btn brue_btn" >确 定</a>
+</div>
+ <script type="text/javascript" src="<?php echo $this->static;?>/js/treeGrid.min.js"></script>
+ <script>
+ var category_edit_url = '/operation/feedbacktype/add';
+ $(function (){
+//   渲染树表格
+   $(".cang_assort").dropkick();
+   $( "#category_div" ).dialog({
+	    autoOpen: false,
+	    width: 655,
+	    dialogClass: "my-dialog hidden-dialog",
+        modal: true,
+	    show: {
+	        effect: "blind",
+	        duration: 300
+	    },
+	    hide: {
+	        effect: null,
+	        duration: 500
+	    },
+	    buttons: { 
+	        "取消": function() {
+	            $( this ).dialog( "close" );
+	        },
+	       "确定": function() {
+                $('#category_form').submit();
+            }
+	    }
+	});
+	$('#add_category_btn').click(function(){
+		var category_div = $('#category_div');
+        // 重置表单信息
+        $('#category_form')[0].reset();
+		category_edit_url = '/operation/feedbacktype/add';
+		 $( "#category_div").dialog("option","title", "添加分类").dialog("open" ); 
+	});
+	 
+	$( "#message_dialog" ).dialog({
+		  autoOpen: false,
+          width: 540,
+          height: 240,
+          show: {
+              effect: "blind",
+              duration: 300
+          },
+          hide: {
+              effect: null,
+              duration: 500
+          },
+          dialogClass: "my_message_dialog",
+          modal: true
+	}); 
+	TreeGrid.scan("#treeGrid");
+	$('#close_message').click(function(){
+		$( "#message_dialog" ).dialog( "close" );
+    });
+});
+//渲染 最后一个操作列的展示
+function onCellContentRender(value,rowData,field){
+   if(field ==="operate") {
+       return  '<a href="#" class="download_a " onclick="edit_node('+ rowData.id + ')">编辑</a>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;<a href="#" class="download_a " onclick="delete_node('+ rowData.id +')" >删除</a>';
+   }
+};
+//渲染中间散列的字体颜色
+function onCellStyleRender(value,rowData,field){
+   if(field==="PercentComplete" || field==="Duration" || field==="Start" ){
+       return 'color:#acacac';
+   }
+   if(field ==="operate"){
+       return 'color:#216ed9';
+   }
+};
+//定义表格的宽度
+function resizeWidth(){
+   return $("#table_warp").width() - 18;
+};
+//定义表格的高度
+function resizeHeight(){
+   return $(window).height() - 200;
+}
+//设置表格的数据
+function treeGridDatasource (obj){
+	$.get('/operation/feedbacktype/treedata', function(data){
+		if(data.status == 200) {
+			obj.setDatasource(TreeGrid.listToTree(data.result,"id","parent_id"));
+		} else if (data.msg == 505) {
+            $('#message_dialog .message_text').text('亲，你没有这个操作的权限！');
+            $("#message_dialog").dialog("open");
+        }
+	},'json');  
+}
+/**
+ * 编辑
+ */
+function edit_node(v) {
+	$.get('/operation/feedbacktype/info',{id:v}, function(data){
+		if(data.status == 200) {
+			var category_div = $('#category_div');
+            $('#category_form')[0].reset();
+			category_edit_url = '/operation/feedbacktype/add?id=' + v;
+			var res = data.result;
+			category_div.find('input[name="name"]').val(res.name);
+			category_div.find('#description').text(res.description);
+			category_div.find('#cang_assort').dropkick("setValue",res.parent_id);
+			$( "#category_div").dialog("option","title", "编辑分类").dialog("open" ); 
+		}
+	},'json');
+}
+
+/**
+ * 删除
+ */
+function delete_node(v) {
+	$.get('/operation/feedbacktype/del', {id:v}, function(data){
+		if(data.status == 200) {
+			if(data.result == 'del_failed') {
+				$( "#message_dialog").dialog( "open" ); 
+			} else {
+				location.reload();
+			}
+		}else if(data.msg == 505) {
+			$('#message_dialog .message_text').text('亲，你没有这个操作的权限！');
+            $("#message_dialog").dialog("open");
+		}
+	},'json');  
+}
+/**
+ * 异步提交表单
+ */
+function ajaxSubmitForm(){
+	var param = $('#category_form').serialize(); 
+	$.post(category_edit_url, param, function(result){
+		if(result.status == 200) {
+			$( "#category_div" ).dialog( "close" );
+			location.reload();
+		} else if(result.status == 403) {
+			$('#category_form').before('<p class="message_text">验证失败<p>');
+		} else if(result.msg == 505) {
+			$('#message_dialog .message_text').text('亲，你没有这个操作的权限！');
+            $("#message_dialog").dialog("open");
+		}
+    }, 'json');
+     return false;
+}
+$('#category_form').validate({
+	rules: {
+		'description': {
+			maxlength:100
+		},
+		'name' : {
+			required: true,
+			maxlength : 20
+		}
+	},
+	submitHandler:function() {
+        ajaxSubmitForm();
+   }
+});	
+</script>
+ 

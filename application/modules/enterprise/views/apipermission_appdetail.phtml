@@ -1,0 +1,157 @@
+
+<!--页面位置-->
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<?php $title = $this->requestTitle?('('.$this->requestTitle.')'):''; ?>
+<h3 class="location f14"><?php echo $this->menu('查看APP详情'.urldecode($title), '/enterprise/apipermission/applist'); ?></h3>
+<form action="/enterprise/apipermission/appdetail/id/<?php echo $this->app_info['id'] ?>/" method="post" name="form_add_action" id="form_add_action">
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th><?php echo $this->t('base_info');?></th>
+        <th></th>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_app_id');?>：</td>
+        <td><?php echo $this->app_info['id']?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_user_name');?>：</td>
+        <td><?php echo $this->app_info['username']?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_user_company');?>：</td>
+        <td><?php echo $this->app_info['company_name']?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_app_name');?>：</td>
+        <td>
+            <input type="text" class="cpy_name valid" placeholder="请输入<?php echo $this->t('api_app_name');?>" value="<?php echo $this->app_info['name']?>" id="name" name="name" aria-required="true" aria-invalid="false">
+        </td>
+    </tr> 
+    <tr>
+        <td><?php echo $this->t('api_app_remark');?>：</td>
+        <td>
+            <input type="text" class="cpy_name valid" placeholder="请输入<?php echo $this->t('api_app_remark');?>" value="<?php echo $this->app_info['remark']?>" id="remark" name="remark" aria-required="false" aria-invalid="false">
+        </td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_app_key');?>：</td>
+        <td>
+            <input type="text" class="cpy_name valid" placeholder="请输入<?php echo $this->t('api_app_key');?>" value="<?php echo $this->app_info['app_key']?>" id="app_key" name="app_key">
+        </td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_app_salt');?>：</td>
+        <td>
+            <input type="text" class="cpy_name valid" placeholder="请输入<?php echo $this->t('api_app_salt');?>" value="<?php echo $this->app_info['app_salt']?>" id="app_salt" name="app_salt">
+        </td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_app_status');?>：</td>
+        <td><?php if($this->app_info['status']== 'enable'):?>启用<?php else:?>禁用<?php endif;?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_app_create');?>：</td>
+        <td><?php echo $this->app_info['ctime']?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_app_modify');?>：</td>
+        <td><?php if($this->app_info['mtime']== '0000-00-00 00:00:00'):?>暂无<?php else:?><?php echo $this->app_info['mtime']?><?php endif;?></td>
+    </tr>
+</table>
+</form>
+<div class="mt36 mb24 tr">
+    <a  onfocus="blur();" href="javascript:void(0)" id="back" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+    <a  onfocus="blur();" href="javascript:void(0)" id="save_action" class="f16 clF fr ml16 tc search_btn" >提 交</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">确 定</a>
+</div>
+<script>
+$(function () {
+	
+	// 提示信息
+	$( "#message_dialog" ).dialog({
+        autoOpen: false,
+        width: 540,
+        height: 240,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: "explode",
+            duration: 500
+        },
+        dialogClass: "my_message_dialog",
+        modal: true
+    });
+
+	$("#close_message").on("click",function() {
+        if($('.message_text').text() == '保存成功！'){
+            location.href = '/enterprise/apipermission/applist';
+        }
+		$( "#message_dialog" ).dialog( "close" );
+	});
+    
+	// 后退
+	$('#back').click(function () {
+		history.go(-1);
+	});
+    // 添加自定义校验规则,2-64位数字和字母组合
+    jQuery.validator.addMethod("isWord", function(value, element) {
+        var isWord = /^[0-9A-Za-z]{2,64}$/;
+        return this.optional(element) || (isWord.test(value));
+    }, "\u53ea\u80fd\u7531\u6570\u5b57\u548c\u82f1\u6587\u5b57\u6bcd\u7ec4\u6210\uff08\u793a\u4f8b\u003a\u0035\u0030\u0030\u0041\u0042\u0043\uff09");
+    // 上述提示为：只能由数字和英文字母组成（示例:500ABC）
+    $('#form_add_action').validate({
+		rules: {
+			'name': {
+				required: true,
+				minlength: 2,
+				maxlength:32
+			},
+			'remark': {
+				required: false,
+				minlength: 2,
+				maxlength:128
+			},
+			'app_key': {
+				required: true,
+				minlength: 2,
+				maxlength:32,
+                isWord:true
+			},
+			'app_salt': {
+				required: true,
+				minlength: 2,
+				maxlength:64,
+                isWord:true
+			}
+		},
+		messages: {   //自定义提示信息
+			
+		}
+	});
+
+	$('#save_action').click(function () {
+		if($('#form_add_action').valid()) {
+			$('#form_add_action').ajaxSubmit({
+				url:$('#form_add_action').attr('action'), //提交给哪个执行
+				type:'POST',
+				dataType: 'json',
+				success: function (result) {
+					if(result.status == 200) {
+                        $('.message_text').text('保存成功！');
+						$( "#message_dialog" ).dialog( "open" );
+					} else {
+						$('.message_text').text(result.msg);
+						$( "#message_dialog" ).dialog( "open" );
+					}
+				}
+			});
+			return false;
+		}
+	});
+});
+</script>

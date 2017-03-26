@@ -1,0 +1,97 @@
+<!--页面位置-->
+<h3 class="location f14">系统 <?php echo $this->menu('', '/file/index/www?domain=www.1719.com'); ?></h3>
+<div class="product_detail mt22">
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/ckfinder/ckfinder.js"></script>
+<script type="text/javascript">
+var site_id = <?php echo $this->site_id;?>;
+var manage_type = "<?php echo $this->type;?>";
+var site_domain = "<?php echo $this->domain;?>";
+
+function showFileInfo( fileUrl, data, allFiles ){
+	var msg = '';
+
+	if ( allFiles.length > 1 ){
+		msg += '<b>Selected files:</b><br /><br />';
+		msg += '<ul style="padding-left:20px">';
+		for ( var i = 0 ; i < allFiles.length ; i++ ){
+			var arr = allFiles[i].data['fileUrl'].split('/');
+			var name = arr[arr.length-1];
+			msg += '<li>' + name + ' (' + allFiles[i].data['fileSize'] + 'KB, '+data['fileDate']+')</li>';
+		}
+		msg += '</ul>';
+	}else{
+		var arr = fileUrl.replace(/%2F/g,'/').split('/');
+		var name = arr[arr.length-1];
+	
+		msg += 'The last selected file is: ' + name + '<br /><br />';
+
+		if( fileUrl.indexOf('%2F') == -1 ){
+			var checkUrl = 'http://check.wondershare.com.wx/'+fileUrl.replace(/(\/[^\/]*\.[^\/]*\.[^\/]*\/)/,'$1httpdocs/').replace('http://','').replace('www.','')+'';
+			msg += '<b>Www url:</b> <a href="' + fileUrl + '" target="_blank">' + fileUrl+ '</a><br />';
+			msg += '<b>Check url:</b> <a href="' + checkUrl + '" target="_blank">' + checkUrl + '</a><br />';
+			msg += '<b>File size:</b> ' + data['fileSize'] + 'KB<br />';
+			msg += '<b>Last modified:</b> ' + data['fileDate'];
+		}
+	}
+
+	this.openMsgDialog( "Selected file", msg );
+}
+
+// You can use the "CKFinder" class to render CKFinder in a page:
+var finder = new CKFinder();
+// The path for the installation of CKFinder (default = "/ckfinder/").
+finder.basePath = '../';
+// The default height is 400.
+finder.height = parent.document.body.clientHeight-95;
+finder.selectActionData = "container";
+finder.selectActionFunction = showFileInfo;
+
+finder.callback = function( api ) {
+	
+};
+
+finder.create();
+
+
+//note 新上传的文件与已有文件同名时，新上传文件被重命名，查看原文件
+function seeFile( obj, name, currentFolder, type ){
+	var o_name = name.replace(/\([\d]+\)/,'');
+	window.open('http://check.wondershare.com.wx/'+type+'/httpdocs'+currentFolder+o_name, 'see');
+}
+
+//note 新上传的文件与已有文件同名时，新上传文件被重命名，被重命名文件替换原文件
+function replaceFile( obj, name, currentFolder, type ){
+	var o_name = name.replace(/\([\d]+\)/,'');
+	delFile( obj, o_name, currentFolder, type );
+	
+	var url = '/file/index/connector/site_id/'+site_id+'?manage_type='+manage_type+
+	'&command=RenameFile&type='+encodeURI(type)+'&currentFolder='+encodeURI(currentFolder)+
+	'&langCode=zh-cn&hash=b999903babde2f1c&fileName='+encodeURI(name)+
+	'&newFileName='+encodeURI(o_name)+'&no_del=1'+
+	'&domain='+site_domain;
+	
+	var data = {"CKFinderCommand":true};
+	$.post(url, data, function(data){
+		obj.innerHTML = '';
+	});
+}
+
+//note 新上传的文件与已有文件同名时，新上传文件被重命名，删除重命名文件
+function delFile( obj, name, currentFolder, type ){
+	var url = '/file/index/connector/site_id/'+site_id+'?manage_type='+
+	manage_type+'&command=DeleteFiles&type='+encodeURI(type)+
+	'&currentFolder='+encodeURI(currentFolder)+'&langCode=zh-cn&hash=6fd73d81b09d14d1'+
+	'&domain='+site_domain;
+	var arr = [];
+		arr[0] = [];
+		arr[0]['folder'] = currentFolder;
+		arr[0]['name'] = name;
+		arr[0]['type'] = type;
+	var data = {"CKFinderCommand":true, "files[0][folder]":currentFolder, "files[0][name]":name, "files[0][type]":type};
+	$.post(url, data, function(data){
+		obj.innerHTML = '';
+	});
+}
+
+</script>
+</div>

@@ -1,0 +1,36 @@
+<link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/base.css" />
+<link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/jquery-ui.min.css" />
+<link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/dropkick.css" />
+<link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/oss.css" />
+<link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/form-validate.css" />
+<script src="<?php echo $this->static;?>/js/jquery.js" type="text/javascript"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.dropkick-min.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/common.js"></script>
+<script src="<?php echo $this->static;?>/js/jquery-simple-pagination-plugin.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.validate.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/messages_zh.js"></script>
+<script>
+$(function(){
+        (function(){
+            var config={
+                changeMonth: true,
+                changeYear: true,
+                rangeSelect: true,
+                yearRange: '-10:+10'
+            }
+            config.onClose = function(selectedDate){
+            	$( "#timer_to" ).datepicker( "option", "minDate", selectedDate );
+            }
+            $("#timer_from").datepicker(config);
+            config.onClose = function(selectedDate){
+            	$( "#timer_from" ).datepicker( "option", "maxDate", selectedDate );
+            }
+            $("#timer_to").datepicker(config);
+        })();
+        
+       $(".product_assort").dropkick();
+       $(".cang_assort").dropkick();
+})
+</script>

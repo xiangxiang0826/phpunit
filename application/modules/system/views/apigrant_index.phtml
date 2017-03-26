@@ -1,0 +1,88 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+<form method="get" action="" id="search_form">
+          <div class="product_detail_search clearfix">
+                           <div class="fl system_drop clearfix ml10">
+                               <label class="fl mt4"><?php echo $this->t('enterprise_status_select');?>：</label>
+                               <select id="cang_assort" class="cpy_style cang_assort" name="search[status]">
+                                   <option value="">所有状态</option>      
+                                   <option value="locked" <?php if( !empty($this->search['status']) && $this->search['status'] =='locked'): ?>selected="selected" <?php endif;?>><?php echo $this->t('locked');?></option>
+                                   <option value="enable" <?php if( !empty($this->search['status']) && $this->search['status'] =='enable'): ?>selected="selected" <?php endif;?>><?php echo $this->t('enable');?></option>
+                               </select>
+                           </div>
+                 <div class="console_search_wrap fr mr10"><a class="search_icon_btn f16 clF tc" onFocus="blur();" href="javascript:;" id="search_submit"><i class="find_icon"></i>查 询</a></div>
+        </div>
+ </form>
+    <div class="product_detail_display">
+
+        <div class="product_table mt24 f14">
+            <table class="table_s tc" width="100%" border="0">
+                <thead>
+                    <tr>
+                        <td>ID</td>
+                        <td><?php echo $this->t('user_type'); ?></td>
+                        <td><?php echo $this->t('company_name'); ?></td>
+                        <td><?php echo $this->t('business_scope'); ?></td>
+                        <td><?php echo $this->t('reg_time'); ?></td>
+                        <td><?php echo $this->t('api_company_status'); ?></td>
+                        <td><?php echo $this->t('control'); ?></td>
+                    </tr>
+                </thead>
+                <tbody>
+<?php if(!empty($this->results['rows'])) :?>
+                 <?php foreach ($this->results['rows'] as $row) {?>
+                    <tr <?php if($row['status'] == 'locked'):?>class="stop" <?php endif;?>>
+                        <td><?php echo $row['id'];?></td>
+                        <td><?php if($row['user_type']) { echo $this->t($row['user_type']);}?></td>
+                        <td title="<?php echo $this->escape($row['company_name']);?>"><?php echo $this->Cutstring($this->escape($row['company_name']), 15);?></td>
+                        <td title="<?php echo $this->escape($row['business_scope']);?>"><?php echo $this->Cutstring($this->escape($row['business_scope']), 12);?></td>
+                        <td><?php echo $row['reg_time'];?></td>
+                        <td id="status_<?php echo $row['id'];?>"><?php if(!empty($row['status'])) { echo $this->t($row['status']);}?></td>
+                        <td class="cl0b9600">
+                           <a href="<?php echo $this->url(array('controller'=>'apigrant', 'action'=>'detail', 'id'=>$row['id']));?>" class="check_detail cl0b9600"><?php echo $this->t('api_auth_disable');?></a>&nbsp;|
+                           <a href="/analyze/index/newuser?enterprise=<?php echo $row['id']?>" class="check_detail cl0b9600"><?php echo $this->t('api_auth_edit');?></a>
+                        </td>
+                    </tr>
+                <?php }?>
+        <?php else:?>
+                     <tr><td colspan="10">暂无记录</td></tr>
+       <?php endif;?>
+                </tbody>
+            </table>
+        </div>
+        <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+    </div>
+</div>
+<div id="manager_div" style="display:none;" title="管理">
+  <form class="cmxform"  action="<?php echo $this->url(array('controller'=>'index', 'action' =>'manager'));?>" method="post" id="manage_form">
+    <table class="detail_tabel form_table f14">
+        <tr>
+            <td>当前状态：</td>
+            <td id="current_status"></td>
+        </tr>
+        
+        <tr class="h60">
+            <td>处理措施：</td>
+            <td>
+                 <input  type="radio" name="pass" checked="checked"  value="0"/><label >启用</label>
+                <input  type="radio" name="pass" class="ml56" value="1"/><label>冻结</label>
+            </td>
+        </tr>
+        <tr class="h170">
+            <td>管理备注：</td>
+            <td><textarea class="text_cls" name="remark" cols="40" rows="6" id="remark"></textarea></td>
+        </tr>
+        <tr>
+            <td>结果通知：</td>
+            <td>
+                <input  type="checkbox" checked="checked"  name="message[]"  value="msg"/><label for="message">短信</label>
+                <input  type="checkbox" checked="checked"  name="message[]" class="ml56"  value="email"/><label for="e-mail">邮箱</label>
+            </td>
+            <input type="hidden" name="enterprise_id" id="enterprise_id">
+        </tr>
+    </table>
+  </form>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/enterprise.js"></script>

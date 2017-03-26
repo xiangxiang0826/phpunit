@@ -1,0 +1,242 @@
+<h3 class="location f14">
+   <?php
+	    if($this->search['status'] =='toreply') {
+	    	echo $this->menu('待回复', '/operation/clientfeedback/index');
+	    } elseif ($this->search['status']=='replied') {
+	    	echo $this->menu('已回复', '/operation/clientfeedback/index');
+	    } else {
+	    	echo $this->menu('全 部', '/operation/clientfeedback/index');
+        } 	    
+	?>
+</h3>
+<div class="product_detail mt22">
+	<div class="product_detail_search clearfix">
+		<form action="/operation/clientfeedback/index" method="get"
+			id="from_feedback">
+			<div class="product_detail_search clearfix mt22 search_div">
+				<div class="fl system_drop clearfix">
+					<select id="cang_assort" class="cpy_style cang_assort"
+						name="search[enterprise]" style="width: 185px;">
+						<option <?php if(!isset($this->search['enterprise'])):?>
+							selected="selected" <?php endif;?> value="0">所有厂商</option>
+						<?php foreach ($this->enterprises as $k=>$v) {?>
+						<option value="<?php echo $k;?>"
+							<?php if(isset($this->search['enterprise']) && $k == $this->search['enterprise']):?>
+							selected="selected" <?php endif;?>>
+							<?php echo mb_strimwidth($v,0,26,'...');?>
+						</option>
+						<?php }?>
+					</select>
+				</div>
+
+				<div class="fl system_drop clearfix">
+					<select class="cpy_style cang_assort" id="produt_assort"
+						name='search[product]' style="width: 120px;">
+						<option value='0' <?php if(!isset($this->search['product']) ):?>
+							selected=selected <?php endif;?>>所有产品</option>
+						<?php foreach ($this->product as $v):?>
+						<option value="<?php echo $v['id']?>"
+							<?php if(isset($this->search['product']) && $this->search['product']==$v['id'] && $this->search['product']!='0'):?>
+							selected=selected <?php endif;?>>
+							<?php echo $v['name'];?>
+						</option>
+						<?php endforeach;?>
+					</select>
+				</div>
+
+				<div class="fl system_drop clearfix">
+					<select class="cpy_style cang_assort" id="tag_assort"
+						name='search[tag]' style="width: 120px;">
+						<option value=''>所有用户标签</option>
+						<?php foreach ($this->tags as $v):?>
+						<option value="<?php echo $v['id']?>"
+							<?php if(isset($this->search['tag']) && $this->search['tag']==$v['id']):?>
+							selected=selected <?php endif;?>>
+							<?php echo $v['name'];?>
+						</option>
+						<?php endforeach;?>
+					</select>
+				</div>
+				<input type="hidden" name="search[status]" id="hidden_status"
+					value="<?php if(isset($this->search['status'])) echo $this->search['status']; ?>" />
+				<div class="fl">
+					<input type="text" id="mobile" class="cpy_name  w150"
+						name="search[mobile]"
+						value="<?php if(isset($this->search['mobile'])):?><?php echo $this->search['mobile'];?><?php endif;?>"
+						class="cpy_name" style="width: 120px;" id="cpy_mobile"
+						placeholder='手机号查询'>
+				</div>
+				<div class="fl">
+					<input type="text" id="email" class="cpy_name  w150"
+						name="search[email]"
+						value="<?php if(isset($this->search['email'])):?><?php echo $this->search['email'];?><?php endif;?>"
+						class="cpy_name" style="width: 120px;" id="cpy_email"
+						placeholder='邮箱查询'>
+				</div>
+
+				<div class="chart_search f14 fr">
+					<div class="console_search_wrap fr">
+						<a class="search_icon_btn f16 clF tc ml10" onFocus="blur();"
+							id="search" href="javascript:;"><i class="find_icon"></i>查 询</a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="chart_index_wrap clearfix product_detail_search"
+		style="margin-top: 24px;">
+
+		<div class="chart_index fl f14">
+			<span status="toreply"
+				<?php if($this->search['status']=='toreply'):?> class="on"
+				<?php endif;?>>未回复</span> <span status="replied"
+				<?php if($this->search['status']=='replied'):?> class="on"
+				<?php endif;?>>已回复</span> <span status=""
+				<?php if(empty($this->search['status'])):?> class="on"
+				<?php endif;?>>全 部</span>
+		</div>
+	</div>
+	<div class="product_detail_display">
+		<div class="product_table mt24 f14">
+			<table class="table_s tc tc_left auto_table_len" width="100%"
+				border="0">
+				<thead>
+					<tr>
+						<td width='60px'>序号</td>
+						<td>反馈内容</td>
+						<td>厂商</td>
+						<td>产品</td>
+						<td width='150px'>反馈时间</td>
+						<td width='150px'>最后回复</td>
+						<td width='60px' style="text-align: right">回复数</td>
+						<td width='60px' style="text-align: center">操作</td>
+					</tr>
+				</thead>
+				<tbody>
+					<?php if(!empty($this->items)):?>
+					<?php foreach($this->items as $v):?>
+					<tr>
+						<td><?php echo $v['no'];?></td>
+						<td title=<?php echo $v['title']?>><?php echo $v['title'];?></td>
+						<td title=<?php echo $v['enterprise_name'] ?>><?php echo $v['enterprise_name']?></td>
+						<td><?php if($v['product_id'])echo $v['product_name'];else echo 'APP';?></td>
+						<td><?php echo $v['ctime'];?></td>
+						<td><?php echo $v['reply_time'];?></td>
+						<td style="text-align: right"><?php echo $v['reply_count'];?></td>
+						<td class="cl0b9600" style="text-align: center"><a
+							href="/operation/clientfeedback/detail/id/<?php echo $v['id'];?>"
+							class="check_detail cl0b9600">回复</a></td>
+					</tr>
+					<?php endforeach;?>
+					<?php else:?>
+					<tr>
+						<td colspan='8' style="text-align: center">暂无数据</td>
+					</tr>
+					<?php endif;?>
+				</tbody>
+			</table>
+		</div>
+		<?php echo $this->paginationControl($this->paginator, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+	</div>
+</div>
+
+<script type="text/javascript"
+	src="<?php echo $this->static;?>/js/jquery.ui.datepicker-zh-CN.js"></script>
+<script type="text/javascript"
+	src="<?php echo $this->static;?>/js/jquery.ui.timepicker.addon.js"></script>
+
+<script type="text/javascript">
+$(function(){
+	
+  	$("#for_pro").dropkick({
+		  change: function (value, label) {
+		 	 $("#pid").val(value);
+		  }
+	});
+
+  	$("#for_type").dropkick({
+		  change: function (value, label) {
+		 	 $("#type").val(value);
+		  }
+	});
+
+  	$("#for_style").dropkick({
+		  change: function (value, label) {
+		 	 $("#status").val(value);
+		  }
+	});
+
+	$("#search").click(function(){
+		$("#from_feedback").submit();
+	});
+});
+
+function noPermitInput(e){
+       var evt = window.event || e ;    
+        if(isIE()){    
+            evt.returnValue=false; //ie 禁止键盘输入    
+        }else{    
+            evt.preventDefault(); //fire fox 禁止键盘输入    
+        }       
+   }    
+function isIE() {    
+	if (window.navigator.userAgent.toLowerCase().indexOf("msie") >= 1){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+$('span[status]').click(function () {
+	var status = $(this).attr('status');
+	var enterprise = Number($('#cang_assort').val());
+	var product = Number($('#produt_assort').val());
+	var tag = Number($('#tag_assort').val());
+	var mobile = $('#mobile').val();
+	var email = $('#email').val();
+	$('#hidden_status').val('replied');
+	location.href = '/operation/clientfeedback/index?search[enterprise]='+enterprise+'&search[product]='+ product +'&search[tag]='+ tag +'&search[mobile]='+ mobile +'&search[email]='+email +'&search[status]='+status;
+});
+
+$('#cang_assort').change(function () {
+	var enterprise_id = $(this).val();
+	//if(Number(enterprise_id)==0) return;
+	$("#dk_container_produt_assort .dk_options .dk_options_inner").empty();
+	$("#dk_container_tag_assort	 .dk_options .dk_options_inner").empty();
+	$('#dk_container_produt_assort >a').text('正在查询...');
+	$('#dk_container_tag_assort >a').text('正在查询...');
+	$('#produt_assort').empty();
+	$('#tag_assort').empty();
+	
+	$.post('/operation/clientfeedback/getproducts/',{enterprise_id:enterprise_id},function (data) {
+		if(data.result.counts > 0) {
+			var list = data.result.list;
+			for(item in list) {
+				$("#produt_assort").append("<option value=\""+ list[item]['id'] + "\">"+ list[item]['name'] +"</option>");
+				$("#dk_container_produt_assort .dk_options .dk_options_inner").append("<li><a data-dk-dropdown-value=\""+ list[item]['id'] +"\">"+ list[item]['name'] +"</a></li>");
+				if(item == 0) { // 第一个元素放到列表的一个位置  <a class="dk_toggle dk_label" style="width: 218px;">美的电风扇</a>
+					$('#dk_container_produt_assort >a').text(list[item]['name']);
+				}
+			}
+		} else {
+			$("#produt_assort").append("<option value=\"\">此商家暂无产品</option>");
+			$('#dk_container_produt_assort >a').text('此商家暂无产品！');
+		}
+	},'json');
+	$.post('/operation/clientfeedback/gettag/',{enterprise_id:enterprise_id},function (data) {
+		if(data.result.length > 0){
+			var list = data.result;
+			for(item in list) {
+				$("#tag_assort").append("<option value=\""+ list[item]['id'] + "\">"+ list[item]['name'] +"</option>");
+				$("#dk_container_tag_assort .dk_options .dk_options_inner").append("<li><a data-dk-dropdown-value=\""+ list[item]['id'] +"\">"+ list[item]['name'] +"</a></li>");
+				if(item == 0) { // 第一个元素放到列表的一个位置  <a class="dk_toggle dk_label" style="width: 218px;">美的电风扇</a>
+					$('#dk_container_tag_assort >a').text(list[item]['name']);
+				}
+			}
+			} else {
+				$("#tag_assort").append("<option value=\"\">此商家暂无标签</option>");
+				$('#dk_container_tag_assort >a').text('此商家暂无标签！');
+				}
+	},'json');
+});
+</script>

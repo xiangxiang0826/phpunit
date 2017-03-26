@@ -1,0 +1,123 @@
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+   <div class="product_detail_search clearfix">
+	   <div class="fl system_drop clearfix">
+           <form action="/enterprise/apipermission/applist" method="get"  id="search_form">
+		   <select id="cang_assort" class="cpy_style cang_assort" name="enterprise_id" style="width: 185px;">
+			   <option value="">选择厂商</option>
+			 <?php foreach ($this->enterprises as $k=>$v) {?>
+			 <option value="<?php echo $k;?>" <?php if($k == $this->enterprise_id):?>selected="selected" <?php endif;?>><?php echo mb_strimwidth($v,0,26,'...');?></option>
+			 <?php }?>
+		   </select>
+           </form>
+	   </div>
+        <div class="console_search_wrap fr">
+            <a class="search_icon_btn f16 clF tc" onFocus="blur();" id="search_submit"  href="javascript:;"><i class="find_icon"></i>查 询</a>
+        </div>
+   </div>
+    
+    <div class="product_detail_search clearfix mt20 mb20">
+        <div class="fl system_drop fr clearfix ml10">
+            <a class="f16 clF tc search_btn ml16" onfocus="blur();" href="/enterprise/apipermission/addapp" id="add">添加应用</a>
+        </div>
+    </div>
+    
+    <div class="product_detail_display">
+        <div class="product_table mt24 f14">
+            <table class="table_s tc tc_left auto_table_len" width="100%" border="0">
+                <thead>
+                    <tr>
+                        <td width="60px"><?php echo $this->t('api_app_id'); ?></td>
+                        <td><?php echo $this->t('api_app_name'); ?></td>
+                        <td><?php echo $this->t('api_user_company'); ?></td>
+                        <td width="250px"><?php echo $this->t('api_app_key'); ?></td>
+                        <td width="130px"><?php echo $this->t('api_app_create'); ?></td>
+                        <td style="text-align: center;width: 200px;"><?php echo $this->t('api_app_operate'); ?></td>
+                    </tr>
+                </thead>
+                <tbody>
+        <?php if(!empty($this->results['rows'])) :?>
+                 <?php foreach ($this->results['rows'] as $row) {?>
+                     <tr <?php if($row['status'] == 'disable'):?>class="stop" <?php endif;?>>
+                        <td><?php echo $row['id'];?></td>
+                        <td title="<?php echo $row['name']; ?>"><?php echo $row['name'];?></td>
+                        <td title="<?php echo $row['company_name']; ?>"><?php echo $row['company_name'];?></td>
+                        <td><?php echo $row['app_key'];?></td>
+                        <td><?php echo $row['ctime'];?></td>
+                        <td class="cl0b9600" style="text-align: center;">
+                            <a href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'appdetail', 'id'=>$row['id'], 'title' => urlencode($row['name'])));?>" title="view" class="check_detail cl0b9600"><?php echo $this->t('api_app_view');?></a>&nbsp;|
+                            <a href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'appauth', 'id'=>$row['id'], 'title' => urlencode($row['name'])));?>" title="edit" class="check_detail cl0b9600"><?php echo $this->t('api_app_auth_edit');?></a>&nbsp;|
+                           <?php if($row['status'] == 'disable'): ?>
+                                <a href="#" data-href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'updateApp', 'id'=>$row['id'], 'status' => 'enable'));?>" title="enable" class="check_detail cl0b9600 update_status"><?php echo $this->t('api_auth_enable');?></a>&nbsp;|
+                            <?php else: ?>
+                                <a href="#" data-href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'updateApp', 'id'=>$row['id'], 'status' => 'disable'));?>" title="disable" class="check_detail cl0b9600 update_status"><?php echo $this->t('api_auth_disable');?></a>&nbsp;|
+                            <?php endif; ?>
+                           <a href="#" data-href="<?php echo $this->url(array('controller'=>'apipermission', 'action'=>'updateApp', 'id'=>$row['id'], 'status' => 'deleted'));?>" title="deleted" class="manager_detail cl0b9600 update_status"><?php echo $this->t('api_auth_deleted');?></a>
+                        </td>
+                    </tr>
+                <?php }?>
+        <?php else:?>
+                     <tr><td colspan="6" style="text-align: center;">暂无记录</td></tr>
+       <?php endif;?>
+                </tbody>
+            </table>
+        </div>
+        <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+    </div>
+</div>
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script>
+$(function(){
+    var url = '';
+    $('.update_status').click(function(){
+        var msg ={
+            'enable':'<?php echo $this->t('api_app_enable_notice');?>',
+            'disable':'<?php echo $this->t('api_app_disable_notice');?>',
+            'deleted':'<?php echo $this->t('api_app_deleted_notice');?>'
+        };
+        var notice = eval('msg.'+$(this).attr('title'));
+        url = $(this).attr('data-href');
+        $('#tips_msg').text(notice);
+        $( "#confirm_dialog" ).dialog("open");
+        return false;
+    });
+		
+		$( "#confirm_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: "explode",
+                duration: 500
+            },
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+        			window.location.href = url;
+                }
+            }
+        });
+        $('#search_submit').click(function(){
+               
+               if(1 == 0){
+                    $('#tips_msg').text(notice);
+                    $( "#confirm_dialog" ).dialog("open");
+               }
+               // location.href = 
+               $('#search_form').submit();
+         });
+		$('#add').click(function () {
+			location.href = '/enterprise/apipermission/add';
+		});
+});
+</script>

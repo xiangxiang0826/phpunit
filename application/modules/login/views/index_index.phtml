@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>遥控e族OSS运营支撑系统-用户登录</title>
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="<?php echo $this->static;?>/styles/base.css" />
+<link rel="stylesheet" type="text/css" href="<?php echo $this->static;?>/styles/system_login.css" />
+<link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/form-validate.css" />
+</head>
+<body>
+	<div class="login_banner_bg">
+		<div class="login_logo"></div>
+		<form action="" method="post" id="login_form">
+			<ul class="login_info_warp">
+				<li></li>
+				<li>
+					<div class="login_form_warp">
+						<div>
+							<input type="text" class="login_user" id="user_name" name="user_name"/> 
+							<input type="password" class="login_psw"  id="password" name="password" />
+							<div class="login_tips" id="login_tips"></div>
+							<div class="login_submit" id="submit">登&nbsp;录</div>
+						</div>
+					</div>
+				</li>
+			</ul>
+		</form>
+	</div>
+	<div class="login_footer">
+        Copyright ©2014 深圳市遥控壹族信息技术有限公司. All rights reserved.粤ICP备05001579号-1 ICP证 粤B2-20110672
+    </div>
+</body>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.js"></script>
+<!--[if lt IE 7]>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/iepng.js"></script>
+<script type="text/javascript">
+EvPNG.fix('div, ul, img, li, input, a, table, td, th, ol, dl, dt, dd, h1, h2, h3, h4, h5, h6, span');
+</script>
+<![endif]--><!-- #EndLibraryItem -->
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.validate.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/messages_zh.js"></script>
+<script src="<?php echo $this->static;?>/js/login.js"></script>
+</html>

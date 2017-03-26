@@ -1,0 +1,121 @@
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+                     	<form action="/ezstudio/firmware/comm" method="get"  id="search_form">
+                           <div class="product_detail_search clearfix">
+                               <div class="fl system_drop clearfix">
+                                    <select id="product_id" class="cpy_style product_assort" name ="search[firmware_type_id]" style="width: 120px;">
+                                        <option value="">所有类型</option>
+                                        <?php foreach($this->firmware_type_list as $type):?>
+                                        <option value="<?php echo $type['id']?>" <?php if($type['id'] === $this->search['firmware_type_id']):?> selected="selected"<?php endif?>><?php echo $type['name']?></option>
+                                        <?php endforeach;?>
+                                    </select>
+                                </div>
+                                <div class="fl system_drop clearfix">
+                                   <input type="text" class="cpy_name w150" id="name"  name ="search[name]" value="<?php echo isset($this->search['name']) ? $this->search['name'] : ''?>" placeholder="请输入固件名称">
+                               </div>
+                                <div class="console_search_wrap fr"><a class="search_icon_btn f16 clF tc" onFocus="blur();" href="javascript:;" id="search"><i class="find_icon"></i>查 询</a></div>
+                           </div>
+                           </form>
+                           <div class="product_detail_display">
+									<div class="product_table mt24 f14">
+									<div class="product_detail_search clearfix">
+									<div class="console_search_wrap fr mr10"><a class="f16 clF tc search_btn ml16" onFocus="blur();" href="javascript:;" id="upload">添 加</a></div>
+									</div>
+                                       <table class="table_s tc mt24 tc_left auto_table_len" width="100%" border="0">
+                                         <thead>
+                                          <tr>                          
+                                            <td width="60px">固件类型</td>
+                                            <td width="100px">固件标识</td>
+                                            <td>固件包名称</td>
+                                            <td>固件描述</td>
+                                            <td width="130px">发布时间</td>
+                                            <td width="60px">版本</td>
+                                            <td width="130px">更新时间</td>
+                                            <td style="text-align: center;width: 200px">操作</td>
+                                          </tr>
+                                         </thead>
+                                         <tbody>
+                                         <?php if($this->fireware_comm_list):?>
+                                         	<?php foreach($this->fireware_comm_list as $item):?>
+                                         	<tr>
+                                            <td>
+                                            <?php echo isset($this->firmware_type_list[$item['firmware_type_id']]['name']) ? $this->firmware_type_list[$item['firmware_type_id']]['name'] : ''?>
+                                            </td>
+                                            <td title = "<?php echo $item['label']?>"><?php echo $item['label'];?></td>
+                                            <td title = "<?php echo $item['name']?>"><?php echo $item['name'];?></td>
+                                            <td title = "<?php echo $item['description']?>"><?php echo $item['description'];?></td>
+                                            
+                                            <td><?php echo $item['ctime']?></td>
+                                            <td title = "<?php echo isset($this->version_map[$item['upgrade_type_id']]) ? $this->version_map[$item['upgrade_type_id']] : '-'?>"><?php echo isset($this->version_map[$item['upgrade_type_id']]) ? mb_strimwidth($this->version_map[$item['upgrade_type_id']],0,10,'...') : '-'?></td>
+                                            <td><?php echo $item['mtime'];//$item['muser'] ? $item['mtime'] : $item['ctime']?></td>
+                                            <td class="cl0b9600" style="text-align: center;">
+                                              <a href="/ezstudio/firmware/commdetail?id=<?php echo $item['id']?>">查看</a> | <a href="/ezstudio/firmware/commversion?id=<?php echo $item['id']?>">版本</a> 
+                                              | <a href="/ezstudio/firmware/edit?id=<?php echo $item['id']?>">编辑</a>  | <a  href="/ezstudio/firmware/upgrade?id=<?php echo $item['id']?>">升级</a>
+                                              | <a href="javascript:void(0)" delete_id="<?php echo $item['id']; ?>">删除</a>
+                                              </td>
+                                          </tr>
+                                         	<?php endforeach;?>
+                                         	<?php else:?>
+                                         	<tr><td colspan="8" style="text-align: center;">暂无记录</td></tr>
+                                         <?php endif;?>
+                                         </tbody>
+                                   </table>
+                                </div>
+               <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+          </div>
+ </div>
+<div id="delete_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text">您确定删除这个固件吗？</p>
+</div>
+<script language="javascript" type="text/javascript">
+	$(function () {
+		$('#search').click(function () {
+			$('#search_form').submit();
+		});
+		$('#upload').click(function () {
+			location.href = '/ezstudio/firmware/add';
+		});
+
+		var delete_id = null;
+		$("#delete_dialog" ).dialog({
+        autoOpen: false,
+        width: 555,
+        dialogClass: "my-dialog",
+        modal: true,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        buttons: {
+            "取消": function() {
+                $( this ).dialog( "close" );
+            },
+            "确定": function() {
+            	$.post('/ezstudio/firmware/delrecord', {id:delete_id}, function (result) {
+            		var tip_el = $('#delete_dialog').find('.message_text');
+            		if(result.status == 200) {
+            			tip_el.text('删除成功');
+            			location.reload(true);
+					} else if(result.msg == 505) {
+						tip_el.text('亲，您暂时没有此页面的权限哦！');
+						$("#delete_dialog").dialog("open");
+                        return false;
+					} else {
+						tip_el.text('删除失败');
+						$("#delete_dialog").dialog("open");
+                        return false;
+					}
+    			},'json');
+            }
+        }
+    });
+	$('a[delete_id]').click(function () {
+		delete_id = $(this).attr('delete_id');
+		$( "#delete_dialog" ).dialog( "open");
+	});
+	});
+</script>

@@ -1,0 +1,125 @@
+
+<!--页面位置-->
+<?php $title = $this->requestTitle?('('.$this->requestTitle.')'):''; ?>
+<h3 class="location f14"><?php echo $this->menu('权限管理'.urldecode($title), '/enterprise/apipermission/applist'); ?></h3>
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th>可授权权限</th>
+        <th></th>
+    </tr>
+    <tr id="auth_ids">
+        <td colspan="2" style="text-align:left;line-height: 50px;padding-left:80px;">
+<?php if(!empty($this->allAuth)):?> 
+<?php foreach($this->allAuth as $k => $v): ?>
+    <?php if($k && ($k % 6)==0): ?>
+            <br />
+    <?php endif; ?>
+	<input type="checkbox" name="ids[]" value="<?php echo $v['id']; ?>"><?php echo $v['name']; ?>&nbsp;&nbsp;
+<?php endforeach;?>
+<?php else: ?>
+        暂无
+<?php endif;?>
+		</td>
+    </tr>
+    <tr>
+        <td  colspan="2">
+            <input type="radio" name="opt" class="selOption" value="selAll">全选&nbsp;&nbsp;
+            <input type="radio" name="opt" class="selOption" value="selNone">全不选&nbsp;&nbsp;
+		</td>
+    </tr>
+    <tr>
+        <th>内部权限</th>
+        <th align="left">(<font color="red">请谨慎使用此组权限</font> , <a href="javascript::void()" id="show_intranet">点击打开或隐藏</a>）</th>
+    </tr>
+    <tr id="intranet_ids"  style="display:none;">
+        <td colspan="2" style="text-align:left;line-height: 50px;padding-left:80px;">
+<?php if(!empty($this->intranetAuth)):?>
+<?php foreach($this->intranetAuth as $k => $v): ?>
+    <?php if($k && ($k % 6)==0): ?>
+            <br />
+    <?php endif; ?>
+	<input type="checkbox" name="ids[]" value="<?php echo $v['id']; ?>"><?php echo $v['name']; ?>&nbsp;&nbsp;
+<?php endforeach;?>
+<?php else: ?>
+        暂无
+<?php endif;?>
+		</td>
+    </tr>
+    <tr>
+        <td  colspan="2">
+           <?php if(!empty($this->templateAuth)):?> 
+                <?php foreach($this->templateAuth as $v): ?>
+                <input type="radio" name="opt" value="sel_<?php echo $v['id']; ?>"  class="selOption" data="<?php echo $v['permission']; ?>"><?php echo $v['name']; ?>&nbsp;&nbsp;
+                <?php endforeach;?>
+           <?php else: ?>
+               暂无模板
+           <?php endif;?>
+		</td>
+    </tr>
+    <tr>
+        <th>公共权限</th>
+        <th align="left">(<font color="red">已自动获取</font>，<a href="javascript::void()" id="show_common">点击打开或隐藏</a>）</th>
+    </tr>
+    <tr id="common_ids" style="display:none;">
+        <td colspan="2" style="text-align:left;line-height: 50px;padding-left:80px;">
+<?php if(!empty($this->commonAuth)):?> 
+<?php foreach($this->commonAuth as $k => $v): ?>
+    <?php if($k && ($k % 6)==0): ?>
+            <br />
+    <?php endif; ?>
+            <input type="checkbox" name="common_ids[]" value="<?php echo $v['id']; ?>" checked="checked" disabled="diabled"><?php echo $v['name']; ?>&nbsp;&nbsp;
+<?php endforeach;?>
+<?php else: ?>
+        暂无
+<?php endif;?>
+		</td>
+    </tr>
+</table>
+<input type="hidden" value="<?php echo $this->requestId; ?>" name="id" id="id">
+<input type="hidden" value="/enterprise/apipermission/applist" name="back_url" id="back_url">
+<div class="mt36 mb24 tr">
+    <a  onfocus="blur();" href="javascript:void(0)" id="back" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+    <a  onfocus="blur();" href="javascript:void(0)" id="save" class="f16 clF tc search_btn" >提 交</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">权限更新成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)">确 定</a>
+</div>
+<script>
+    var idstr = "";
+    var selInitDefault = <?php echo ($this->selAuth)?(json_encode($this->selAuth)):'[]'; ?>;
+$(function () {
+    selInit(selInitDefault, onload=1);
+    $('#show_common').click(function(){
+        $('#common_ids').toggle();
+    });
+    $('#show_intranet').click(function(){
+        $('#intranet_ids').toggle();
+    });
+	$("#close_message").on("click",function() {
+        if($('.message_text').text() == '保存成功！'){
+            location.href = $('#back_url').val();
+            return;
+        }
+        $( "#message_dialog" ).dialog( "close" );
+    });
+
+	$('#save').click(function () {
+        idstr = "";
+        $('input:checkbox[name="ids[]"]').each(function(){ 
+            if($(this).prop("checked")){
+                idstr += $(this).val()+","
+            }
+        });
+		$.post('/enterprise/apipermission/setauth',{ids:idstr,id:$('#id').val()},function (result) {
+			if(result.status == 200) {
+				$('.message_text').text('保存成功！');
+				return $( "#message_dialog" ).dialog( "open" );
+			}
+			$('.message_text').text('服务器忙，请重试！');
+			return $( "#message_dialog" ).dialog( "open" );
+		},'json');
+	});
+});
+</script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/auth.common.js"></script>

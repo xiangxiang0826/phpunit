@@ -1,0 +1,183 @@
+ <script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+ <style>
+ 	.not_detail_table {
+ 		border: 0px;
+ 	}
+ 	.not_detail_table tr td {
+ 		border: 0px;
+ 	}
+ 	.not_detail_table tr td:first-child	{ 	
+		padding-right: 20px;
+		text-align: left;
+		background-color: #FFFFFF;
+ 	}
+ 	
+ </style>
+<!--页面位置-->
+ <h3 class="location f14"><?php echo $this->menu('设备详情', '/product/device/index'); ?></h3>
+ <?php if(isset($this->device['id'])):?>
+ <form action="<?php echo $this->url(array('action'=>'save'));?>" method="post" id="submit_from">
+ <table class="detail_tabel f14 mt20">
+     <tr>
+         <th>基本信息</th>
+         <th></th>
+     </tr>
+     <tr>
+         <td>设备ID：</td>
+         <td><?php echo $this->device['id'];?></td>
+     </tr>
+     <tr>
+         <td>设备名称：</td>
+         <td><?php echo $this->device['name'] ? $this->device['name'] : '-';?></td>
+     </tr>
+     <tr>
+         <td>产品名称：</td>
+         <td><?php echo $this->device['p_name'];?></td>
+     </tr>
+      <tr>
+         <td>品类：</td>
+         <td><?php echo $this->device['c_name'];?></td>
+     </tr>
+     <tr>
+         <td>厂商：</td>
+         <td><?php echo $this->device['company_name'];?></td>
+     </tr>
+    <tr>
+         <th> 固件信息</th>
+         <th></th>
+     </tr>
+     <tr>
+         <td>MAC地址：</td>
+         <td><?php echo $this->device['mac_address'];?></td>
+     </tr>
+     <tr>
+         <td>生产批次：</td>
+         <td><?php echo $this->device['deviceid_manager_id'];?></td>
+     </tr>
+     <tr>
+         <td>固件版本：</td>
+         <td><?php echo $this->device['version'];?></td>
+     </tr>
+    <tr>
+         <th>状态信息</th>
+         <th></th>
+     </tr>
+     <tr>
+         <td>设备状态：</td>
+         <td>
+            <?php if(in_array($this->device['status'], array(Model_Device::STATUS_NEW, Model_Device::STATUS_FACT_ACTIVATE))): ?>
+                新的
+            <?php else: ?>
+                <?php echo $this->t($this->device['status']);?>
+            <?php endif; ?>
+         </td>
+     </tr>
+     <tr>
+         <td>激活时间：</td>
+         <td><?php echo $this->device['user_activate_time']?></td>
+     </tr>
+     <tr>
+         <td>IP地址：</td>
+         <td><?php echo $this->device['ip'] ? long2ip($this->device['ip']) : '0.0.0.0';?></td>
+     </tr>
+     <tr>
+         <td>绑定用户：</td>
+         <td>
+         		<?php if(!empty($this->device['bind_user'])):?>
+         		<ul>
+	         		<?php foreach($this->device['bind_user'] as $v):?>
+	         			<li>
+	         				<span >(<?php echo empty($v['id']) ? '-' : $v['id']?>)</span>
+	         				<span >(<?php echo empty($v['name']) ? '-' : $v['name']?>)</span>
+	         				<span ><?php echo empty($v['email']) ? '-' : $v['email']?> / <?php echo empty($v['phone']) ? '-' : $v['phone'] ?></span>
+	         			</li>
+	         		<?php endforeach;?>
+	         	</ul>
+         		<?php else:?>
+         		-
+         		<?php endif;?>
+         </td>
+     </tr>
+     <tr>
+         <th>设备管理</th>
+         <th></th>
+     </tr>
+      <tr>
+         <td>类型设置：</td>
+         <td>
+             <input type="radio" name="type" value="<?php echo Model_Device::DEVICE_TYPE_TEST;?>" <?php if(Model_Device::DEVICE_TYPE_TEST == $this->device['type']):?>checked="checked" <?php endif;?>> <?php echo $this->t('test');?>
+             <input type="radio" name="type" value="<?php echo Model_Device::DEVICE_TYPE_FORMAL;?>" <?php if(Model_Device::DEVICE_TYPE_FORMAL == $this->device['type']):?>checked="checked" <?php endif;?>> <?php echo $this->t('formal');?>
+         </td>
+     </tr>
+      <tr>
+         <td>状态管理：</td>
+         <td>
+             <?php foreach ($this->status as $key=>$name) {?>
+              <input type="radio" name="status"  value="<?php echo $key;?>" <?php if($key == $this->device['status']):?>checked="checked" <?php endif;?> > <?php echo $name;?>
+              <?php }?>
+         </td>
+     </tr>
+ </table>
+ </form>
+  <div class="mt36 mb24 tr">
+     <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+     <a  onfocus="blur();" href="javascript:void(0)" id="save_btn" class="f16 clF tc search_btn" >提 交</a>
+ </div>
+ <div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice">数据保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)">确 定</a>
+</div>
+<script>
+   $(document).ready(function(){
+       
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        
+        $("#close_message").on("click",function() {
+            if($('.message_text').text() == '保存成功！'){
+                location.href="/product/device/index";
+            }
+        	$( "#message_dialog" ).dialog( "close" );
+        });
+        
+       $('#cancel_btn').click(function(){
+           location.href='/product/device/index';
+        });
+       $('#save_btn').click(function(){
+              $('#submit_from').ajaxSubmit({
+					url:$('#submit_from').attr('action'), //提交给数据保存接口
+					type:'POST',
+					dataType: 'json',
+					success: function (result) {
+						if(result.status == 200) {
+							$('.message_text').text('保存成功！');
+						} else if(result.status == 500) {
+							$('.message_text').text('系统繁忙，请稍后再试！');
+						} else if (result.msg == 505) {
+	                        $('.message_text').text('亲，你没有这个操作的权限！');
+	                    } else {
+							$('.message_text').text(result.msg);
+						}
+						$( "#message_dialog" ).dialog( "open" );
+						return;
+					}
+				});
+       });
+    });
+</script>
+<?php else:?>
+暂无记录
+<?php endif;?>

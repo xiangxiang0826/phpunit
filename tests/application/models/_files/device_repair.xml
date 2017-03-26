@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<dataset>
+    <EZ_SERVICE_REPAIR  id="100" number="100" product_id="301" device_id="admin" user_id="1" sn="123asd" buy_date="2010-04-26" content="content" name="admin" mobile="18658545847" email="www.qq.com" ctime="2010-04-26 12:14:20" mtime="2010-04-26 12:14:20" status="new"/>
+    <EZ_SERVICE_REPAIR  id="101" number="100" product_id="302" device_id="admin" user_id="1" sn="123asd" buy_date="2010-04-26" content="content" name="admin" mobile="18658545847" email="www.qq.com" ctime="2010-04-26 12:14:20" mtime="2010-04-26 12:14:20" status="new"/>
+</dataset>

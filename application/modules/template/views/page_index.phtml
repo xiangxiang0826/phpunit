@@ -1,0 +1,248 @@
+<h3 class="location f14">系统<?php echo $this->menu('页面管理','/template/template/index'); ?></h3>
+<div class="product_detail mt22">
+	<form id="searchForm">
+		<div class="product_detail_search clearfix">
+			<div class="fl system_drop clearfix mr10">
+			<select id="condition" name="S[condition][]" class="cang_assort">
+				<option value="url">URL</option>
+				<?php if($this->entity_i18n_name): ?>
+				<option value="entity_id"><?php echo Cms_L::_($this->entity_i18n_name); ?>ID</option>
+				<option value="entity_name"><?php echo Cms_L::_($this->entity_i18n_name), Cms_L::_('name'); ?></option>
+				<?php endif; ?>
+				<option value="title"><?php echo Cms_L::_('page'); ?>title</option>
+				<option value="keyword"><?php echo Cms_L::_('page'); ?>keyword</option>
+				<option value="description"><?php echo Cms_L::_('page'); ?>description</option>
+				<option value="add_time"><?php echo Cms_L::_('add_time'); ?></option>
+				<option value="html_time"><?php echo Cms_L::_('html_time'); ?></option>
+				<option value="user_name"><?php echo Cms_L::_('actor'); ?></option>
+				<?php foreach($this->search_fields as $field): ?>
+				<option value="<?php echo $field['field_name']?>"><?php echo $field['input_label']; ?></option>
+				<?php endforeach; ?>
+			</select>
+			</div>
+			<div class="fl system_drop clearfix mr10">
+			<select name="S[type][]" class="cang_assort">
+				<option value="1"><?php echo Cms_L::_('in'); ?></option>
+				<option value="2"><?php echo Cms_L::_('not_in'); ?></option>
+				<option value="3"><?php echo Cms_L::_('eq'); ?></option>
+				<option value="4"><?php echo Cms_L::_('not_eq'); ?></option>
+				<option value="5"><?php echo Cms_L::_('gt'); ?></option>
+				<option value="6"><?php echo Cms_L::_('lt'); ?></option>
+				<option value="7"><?php echo Cms_L::_('gt_eq'); ?></option>
+				<option value="8"><?php echo Cms_L::_('lt_eq'); ?></option>
+			</select>
+			</div>
+			<div class="fl chart_search f14">
+				<input type="text" name="S[keyword][]" size="60" class="cpy_name"/>
+			</div>
+			<div class="fl system_drop clearfix mr10">
+			<select name="S[state]"  class="cang_assort">
+				<option value="2"><?php echo Cms_L::_('page_state'); ?></option>
+				<option value="1"><?php echo Cms_L::_('created'); ?></option>
+				<option value="0"><?php echo Cms_L::_('not_created'); ?></option>
+			</select>
+			</div>
+			<div class="console_search_wrap fr mr10"><a class="search_icon_btn f16 clF tc" onFocus="blur();" href="javascript:;" id="search"><i class="find_icon"></i>查 询</a></div>
+		</div>
+	</form>
+</div>
+<div class="product_detail mt22 clearfix">
+	<table id="datagrid" title="<?php echo Cms_L::_('page_list'); ?> - [<?php echo $this->tpl_info['name']?>]" style="width:auto;"  
+            data-options="url:'/template/page/data/site_id/<?php echo $this->site_id; ?>/tpl_id/<?php echo $this->tpl_id; ?>',
+						pagination:'true',
+						pageList:[15,30,60,100,500,1000], 
+						pageSize:'15',
+						striped:'true',
+						fitColumns:'false'">  
+		
+	</table>
+</div>
+<script>
+var $datagrid = $('#datagrid');
+var site_id = <?php echo $this->site_id; ?>;
+var tpl_id = '<?php echo $this->tpl_id; ?>';
+var tpl_name = '<?php echo $this->tpl_info['name']?>';
+
+$(function(){
+	$datagrid.datagrid({
+		toolbar : [
+			{text:'<?php echo Cms_L::_('add'); ?>', iconCls:'icon-add', handler:add_page},
+			{text:'<?php echo Cms_L::_('create_selected'); ?>', handler:create_selected},
+			{text:'<?php echo Cms_L::_('edit_template'); ?>', handler:edit_template},
+			{text:'<?php echo Cms_L::_('delete_selected'); ?>', iconCls:'icon-remove', handler:delete_selected}
+		],
+		columns : [[
+			{field:'id', width:50, checkbox:true},
+			{field:'page_id', title:'<?php echo Cms_L::_('page'); ?>ID', width:50, sortable:'true'},
+			{field:'url', title:'URL', width:270, sortable:'true', formatter:function(val, row, idx){
+				return '<a href="/public/template/html/tpl_id/' + tpl_id + '/page_id/' + row.page_id + '" target="_blank" title="' + val + '">' + val + '</a>';
+			}},
+			{field:'page_state', title:'<?php echo Cms_L::_('page_state'); ?>', width:90, formatter:function(val, row, idx){
+				var html;
+
+				if(row.state == 'disable') {
+					return '<span class="warn"><?php echo Cms_L::_('disabled'); ?></span>'
+				}
+				
+				if(parseInt(row.html_time) > 0){
+					html = '<?php echo Cms_L::_('created'); ?>';
+				} else {
+					html = '<span class="warn"><?php echo Cms_L::_('not_created'); ?></span>';
+				}
+				
+				if(parseInt(row.html_time) > 0 && row.edit_time > row.html_time){
+					html += '&nbsp;|&nbsp;<span class="warn"><?php echo Cms_L::_('modified'); ?></span>';
+				}
+				
+				return html;
+			}},
+			<?php if($this->entity_i18n_name): ?>
+			{field:'entity_id', title:'<?php echo Cms_L::_($this->entity_i18n_name); ?>ID', width:50, sortable:'true'},
+			{field:'entity_name', title:'<?php echo Cms_L::_($this->entity_i18n_name), Cms_L::_('name'); ?>', width:200, sortable:'true'},
+			<?php endif; ?>
+			{field:'edit_time', title:'<?php echo Cms_L::_('action_time'); ?>', width:100, sortable:'true'},
+			{field:'user_name', title:'<?php echo Cms_L::_('actor'); ?>', width:50, sortable:'true'},
+			<?php foreach($this->list_fields as $field): ?>
+			{field:'<?php echo $field['field_name']; ?>', title:'<?php echo $field['input_label']; ?>', width:Math.min(<?php echo $field['input_width']?>, 70), sortable:'true'},
+			<?php endforeach; ?>
+			{field:'action', title:'<?php echo Cms_L::_('action'); ?>', width:190, formatter:function(val, row, idx){
+				var html;
+				html = '<a href="javascript:;" onclick="edit_page(' + row.id + ')"><?php echo Cms_L::_('edit'); ?></a>';
+				if(row.state == 'disable'){
+					html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="able_page(' + row.id + ')" class="warn"><?php echo Cms_L::_('enable'); ?></a>';
+				}else{
+					html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="disable_page(' + row.id + ')"><?php echo Cms_L::_('disable'); ?></a>';
+					html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="create_html(' + row.id + ')"><?php echo Cms_L::_('create'); ?></a>';
+					html += '&nbsp;|&nbsp;<a href="template/page/preview/site_id/' + site_id + '/tpl_id/' + tpl_id + '/page_id/' + row.page_id + '" target="_blank"><?php echo Cms_L::_('preview'); ?></a>';
+				}
+				html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="delete_page(' + row.id + ')"><?php echo Cms_L::_('delete'); ?></a>';
+				return html;
+			}}
+		]]
+	});
+	
+	$('#searchForm').form({
+		onSubmit:function(data){
+			$datagrid.datagrid({url : '/template/page/data/site_id/' + site_id + '/tpl_id/' + tpl_id + '/?' + $('#searchForm').serialize()});
+			return false;
+		}
+	});
+	$('#search').click(function () {
+		$('#searchForm').submit();
+	});
+});
+
+//添加页面
+function add_page() {
+	$.nav_tab.add('<?php echo Cms_L::_('add_page'); ?> - [' + tpl_name + ']', '/template/page/edit', {tpl_id:tpl_id, site_id:site_id});
+}
+
+//编辑页面
+function edit_page(page_id) {
+	$.nav_tab.add('<?php echo Cms_L::_('edit_page'); ?> - [' + tpl_name + '][' + page_id + ']', '/template/page/edit', {tpl_id:tpl_id, page_id:page_id, site_id:site_id});
+}
+
+//删除页面
+function delete_page(page_id) {
+	$.messager.confirm('<?php echo Cms_L::_('tip'); ?>', '<?php echo Cms_L::_('delete_confirm'); ?>', function(is_del){
+		if(is_del) {
+			$.post('/template/page/delete', {site_id:site_id, tpl_id:tpl_id, page_id:page_id}, function(data){
+				if(data.state == 'ok') {
+					$datagrid.datagrid('reload');
+				} else {
+					$.messager.alert('<?php echo Cms_L::_('tip'); ?>', data.msg, 'error');
+				}
+			}, 'json');
+		}
+	});
+}
+
+//删除选中页面
+function delete_selected() {
+	var page_ids = $.datagrid.getSelectItems('page_id');
+	if(!page_ids) {
+		$.messager.alert('<?php echo Cms_L::_('tip'); ?>', '<?php echo Cms_L::_('no_item'); ?>', 'warning');
+		return false;
+	}
+	
+	page_ids = page_ids.split(',');
+	$.messager.confirm('<?php echo Cms_L::_('tip'); ?>', '<?php echo Cms_L::_('delete_confirm'); ?>', function(is_del){
+		$.overlay.open({width:150});
+		(function func(i){
+			if(typeof page_ids[i] == 'undefined') {
+				$datagrid.datagrid('reload');
+				$.overlay.close();
+				return false;
+			}
+			
+			$.post('/template/page/delete', {site_id:site_id, tpl_id:tpl_id, page_id:page_ids[i]}, function(data){
+				if(data.state == 'ok') {
+					$.overlay.set_content('<span class="create-state"><span class="create-done">' + (++i) + '</span>/' + page_ids.length + '</span>');
+					func(i);
+				} else {
+					$.messager.alert('<?php echo Cms_L::_('tip'); ?>', data.msg, 'error', function(){
+						$.overlay.close();
+					});
+				}
+			}, 'json');
+		})(0);
+	});
+}
+
+//禁用页面
+function disable_page(page_id){
+	$.post('/template/page/state', {site_id:site_id, tpl_id:tpl_id, page_id:page_id, state:'disable'}, function(data){
+		if(data.state == 'ok') {
+			$datagrid.datagrid('reload');
+		} else {
+			$.messager.alert('<?php echo Cms_L::_('tip'); ?>', data.msg, 'error');
+		}
+	}, 'json');
+}
+
+//启用页面
+function able_page(page_id){
+	$.post('/template/page/state', {site_id:site_id, tpl_id:tpl_id, page_id:page_id, state:'enable'}, function(data){
+		if(data.state == 'ok'){
+			$datagrid.datagrid('reload');
+		}else{
+			if(data.state == 'error'){
+				var msg = [];
+				if(typeof data.title != 'undefined') {
+					$.each(data.title, function(i, n){
+						msg.push('<a href="javascript:;" onclick="$.template_page.edit(' + n.tpl_id + ',' + n.page_id + ',\'<?php echo Cms_L::_('edit_page'); ?>\');"><?php echo Cms_L::_('title_dup_page'); ?></a>');
+					});
+				}
+
+				if(typeof data.url != 'undefined') {
+					$.each(data.url, function(i, n){
+						msg.push('<a href="javascript:;" onclick="$.template_page.edit(' + n.tpl_id + ',' + n.page_id + ',\'<?php echo Cms_L::_('edit_page'); ?>\');"><?php echo Cms_L::_('url_dup_page'); ?></a>');
+						focus = 'url';
+					});
+				}
+				
+				data.msg += '<div><span style="margin:20px;">' + msg.join('</span><span style="margin:20px;">') + '</span></div>';
+			}
+
+			$.messager.alert('<?php echo Cms_L::_('tip'); ?>', data.msg, data.state);
+		}
+	}, 'json');
+}
+
+//生成页面
+function create_html(page_id) {
+	$.create_html.page(site_id, tpl_id, page_id);
+}
+
+//生成选中页面
+function create_selected() {
+	var page_ids = $.datagrid.getSelectItems('page_id');
+	$.create_html.multi_page(site_id, tpl_id, page_ids);
+}
+
+//修改模版
+function edit_template() {
+	var title = '<?php echo Cms_L::_('edit_template'); ?> - [' + tpl_name + ']';
+	$.nav_tab.add(title, '/template/template/edit', {site_id:site_id, tpl_id:tpl_id});
+}
+</script>

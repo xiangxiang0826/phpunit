@@ -1,0 +1,16 @@
+<ul>
+	<li><a href="javascript:;" onClick="$('#kwTooltip').tooltip('update');"><?php echo Cms_L::_('re_update'); ?></a></li>
+</ul>
+<ol>
+<?php foreach($this->data as $keyword => $data):?>
+	<li>
+		<?php echo $keyword; ?>
+		<dl>
+			<dt><?php echo Cms_L::_('keyword_num', array('x' => count($data))); ?></dt>
+			<?php foreach($data as $k => $row): ?>
+			<dd><a href="javascript:;" onclick="$.template_page.edit(<?php echo $row['tpl_id'], ',', $row['page_id'], ',\'', Cms_L::_('edit_page') , '\''; ?>);"><?php echo Cms_L::_('show'); ?></a></dd>
+			<?php endforeach; ?>
+		</dl>
+	</li>
+<?php endforeach; ?>
+</ol>

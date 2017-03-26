@@ -1,0 +1,147 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('待处理', 'enterprise/index/index'); ?></h3>
+<div class="product_detail mt22">
+
+	<div class="product_detail_display">
+		 <div class="product_detail_display_tab_wrap clearfix">
+				<div class="fl product_detail_display_tab" id="change_tab">
+				<span class="last" id="publish">已处理</span><span class="on" id="pending">待处理</span>
+				</div>
+		 </div>
+		<div class="product_table mt24 f14">
+			<table class="table_s tc tc_left auto_table_len" width="100%" border="0">
+				<thead>
+					<tr>
+						<td width="60px">ID</td>
+						<td width="60px"><?php echo $this->t('user_type'); ?></td>
+						<td><?php echo $this->t('company_name'); ?></td>
+						<td><?php echo $this->t('business_scope'); ?></td>
+						<td width="90px"><?php echo $this->t('mobile'); ?></td>
+						<td width="200px"><?php echo $this->t('enterprise_email'); ?></td>
+						<td width="80px"><?php echo $this->t('reg_time'); ?></td>
+						<td width="60px"><?php echo $this->t('certificate'); ?></td>
+						<td width="80px"><?php echo $this->t('company_status'); ?></td>
+                        <td width="60px"><?php echo $this->t('inform_status'); ?></td>
+						<td style="text-align: center;width: 80px;"><?php echo $this->t('control'); ?></td>
+					</tr>
+				</thead>
+				<tbody>
+<?php if(!empty($this->results['rows'])) :?>
+				 <?php foreach ($this->results['rows'] as $row) {?>
+					<tr>
+						<td><?php echo $row['id'];?></td>
+						<td width="70"><?php if($row['user_type']) { echo $this->t($row['user_type']);}?></td>
+						<td title = "<?php echo $row['company_name'];?>"><?php echo $this->escape(mb_strimwidth($row['company_name'],0,80,'...'));?></td>
+						<td title = "<?php echo $row['business_scope'];?>"><?php echo $this->escape(mb_strimwidth($row['business_scope'],0,80,'...'));?></td>
+						<td><?php echo $row['mobile'];?></td>
+						<td title="<?php echo $row['email'];?>"><?php echo $row['email'];?></td>
+						<td><?php echo $this->cutstring($row['reg_time'], 10, '');?></td>
+						<td><?php if(empty($row['certificate'])) { echo '未上传';} else { echo  '<a href="' . $this->upload['baseUrl'] . $row['certificate'] .'" target="_blank">下载</a>';};?></td>
+						<td id="status_<?php echo $row['id'];?>" style="color:<?php if($row['status'] == 'pending') { echo 'red';} elseif ($row['status'] == 'unactivated'){ echo 'green';}?>">
+						<?php if(!empty($row['status'])) { echo $this->t($row['status']);}?>
+                         </td>   
+                        <td id="inform_status_<?php echo $row['id'];?>">
+                            <?php if($row['inform_status'] == $row['inform_result']): ?>
+                                <?php if($row['inform_status'] == 0): ?>
+                            <span>-</span>
+                                <?php else: ?>
+                            <span>√</span>
+                                <?php endif; ?>
+                            <?php else: ?>
+                            <font color="red">!</font>
+                            <?php endif; ?>
+                        </td>
+						<td class="cl0b9600" style="text-align: center;">
+						  <?php if($row['status'] == 'audit_failed') {?>
+						  <a href="javascript:;"  id="id_<?php echo $row['id'];?>" class="view_detail cl0b9600"><?php echo $this->t('view');?></a>
+						  <?php } elseif ($row['status'] == 'pending') { ?>
+						   <a href="javascript:;"  id="id_<?php echo $row['id'];?>" class="check_detail cl0b9600 "  ><?php echo $this->t('check');?></a>
+						   <?php } else {?>
+						   <a href="javascript:;" id="id_<?php echo $row['id'];?>" class="manager_detail cl0b9600" ><?php echo $this->t('manager');?></a>
+						   <?php }?>
+						</td>
+					</tr>
+				<?php }?>
+	<?php else:?>
+	<tr><td colspan="10" style="text-align: center;">暂无记录</td></tr>
+	<?php endif;?>
+				</tbody>
+			</table>
+		</div>
+		<?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml', array('base_url'=>$this->base_url)); ?>
+	</div>
+</div>
+</div>
+<div id="check_div" style="display:none;" title="厂商审核">
+<form class="cmxform"  method="post" id="check_form">
+<table class="detail_tabel form_table f14">
+	<tr class="h60">
+		<td>审核结论：</td>
+		<td>
+			 <input  type="radio" name="pass" checked="checked" value="1"/><label for="message">通过</label>
+			<input  type="radio" name="pass" class="ml56" value="0"/><label for="e-mail">不通过</label>
+		</td>
+	</tr>
+	 <tr class="h60">
+		<td>企业标识：</td>
+		<td><input name="label" type="text" class="cpy_name"></td>
+	</tr>
+	<tr class="h170">
+		<td>审核意见：</td>
+		<td><textarea class="text_cls" name="check_opinion" cols="40" rows="6" id="remark"></textarea></td>
+	</tr>
+	<tr>
+		<td>结果通知：</td>
+		<td>
+			<input  type="checkbox" name="message[]" checked="checked" value="msg"/><label for="message">短信</label>
+			<input  type="checkbox" name="message[]" checked="checked"  class="ml56"  value="email"/><label for="e-mail">邮箱</label>
+		</td>
+		<input type="hidden" name="enterprise_id" id="enterprise_id">
+	</tr>
+</table>
+ <div class="error" style="text-align: center; color:red;display: none;"></div>
+</form>
+<div id="manager_div" style="display:none;" title="厂商管理">
+  <form class="cmxform"  action="<?php echo $this->url(array('controller'=>'index', 'action' =>'manager'));?>" method="post" id="manage_form">
+    <table class="detail_tabel form_table f14">
+        <tr>
+            <td>当前状态：</td>
+            <td id="current_status"></td>
+        </tr>
+        
+        <tr class="h60">
+            <td>处理措施：</td>
+            <td>
+                 <input  type="radio" name="pass" checked="checked" value="0"/><label >启用</label>
+                <input  type="radio" name="pass" class="ml56" value="1"/><label>冻结</label>
+            </td>
+        </tr>
+        <tr class="h170">
+            <td>管理备注：</td>
+            <td><textarea class="text_cls" name="remark" cols="40" rows="6" id="remark"></textarea></td>
+        </tr>
+        <tr>
+            <td>结果通知：</td>
+            <td>
+                <input  type="checkbox" checked="checked"  name="message[]"  value="msg"/><label for="message">短信</label>
+                <input  type="checkbox" checked="checked"  name="message[]" class="ml56"  value="email"/><label for="e-mail">邮箱</label>
+            </td>
+            <input type="hidden" name="enterprise_id" id="enterprise_id">
+        </tr>
+    </table>
+  </form>
+</div>
+<div id="view_div" style="display:none;" title="查看审核意见">
+    <table class="detail_tabel form_table f14">
+        <tr>
+            <td>审核结论：</td>
+            <td id="current_status"></td>
+        </tr>
+        <tr class="h170">
+            <td>审核意见：</td>
+            <td id="check_opinion"></td>
+        </tr>
+    </table>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/enterprise.js"></script>

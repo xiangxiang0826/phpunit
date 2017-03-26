@@ -1,0 +1,202 @@
+<h3 class="location f14"><?php echo $this->menu('版本列表', '/ezstudio/ota/list'); ?></h3>
+<div class="product_detail mt22">
+<div class="product_detail_search clearfix">
+    <div class="product_detail_search clearfix">
+        <div class="fl system_drop clearfix ml10">
+             <label class="fl mt4">资源名称：<?php echo $this->type_info['name']; ?></label>
+             <input type="hidden" value="<?php echo $this->type_info['id']; ?>" id="tid" name="tid" />
+         </div>
+    </div>
+                           
+</div>
+<div class="product_detail_display">
+									<div class="product_table mt24 f14">
+									<div class="product_detail_search clearfix">
+									<div class="console_search_wrap fr mr10" style="margin-top:8px;"><a class="f16 clF tc search_btn ml16" onFocus="blur();" href="javascript:;" id="add">添加新版本</a></div>
+									</div>
+                                       <table class="table_s tc mt24" width="100%" border="0">
+                                         <thead>
+                                          <tr>                          
+                                            <td>资源ID</td>
+                                            <td>版本</td>
+                                            <td>版本更新</td>
+                                            <td>升级方式</td>
+                                            <td>产品关联</td>
+                                            <td>发布类型</td>
+                                            <td>发布时间</td>
+                             				<td>操作</td>
+                                          </tr>
+                                         </thead>
+                                         <tbody>
+                                         <?php if($this->control_list):?>
+                                         	<?php foreach($this->control_list as $item):?>
+                                         	<tr>
+                                            <td><?php echo $item['id']?></td>
+                                            <td>
+                                            <?php echo $this->escape($item['version'])?>
+                                            </td>
+                                            <td title="<?php echo $this->escape($item['description'])?>">
+                                            <?php if($item['description']):?>
+                                            <?php echo $this->Cutstring($this->escape($item['description']), 20, '...');?>
+                                            <?php else: ?>
+                                                -
+                                            <?php endif; ?>
+                                            </td>
+                                            <td>
+                                            <?php echo $this->t('upgrade_'.$item['exec_type'])?>
+                                            </td>
+                                            <td>
+                                            <?php echo $this->t('upgrade_with_product_'.($item['product_id']?'yes':'no')); ?>
+                                            </td>
+                                            <td>
+                                            <?php echo $this->t('upgrade_post_'.$item['device_type']) ?>
+                                            </td>
+                                            <td>
+                                            <?php echo $this->escape($item['ctime'])?>
+                                            </td>
+                                            <td class="cl0b9600">
+                                                <?php if($item['device_type'] != 'formal'): ?>
+                                                <a class='postVersion' href="/ezstudio/ota/postversion/tid/<?php echo $item['id']?>">正式发布</a> | 
+                                                <?php endif; ?>
+                                                <a href="/ezstudio/ota/editversion/tid/<?php echo $this->type_info['id']; ?>/id/<?php echo $item['id']?>">编辑</a> 
+ | <a href="javascript:void(0)" delete_id="<?php echo $item['id']; ?>">删除</a>
+</td>
+                                           </tr>
+                                         	<?php endforeach;?>
+                                         	<?php else:?>
+                                         	<tr><td colspan="8">暂无记录</td></tr>
+                                         <?php endif;?>
+                                         </tbody>
+                                   </table>
+                                </div>
+               <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+          </div>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice">数据保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)" >确 定</a>
+</div>
+
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text">您确定发布这个资源吗？</p>
+</div>
+<div id="delete_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text">您确定删除这个版本吗？</p>
+</div>
+<script language="javascript" type="text/javascript">
+	$(function () {
+		var post_id = 0;
+		$( "#confirm_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+                    $( this ).dialog( "close" );
+                	$.post('/ezstudio/ota/postversion', {id:post_id}, function (result) {
+                        // alert('res'+result);
+						if(result.status == 200) {
+							$('#sys_notice').text('数据保存成功！');
+						} else if(result.status == 500) {
+							$('#sys_notice').text('系统繁忙，请稍后再试！');
+						} else if(result.msg == 505) {
+							$('#sys_notice').text('亲，你没有这个操作的权限！');
+						} else {
+							$('#sys_notice').text(result.msg);
+						}
+						$( "#message_dialog" ).dialog( "open" );
+						return ;
+        			},'json');
+                }
+            }
+        });
+        
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        
+        $("#close_message").on("click",function() {
+        	$( "#message_dialog" ).dialog( "close" );
+            if($('#sys_notice').text() == "数据保存成功！"){
+                window.location.reload();
+            }
+            return false;
+        });
+        
+		$('#search').click(function () {
+			$('#search_form').submit();
+		});
+		
+		$('#add').click(function () {
+            var tid = $('#tid').val();
+			location.href = '/ezstudio/ota/addversion/tid/'+tid;
+		});
+        
+ 		$('.postVersion').click(function () {
+            post_id = $(this).attr('data');
+            $( "#confirm_dialog" ).dialog('open');
+            return false;
+		});
+		var delete_id = null;
+ 		$("#delete_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+                	$.post('/ezstudio/ota/delversion', {id:delete_id}, function (result) {
+                		var tip_el = $('#delete_dialog').find('.message_text');
+                		if(result.status == 200) {
+                			tip_el.text('删除成功');
+                			location.reload(true);
+						} else {
+							tip_el.text('删除失败');
+							$("#delete_dialog").dialog("open");
+	                        return false;
+						}
+        			},'json');
+                }
+            }
+        });
+		$('a[delete_id]').click(function () {
+			delete_id = $(this).attr('delete_id');
+			$( "#delete_dialog" ).dialog( "open");
+		});
+    });
+</script>

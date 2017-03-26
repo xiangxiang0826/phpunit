@@ -1,0 +1,151 @@
+<!--页面位置-->
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<?php 
+if(isset($this->cid)): 
+    $title = '修改新闻分类';
+else:
+    $title = '添加新闻分类';
+endif;
+?>
+<h3 class="location f14"><?php echo $this->menu($title, '/website/news/category'); ?></h3>
+	<form class="cmxform"  action="/website/news/addcategory" method="post" id="form_add_action">
+            <table class="detail_tabel psw_table f14 mt20">
+                <tr>
+                    <td>新闻分类名称：</td>
+                    <td>
+                        <input type="text" class="cpy_name"  placeholder="请输入分类名称" id="name" name="type[name]" class="required" value="<?php echo $this->info['name'];?>" />
+                    </td>
+                </tr>
+                <!--
+                <tr>
+                    <td>所在层级：</td>
+                    <td>
+                    	<input type="text" class="cpy_name" name="type[layer]" value="<?php echo $this->info['layer'];?>" />
+                     </td>
+                </tr>
+                <tr>
+                    <td>序数：</td>
+                    <td>
+                    	<input type="text" class="cpy_name"  name="type[sort]" value="<?php echo $this->info['sort'];?>" />
+                     </td>
+                </tr>
+                -->
+                <tr>
+                    <td>
+                        <a id="save_action"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">保存</a>
+                    </td>
+                </tr>
+</table>
+</form>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice">数据保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">确 定</a>
+</div>
+<div id="tips_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script language="javascript" type="text/javascript">
+    $(function() {
+    	$( "#tips_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "确定": function() {
+                	$( this ).dialog( "close" );
+        		}
+            }
+        });
+        
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        $("#close_message").on("click",function() {
+            $( "#message_dialog" ).dialog( "close" );
+            if($('#sys_notice').text() == "数据保存成功！"){
+               window.location.href = '/website/news/category'; 
+            }
+        });
+
+    	$('#form_add_action').validate({
+    		rules: {
+    			'type[name]': {
+    				required: true,
+    				minlength: 2,
+    				maxlength:20
+    			},
+                /**
+    			'type[layer]': {
+    				required: false
+    			}
+                **/
+    		},
+    		messages: {   //自定义提示信息
+    			
+    		}
+    	});
+    	$('#save_action').click(function () {
+			if($('#form_add_action').valid()) {
+                var url = '/website/news/addcategory';
+                var cid = '<?php echo $this->cid; ?> '
+                url = cid?(url+'/cid/'+cid):url;
+				$('#form_add_action').ajaxSubmit({
+					url:url, //提交给哪个执行
+					type:'POST',
+					dataType: 'json',
+					success: function (result) {
+						if(result.status == 200) {
+							$( "#message_dialog" ).dialog( "open" );
+						} else if (result.msg == 505) {
+	                        $('#tips_msg').text('亲，你没有这个操作的权限！');
+	                        $("#tips_dialog").dialog("open");
+	                    } else {
+							$('#tips_msg').text(result.msg);
+							$( "#tips_dialog" ).dialog( "open" );
+						}
+					}
+				});
+				return false;
+			}
+		});
+        $('#name').keypress(function (e) { //这里给function一个事件参数命名为e，叫event也行，随意的，e就是IE窗口发生的事件。
+            var key = e.which; //e.which是按键的值
+            if (key == 13) {
+                return false;
+            }
+        });
+        $('#layer').keypress(function (e) { //这里给function一个事件参数命名为e，叫event也行，随意的，e就是IE窗口发生的事件。
+            var key = e.which; //e.which是按键的值
+            if (key == 13) {
+                return false;
+            }
+        });
+        $('#sort').keypress(function (e) { //这里给function一个事件参数命名为e，叫event也行，随意的，e就是IE窗口发生的事件。
+            var key = e.which; //e.which是按键的值
+            if (key == 13) {
+                return false;
+            }
+        });
+})
+</script>

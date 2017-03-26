@@ -1,0 +1,171 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<form action="" method="get"  id="search_form">
+<div class="product_detail mt22">
+   <div class="product_detail_search clearfix">
+	   <div class="fl system_drop clearfix">
+		   <select id="cang_assort" class="cpy_style cang_assort" name="search[enterprise_id]" style="width: 185px;">
+			   <option value="">所有厂商</option>
+			 <?php foreach ($this->enterprises as $k=>$v) {?>
+			 <option value="<?php echo $k;?>" <?php if($k == $this->search['enterprise_id']):?>selected="selected" <?php endif;?>><?php echo mb_strimwidth($v,0,26,'...');?></option>
+			 <?php }?>
+		   </select>
+	   </div>
+		<div class="fl system_drop clearfix">
+			<select id="produt_assort" class="cpy_style product_assort" name="search[category]" style="width: 140px;">
+				<option value="">所有品类</option>
+			 <?php foreach ($this->category as $v) {?>
+			 <option value="<?php echo $v['id'];?>" <?php if($v['id'] == $this->search['category']):?>selected="selected" <?php endif;?>><?php echo $v['levelstr'] . mb_strimwidth(($v['name']),0,16,'...');?></option>
+			 <?php }?>
+			</select>
+		</div>
+	  <div class="fl system_drop clearfix">
+			<select id="into_ezapp" class="cpy_style product_assort" name="search[into_ezapp]" style="width: 80px;">
+				<option value="">是否e族发布</option>
+				<option value="0" <?php if('0' == $this->search['into_ezapp']):?>selected="selected" <?php endif;?>>否</option>
+				<option value="1" <?php if('1' == $this->search['into_ezapp']):?>selected="selected" <?php endif;?>>是</option>
+			</select>
+	 </div>
+	  <div class="fl system_drop clearfix">
+			<select id="status_select" class="cpy_style product_assort" name="search[status]" style="width: 80px;">
+				<option value="all">产品状态</option>
+				<option value="enable" <?php if('enable' == $this->search['status']):?>selected="selected" <?php endif;?>>启用</option>
+			   <option value="disable" <?php if('disable' == $this->search['status']):?>selected="selected" <?php endif;?>>停用</option>
+			</select>
+		</div>
+		<div class="fl clearfix">
+			<input type="text" class="cpy_name w150" id="cpy_name" name="search[product_name]" value="<?php if(!empty($this->search['product_name'])){ echo $this->search['product_name'];}?>" placeholder="搜索产品名称" />
+		</div>
+		<div class="console_search_wrap fr"><a class="search_icon_btn f16 clF tc" onFocus="blur();" id="search_submit"  href="javascript:;"><i class="find_icon"></i>查 询</a></div>
+   </div>
+   </form>
+   <div class="product_detail_display">
+		 <div class="product_detail_display_tab_wrap clearfix">
+				<div class="fl product_detail_display_tab" id="change_tab">
+				<span class="on" id="publish">已发布</span><span class="last" id="pending">待审核</span>
+				</div>
+		 </div>
+		 <div class="product_table mt24 f14">
+			   <table class="table_s tc tc_left auto_table_len" width="100%" border="0">
+				 <thead>
+				  <tr>                          
+					<td style="width:60px;">产品ID</td>
+					<td>产品名称（型号）</td>
+					<td>品类</td>
+					<td>厂商</td>
+					<td style="width:140px;">更新时间</td>
+					<td style="width:60px;">产品状态</td>
+					<td style="width:60px;">e族发布</td>
+					<td style="text-align: right;width:60px;">激活量</td>
+					<td style="text-align: center;width:200px;">操作</td>
+				  </tr>
+				 </thead>
+				 <tbody>
+<?php if(!empty($this->results['rows'])) :?>
+				 <?php foreach ($this->results['rows'] as $row) :?>
+				  <tr id="tr_<?php echo $row['id']?>">
+					<td><?php echo $row['id'];?></td>
+					<td title = "<?php echo $row['name']?>"><?php echo $row['name']?></td>
+					<td><?php echo $row['c_name'];?></td>
+					<td title = "<?php echo $row['e_name']?>"><?php echo $row['e_name']?></td>
+					<td><?php echo $row['mtime'];?></td>
+					<td><?php echo $row['p_status'] ? $this->t($row['p_status']) : '-';?></td>
+					<td><?php
+					if(isset($row['p_status']) && $row['p_status'] == Model_Product::STATUS_ENABLE) :
+						if($row['into_ezapp']): echo '是';
+						else: echo '否';
+						endif;
+					else:
+						echo '-';
+					endif;
+					?></td>
+					<td style="text-align: right"><?php echo isset($this->actives[$row['id']]) ? $this->actives[$row['id']] : 0?></td>
+					  <td class="cl0b9600 product_ctrl" style="text-align: center;">
+					        <?php if($row['p_status'] != Model_Product::STATUS_DELETED):?>
+                            <a href="javascript:void(0)" data-proid="<?php echo $row['id'];?>" class="check_code cl0b9600" data-this-logo="<?php echo empty($row['logo']) ? '' : $this->baseUrl.$row['logo']?>"
+                                   data-urlcode="<?php echo urlencode("http://api.1719.com/download/app/?ez_pro_id=".$row['id'])?>" v="h">二维码</a>
+                             &nbsp;|&nbsp;
+                             <a href="javascript:;"  id="view_<?php echo $row['id'];?>" class="check_detail cl0b9600">查看</a>
+							&nbsp;|&nbsp;
+							<a href="/analyze/index/newuser?enterprise=<?php echo $row['enterprise_id']?>&product=<?php echo $row['id'];?>" class="check_detail cl0b9600">报表</a>
+							&nbsp;|&nbsp;
+							<a href="javascript:;" id="manager_<?php echo $row['id'];?>"class="check_detail cl0b9600">管理</a>
+							<?php endif;?>
+					  </td>
+				  </tr>
+				  <?php endforeach;?>
+	 <?php else:?>
+				  <tr><td colspan="9" style="text-align: center;">暂无记录</td></tr>
+	 <?php endif;?>
+				 </tbody>
+		   </table>
+		</div>
+	  <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+</div>
+ <div id="manager_div" style="display:none;" title="产品管理">
+  <form class="cmxform"  action="<?php echo $this->url(array('controller'=>'index', 'action' =>'manager'));?>" method="post" id="manage_form">
+    <table class="detail_tabel form_table f14">
+        <tr>
+            <td style="width:25%">产品名称(型号)：</td>
+            <td id="product_name"></td>
+        </tr>  
+        <tr>
+            <td>厂商：</td>
+            <td id="product_enterprise"></td>
+        </tr> 
+        <tr class="h60" id="is_ez_app_div">
+            <td>是否在e族APP发布：</td>
+            <td>
+                 <input  type="radio" name="is_ez_app" value="1"/><label >是</label>
+                <input  type="radio" name="is_ez_app" class="ml20" value="0"/><label>否</label>         
+            </td>
+        </tr>
+        <tr class="h60">
+            <td>管理操作：</td>
+            <td>
+                 <input  type="radio" name="control"  value="1"/><label >启用</label>
+                <input  type="radio" name="control" class="ml20" value="0"/><label>停用</label>
+                &nbsp;<span>(注:停用会造成产品在所有渠道同时下架,请慎重使用)</span>
+            </td>
+        </tr>
+        <tr class="h170">
+            <td>变更说明：</td>
+            <td><textarea class="text_cls" name="remark" cols="40"  id="remark" rows="6"></textarea></td>
+        </tr>
+         <tr>
+            <td>结果通知：</td>
+            <td>
+                <input  type="checkbox" name="message[]"  value="msg"/><label for="message">短信</label>
+                <input  type="checkbox" name="message[]" class="ml56"  value="email"/><label for="e-mail">邮箱</label>
+            </td>
+        </tr>
+        <input type="hidden" name="product_id" id="product_id">
+    </table>
+  </form>
+</div>
+<div class="qr_pop" >
+    <p class="qr_url">产品二维码下载：<br /></p>
+    <div class="clearfix mt18">
+        <p class="fl"><img id="show_img" src="" width="138" height="138" /></p>
+        <ul class="fl ml22 mr26">
+            <li>
+                <input type="radio" id="size8" name="qr_size" data-width="258" checked="checked" /><label for="size8">8cm * 8cm</label>
+            </li>
+            <li>
+                <input type="radio" id="size12" name="qr_size" data-width="344" /><label for="size12">12cm * 12cm</label>
+            </li>
+            <li>
+                <input type="radio" id="size15" name="qr_size" data-width="430" /><label for="size15">15cm * 15cm</label>
+            </li>
+            <li>
+                <input type="radio" id="size30" name="qr_size" data-width="860" /><label for="size30">30cm * 30cm</label>
+            </li>
+            <li>
+                <input type="radio" id="size50" name="qr_size" data-width="1280" /><label for="size50">50cm * 50cm</label>
+            </li>
+        </ul>
+        <a href="javascript:;" data-target-id="0" data-logo="" target="_blank" class="check_more f14 clF tc fl mt60">二维码下载</a>
+    </div>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/product.js"></script>

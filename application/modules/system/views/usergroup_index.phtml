@@ -1,0 +1,225 @@
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+    <div class="product_detail_search clearfix">
+        <div class="console_search_wrap fr mr10" style="margin-top:8px">
+            <a class="f16 clF tc search_btn ml16" onfocus="blur();" href="/system/usergroup/add" id="add">添加权限组</a>
+        </div>
+    </div>
+    <div class="product_detail_display">
+        <div class="product_table mt24 f14">
+            <table class="table_s tc tc_left" width="100%" border="0">
+                <thead>
+                    <tr>
+                        <td><?php echo $this->t('权限组'); ?></td>
+                        <td><?php echo $this->t('描述'); ?></td>
+                        <td style="text-align: right;"><?php echo $this->t('账户数'); ?></td>
+                        <td style="text-align: center;"><?php echo $this->t('操作'); ?></td>
+                    </tr>
+                </thead>
+                <tbody>
+        <?php if(!empty($this->results['rows'])) :?>
+        		 <?php $groupOfDisable = array();//排在队列末尾 ?>
+                 <?php foreach ($this->results['rows'] as $row) {?>
+                    <?php if(isset($row['name']) && ($row['name'] == '超级管理员')): ?>
+                    <tr>
+                        <td style="color:red;"><?php echo $row['name'];?></td>
+                        <td align="left" style="color:red;">
+                            <?php if($row['description']): ?>
+                            <?php echo $this->Cutstring($this->escape($row['description']), 30, '...');?>
+                            <?php else: ?>
+                            -
+                            <?php endif; ?>
+                        </td>
+                        <td style="color:red;text-align: right;">
+                            <?php if(isset($this->group_map[$row['id']])): ?>
+                                <?php echo $this->group_map[$row['id']];?>
+                            <?php else: ?>
+                                0
+                            <?php endif; ?>
+                        </td>
+                        <td class="cl0b9600" style="text-align: center;">-</td>
+                    </tr>
+                    <?php elseif($row['name'] == '默认组'): ?>
+                    <?php $groupOfDisable = $row;?>
+                    <?php else: ?>
+                    <tr <?php if(isset($row['status']) && ($row['status'] == 'disable')):?>class="stop" <?php endif;?>>
+                        <td ><?php echo $this->escape($row['name']); ?></td>
+                        <td align="left" title="<?php echo $this->escape($row['description']);?>">
+                            <?php if($row['description']): ?>
+                            <?php echo $this->Cutstring($this->escape($row['description']), 30, '...');?>
+                            <?php else: ?>
+                            -
+                            <?php endif; ?>
+                        </td>
+                        <td style="text-align: right;">
+                            <?php if(isset($this->group_map[$row['id']])): ?>
+                                <?php echo $this->group_map[$row['id']];?>
+                            <?php else: ?>
+                                0
+                            <?php endif; ?>
+                        </td>
+                        <td class="cl0b9600" style="text-align: center;">
+                            <a href="<?php echo $this->url(array('controller'=>'usergroup', 'action'=>'add', 'gid'=>$row['id']));?>" title="edit" class="manager_detail cl0b9600 " ><?php echo $this->t('user_group_modify');?></a>&nbsp;|
+                            <a href="<?php echo $this->url(array('controller'=>'usergroup', 'action'=>'privilege', 'gid'=>$row['id'])); ?>" data-title="deleted" class="manager_detail cl0b9600"><?php echo $this->t('user_group_privilege');?></a>&nbsp;|
+                           <?php if($row['status'] == 'disable'): ?>
+                                <a href="#" data-href="<?php echo $this->url(array('controller'=>'usergroup', 'action'=>'update', 'gid'=>$row['id'], 'status' => 'enable'));?>" data-title="enable" class="check_detail cl0b9600 update_status"><?php echo $this->t('user_group_enable');?></a>&nbsp;|
+                            <?php else: ?>
+                                <a href="#" data-href="<?php echo $this->url(array('controller'=>'usergroup', 'action'=>'update', 'gid'=>$row['id'], 'status' => 'disable'));?>" data-title="disable" class="check_detail cl0b9600 update_status"><?php echo $this->t('user_group_disable');?></a>&nbsp;|
+                            <?php endif; ?>
+                           <a href="#" data-href="<?php echo $this->url(array('controller'=>'usergroup', 'action'=>'update', 'gid'=>$row['id'],  'status' => 'deleted'));?>" data-title="deleted" class="manager_detail cl0b9600 update_status"><?php echo $this->t('user_group_deleted');?></a>
+                        </td>
+                    </tr>       
+                    <?php endif;?>
+                <?php }?>
+                <?php if(!empty($groupOfDisable))://这里确保停用组放在最后一行?>
+                	<tr>
+                        <td ><?php echo $this->escape($groupOfDisable['name']); ?></td>
+                        <td align="left" title="<?php echo $this->escape($groupOfDisable['description']);?>">
+                            <?php if($groupOfDisable['description']): ?>
+                            <?php echo $this->Cutstring($this->escape($groupOfDisable['description']), 30, '...');?>
+                            <?php else: ?>
+                            -
+                            <?php endif; ?>
+                        </td>
+                        <td style="text-align: right;">
+                            <?php if(isset($this->group_map[$groupOfDisable['id']])): ?>
+                                <?php echo $this->group_map[$groupOfDisable['id']];?>
+                            <?php else: ?>
+                                0
+                            <?php endif; ?>
+                        </td>
+                        <td class="cl0b9600" style="text-align: center;">-
+                        </td>
+                    </tr>
+                <?php endif;?>
+        <?php else:?>
+                     <tr><td colspan="4">暂无记录</td></tr>
+       <?php endif;?>
+                </tbody>
+            </table>
+        </div>
+        <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+    </div>
+</div>
+<div id="msg_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+</div>
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<div id="update_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script>
+$(function(){
+    var url = '';
+    var delete_id = 0;
+    $('.update_status').click(function(){
+        var msg ={
+            'enable':'<?php echo $this->t('user_group_enable_notice');?>',
+            'disable':'<?php echo $this->t('user_group_disable_notice');?>',
+            'deleted':'<?php echo $this->t('user_group_deleted_notice');?>'
+        };
+        var notice = eval('msg.'+$(this).attr('data-title'));
+        url = $(this).attr('data-href');
+        $('#update_dialog .message_text').text(notice);
+        $( "#update_dialog" ).dialog("open");
+        return false;
+    });
+    $( "#msg_dialog" ).dialog({
+        autoOpen: false,
+        width: 555,
+        dialogClass: "my-dialog",
+        modal: true,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        buttons: {
+            "确定": function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+    $( "#confirm_dialog" ).dialog({
+        autoOpen: false,
+        width: 555,
+        dialogClass: "my-dialog",
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        buttons: {
+            "取消": function() {
+                $( this ).dialog( "close" );
+            },
+            "确定": function() {
+                $( this ).dialog( "close" );
+                $.post('/system/usergroup/delete', {gid:delete_id}, function (data) {
+                    if(data.status == 200){
+                        location.href = '/system/usergroup/index';
+                    } else if (data.msg == 505) {
+                        $('#msg_dialog .message_text').text('亲，你没有这个操作的权限！');
+                        $("#msg_dialog").dialog("open");
+                    } else{
+                        $('#msg_dialog .message_text').text(data.msg);
+                        $( "#msg_dialog" ).dialog( "open");
+                        return false;
+                    }
+
+                },'json');
+            }
+        }
+    });
+    $( "#update_dialog" ).dialog({
+        autoOpen: false,
+        width: 555,
+        dialogClass: "my-dialog",
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        buttons: {
+            "取消": function() {
+                $( this ).dialog( "close" );
+            },
+            "确定": function() {
+                $( this ).dialog( "close" );
+                $.post(url, {}, function (data) {
+                    if(data.status == 200){
+                        location.href = '/system/usergroup/index';
+                    }else{
+                        $('#msg_dialog .message_text').text(data.msg);
+                        $( "#msg_dialog" ).dialog( "open");
+                        return false;
+                    }
+                },'json');
+            }
+        }
+    });
+    $('#add').click(function () {
+        location.href = '/system/usergroup/add';
+    });
+    
+    $('a[delete_id]').click(function () {
+        delete_id = $(this).attr('delete_id');
+        var notice = '您确认删除此个权限组吗？';
+        $('#tips_msg').text(notice);
+        $( "#confirm_dialog" ).dialog( "open");
+        return false;
+    });
+});
+</script>

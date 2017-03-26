@@ -1,0 +1,288 @@
+<!--页面位置-->
+<link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/jquery.mCustomScrollbar.min.css" />
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.mCustomScrollbar.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.queue.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/fileprogress.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/handlers.js"></script>
+
+<h3 class="location f14"><?php echo $this->menu('版本升级', '/ezstudio/firmware/comm'); ?></h3>
+	<form class="cmxform"  action="" method="post" id="form_firmware">
+			<table class="detail_tabel remote_table f14 mt20">
+               <tbody>
+            	<tr>
+                    <th>版本信息</th>
+                    <th></th>
+                </tr>
+            	<tr>
+                    <td>固件标识：</td>
+                    <td>
+                        <?php echo $this->fireware_detail['label']?>
+                        <input type="hidden" name="version[name]" class="cpy_name wp60" value="<?php echo $this->fireware_detail['name']?>">
+                        <input type="hidden"  name="version[upgrade_type_id]" id="upgrade_type_id" class="cpy_name wp60" value="<?php echo $this->fireware_detail['upgrade_type_id']?>">
+                        <input type="hidden"  name="firmware_id" id="firmware_id" class="cpy_name wp60" value="<?php echo $this->fireware_detail['id']?>">
+                        <input type="hidden"  name="upgrade_type_id" id="upgrade_type_id_0" class="cpy_name wp60" value="<?php echo $this->fireware_detail['upgrade_type_id']?>">
+                    </td>
+                </tr>
+                <tr>
+                    <td>固件类型：</td>
+                    <td>
+                        <?php echo $this->fireware_detail['firmware_type']['name']?>
+                    </td>
+                </tr>
+                <tr>
+                    <td>当前版本：</td>
+                    <td>
+                        <?php echo $this->fireware_detail['version']['version']?>
+                    </td>
+                </tr>
+                <tr>
+                    <td>升级版本：</td>
+                    <td>
+                        <input type="text" name="version[version]" class="cpy_name wp60">
+                    </td>
+                </tr>
+                <tr>
+                    <td>版本描述：</td>
+                    <td>
+                        <textarea rows="10" cols="60" class="text_cls wp60" id="description_ver" name="version[description]"></textarea>
+                    </td>
+                </tr>
+                <tr>
+					<td>固件包上传：</td>
+					<td>
+					<span class="fieldset flash" id="fsUploadProgress_package"></span>
+					<span id="upload_status_package"></span>
+					<a  id="upload_package" class="f14 clF tc search_btn brue_btn ml56" onfocus="blur();" href="javascript:void(0)">上传</a>
+					<input id="btnCancel__package" type="button" value="取消上传" disabled="disabled" style="display:none" />
+					<input type="hidden" name="version[check_sum]" id="check_sum" value="">
+					<input type="hidden" name="version[file_path]" id="file_path" value="">
+					</td>
+				</tr>
+                <tr>
+                    <td>强制升级：</td>
+                    <td>
+                    	<input type="radio" value="1" name="version[is_force]"> 是 <input name="version[is_force]" type="radio" value="0" checked="checked"> 否
+                    </td>
+                </tr>
+                <tr class="system_drop">
+                    <td>发布状态：</td>
+                    <td>
+                        <select id="device_type" class="cpy_style product_assort mt_12" name ="version[device_type]">
+                           <option value="">选择发布方式</option>
+                          <?php foreach ($this->device_type as $k=>$v) :?>
+                               <option value="<?php echo $k;?>"><?php echo $v;?></option>
+                          <?php endforeach;?>
+                       </select>
+                    </td>
+                </tr>
+                <tr>	<td></td>
+                		<td>
+                		<div id="custom_scollbar">
+                            <ul class="clearfix mt20 mb10" id="fsUploadProgress"></ul>
+                			</div>
+						<div id="img_upload_status"></div>
+						</td>
+				</tr>
+                </tbody>
+                </table>
+            <div class="mt36 mb24 tr">
+                <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+                <a  onfocus="blur();" href="javascript:void(0)" id="sub_btn" class="f16 clF tc search_btn" >提 交</a>
+            </div>
+</form>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice">数据保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)" >确 定</a>
+</div>
+
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">您确认删除此上传的文件吗？</p>
+</div>
+
+<script language="javascript" type="text/javascript">
+    $(function() {
+        /*
+    	$("#custom_scollbar").width($("#custom_scollbar").parent().width());
+        var marginLeft= 7,l=$("#custom_scollbar ul li").length,oLiWidth=(parseInt($("#custom_scollbar ul li").eq(0).width())+marginLeft)*l;
+        $("#custom_scollbar ul").width(oLiWidth);
+        $("#custom_scollbar").mCustomScrollbar({
+            axis:"x",
+            theme:"dark-2",
+            scrollInertia:550,
+            scrollbarPosition:"inside"
+        });
+        */
+        var G_validate = false;
+        var img_container = '';
+    	$( "#confirm_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true,
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+                	img_container.remove(); // 移除需要删除的图片
+                	$( this ).dialog( "close" );
+                }
+            }
+        });
+        
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        
+        $("#close_message").on("click",function() {
+        	$( "#message_dialog" ).dialog( "close" );
+            if(G_validate) {
+				location.href = '/ezstudio/firmware/commversion?id='+$('#firmware_id').val();
+            }
+            return false;
+        });
+
+       $('#form_firmware').validate({
+    		rules: {
+    			'version[name]': {
+    				maxlength:50,
+    				minlength:2,
+    				required: true
+    			},
+    			'version[version]': {
+    				maxlength:32,
+    				minlength:2,
+    				required: true
+    			},
+    			'version[file_path]': {
+    				required: true
+    			},
+    			'version[device_type]': {
+    				required: true
+    			},
+    			'version[is_force]': {
+    				required: true
+    			},
+    			'version[description]': {
+    				maxlength:100,
+    				minlength:5
+    			}
+    		},
+    		messages: {   //自定义提示信息
+    			//old_password: "原密码输入错误",
+    		},
+    		ignore : ''
+    	});	
+		// 提交表单
+    	$('#sub_btn').click(function () {
+			if($('#form_firmware').valid()) {
+				$('#form_firmware').ajaxSubmit({
+					url:'/ezstudio/firmware/upgrade', //提交给数据保存接口
+					type:'POST',
+					dataType: 'json',
+					success: function (result) {
+						if(result.status == 200) {
+							G_validate =  true;
+							$('#sys_notice').text('数据保存成功！');
+						} else if(result.status == 500) {
+							G_validate =  false;
+							$('#sys_notice').text('系统繁忙，请稍后再试！');
+						} else if(result.msg == 500) {
+							G_validate =  false;
+							$('#sys_notice').text('亲，你没有这个操作的权限！');
+						} else {
+							G_validate =  false;
+							$('#sys_notice').text(result.msg);
+						}
+						$( "#message_dialog" ).dialog( "open" );
+						return ;
+					}
+				});
+				return false;
+			}
+		});
+		$('#cancel_btn').click(function () {
+			history.go(-1);
+		});
+		$(document).on('click','li[delete_upload]',function () {
+			$( "#confirm_dialog" ).dialog( "open" );
+			img_container = $(this);
+		});
+		
+		//固件包
+    	var settings = {
+				flash_url : "<?php echo $this->static;?>/js/libs/swfupload/swfupload.swf",
+				upload_url: "/api/upload/index",
+				post_params: {"type":"firmware","keep_name":true,"suffix":"<?php echo date("YmdHi");?>"},
+				file_size_limit : "50 MB",
+				file_types : "*.bin;*.exe;*.rar;*.zip",
+				file_types_description : "All Files",
+				file_upload_limit : 100,  //配置上传个数
+				file_queue_limit : 1,
+				custom_settings : {
+					progressTarget : "fsUploadProgress_package",
+					cancelButtonId : "btnCancel__package",
+					ProgressStatusId:'upload_status_package'
+				},
+				debug: false,
+				button_window_mode:'Opaque',
+				// Button settings
+				button_image_url: "<?php echo $this->static;?>/images/TestImageNoText_65x29.png",
+				button_width: "65",
+				button_height: "29",
+				button_placeholder_id: "upload_package",
+				button_text: '<span class="falsh_upload_button">上传</span>',
+				button_text_style: '.falsh_upload_button{color:#FFFFFF;}',
+				button_text_left_padding: 16,
+				button_text_top_padding: 5,
+				button_text_top_margin: 10,
+				file_queued_handler : fileQueued,
+				file_queue_error_handler : fileQueueError,
+				file_dialog_complete_handler : fileDialogComplete,
+				upload_error_handler : uploadError,
+				upload_success_handler : function(file, serverData) {
+					try {
+						serverData = eval("("+ serverData +")");
+						var progress_div_id = this.customSettings.progressTarget;
+						var progress = new FileProgress(file, progress_div_id);
+						progress.setComplete();
+						progress.setStatus("上传成功");
+						progress.toggleCancel(false);
+						var link = '<a target="_blank" href="'+ serverData.result.url +'">'+ serverData.result.file_name +'</a>';
+						$('#file_path').val(serverData.result.path);
+						var file_container = '<span class="mr10">'+ link +'</span>';
+						$("#"+progress_div_id).html(file_container);
+						$('#check_sum').val(serverData.result.md5);
+					} catch (ex) {
+						this.debug(ex);
+					}
+				},
+				upload_complete_handler : uploadComplete,
+				queue_complete_handler : queueComplete
+			};
+			var swfu = new SWFUpload(settings);    	
+	});
+</script>

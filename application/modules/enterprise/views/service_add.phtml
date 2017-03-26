@@ -1,0 +1,46 @@
+<!--页面位置-->
+    <script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+	<h3 class="location f14"><?php echo $this->menu('添加配置', '/enterprise/service/index'); ?></h3>
+	<form class="cmxform"  action="/enterprise/service/add" method="post" id="form_add_action">
+            <table class="detail_tabel psw_table f14 mt20">
+                <tr>
+                    <td>APP_KEY:</td>
+                    <td>
+                        <input type="text" class="cpy_name" placeholder="请输入APP_KEY" id="app_key" name="app_key" class="required"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>产品id：</td>
+                    <td>
+                        <input type="text" class="cpy_name"  id="product_id" name="product_id" placeholder="请输入产品id" class="required"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>回调地址：</td>
+                    <td>
+                        <input type="text" class="cpy_name"  id="callback_url" name="callback_url" placeholder="回调地址，请输入正确的URL" class="required"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>配置状态：</td>
+                    <td class="system_drop">
+                    	<select id="status" class="cpy_style product_assort" name ="status">
+                           <option value="enable" selected="selected">启用</option>
+                           <option value="disable">禁用</option>
+                       </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a id="save_action"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">保存</a>
+                    </td>
+                </tr>
+        </table>
+    </form>
+<input type="hidden" name="back_url" id="back_url" value="/enterprise/service/index" />
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">确 定</a>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/auth.common.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/auth.service.js"></script>

@@ -1,0 +1,54 @@
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('', '/operation/channel/index'); ?></h3>
+<div class="product_detail_search clearfix mt16">
+	<span class="mt12" style="display: inline-block;">资讯推送</span> <a href="javascript:;" class="f16 clF tc search_btn mt10 mr10 fr" id="add_content">添加</a>
+</div>
+<table class="news">
+  <?php if($this->pagination->getTotalItemCount() >0) :?>
+  <?php foreach ($this->pagination as $v):?>
+	<tr>
+		<td class="news_main">
+		  <?php if($v['image']) :?>
+		    <img src="<?php echo $v['image'];?>" />
+			<div>
+		  <?php endif;?>
+				<p class="news_title">
+					<i><?php echo $v['id']?></i> <?php echo $this->escape($v['title'])?>
+				</p>
+				<p class="news_content"><?php echo $this->escape($v['content']);?></p>
+				<p class="news_source">
+					<span>  收藏数：<?php if(isset($this->favMap[$v['id']])) { echo $this->favMap[$v['id']]; } else { echo '0';};?> </span> 推送来源：<?php echo $v['source']?>
+					&nbsp;&nbsp; 添加时间：<?php echo $v['ctime'];?>
+				</p>
+			<?php if($v['image']):?>
+			</div>
+			<?php endif;?>
+		</td>
+		<td class="news_iconlink"><a href="<?php echo $v['url'];?>" target="_blank"></a>
+		</td>
+		<?php if($v['status'] == Model_ChannelContent::STATUS_ENABLE) :?>
+		       <td style="color:#1a1;" class="news_status">已发布</td>
+		<?php elseif($v['status'] == Model_ChannelContent::STATUS_DISABLE):?>
+		       <td style="color: red;" class="news_status"> 待发布</td>
+		<?php endif;?>
+		<td class="news_link">
+		<?php if($v['status'] == Model_ChannelContent::STATUS_DISABLE) :?>
+		    <a id="publish_<?php echo $v['id'];?>" href="javascript:;">发布</a>
+		    <br /> 
+		<?php endif;?>
+		    <a id="edit_<?php echo $v['id'];?>" href="javascript:;">编辑</a><br />
+			<a id="del_<?php echo $v['id'];?>" href="javascript:;">删除</a>
+		</td>
+	</tr>
+	<?php endforeach;?>
+<?php else:?>
+	<tr>
+		<td colspan="4" style="text-align: center;">暂无记录</td>
+	</tr>
+<?php endif;?>
+</table>
+<div id="delete_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text">您确定删除该资讯吗？</p>
+</div>
+<?php echo $this->paginationControl($this->pagination, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+<script src="<?php echo $this->static;?>/js/channel_content.js"></script>

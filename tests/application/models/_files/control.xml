@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<dataset>
+    <EZ_CONTROL id="1" name="XX" label="xx_label" icon="xx_icon" control_type_id="12" html_code="html_test" js_code="alert('haha');" description="asdasd" cuser="12" ctime="2010-04-26 12:14:20" mtime="2010-04-26 12:14:20" muser="admin" />
+</dataset>

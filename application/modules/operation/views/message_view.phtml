@@ -1,0 +1,122 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu("消息ID（{$this->info['id']}）",'/operation/message/index'); ?></h3>
+<form action="" id="check_form">
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th>消息内容</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>标题：</td>
+        <td id="feedback_id"><?php echo $this->escape($this->info['title']);?></td>
+    </tr>
+    <tr>
+         <td>消息类型：</td>
+         <td>
+            <?php
+               if($this->info['type'] == 1) {
+                    echo '服务信息';
+               } elseif ($this->info['type'] == 2) {
+                    echo '系统消息';
+               }
+            ?>
+         </td>
+    </tr>
+    <tr>
+        <td>内容详情：</td>
+        <td><?php echo $this->escape($this->info['content']);?></td>
+    </tr>
+    <tr>
+        <th>添加链接</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>链接地址：</td>
+        <td class="system_drop">
+              <?php echo $this->info['url'];?>
+        </td>
+    </tr>
+    <tr>
+        <th>发送设置</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>发送对象：</td>
+        <td class="system_drop">
+              <?php 
+                   if($this->info['receive_type'] == 'special'):
+                       echo '特定用户';
+                   elseif($this->info['receive_type'] == 'all'):
+                       echo '所有用户';
+                   endif;
+               ?>
+        </td>
+    </tr>
+    <tr>
+        <td>产品设定：</td>
+        <td class="system_drop">
+             <?php if(!empty($this->info['product_name'])) :?>
+              <?php echo implode('，', $this->info['product_name']);?>
+              <?php endif;?>
+        </td>
+    </tr>
+    <tr>
+        <td>发送时间：</td>
+        <td class="system_drop">
+              <?php echo $this->info['send_time'];?>
+        </td>
+    </tr>
+    <?php if($this->info['status'] == Model_Message::STATUS_CHECK_FAILED):?>
+    <tr>
+        <th>审核结论</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>审核结论：</td>
+        <td class="system_drop">
+           <?php if($this->info['status'] == Model_Message::STATUS_CHECK_SUCC) : ?>
+           审核成功
+           <?php elseif ($this->info['status'] == Model_Message::STATUS_CHECK_FAILED):?>
+           审核失败
+           <?php endif;?>
+        </td>
+    </tr>
+    <tr>
+        <td>审核意见：</td>
+        <td class="system_drop">
+         <?php echo $this->info['comments'];?>
+        </td>
+    </tr>
+    <?php else:?>
+    <tr>
+        <td>发送状态：</td>
+        <td class="system_drop">
+              <?php 
+                  if($this->info['status'] == Model_Message::STATUS_PENDING || Model_Message::STATUS_CHECK_SUCC == $this->info['status']) {
+                        echo '待发送';
+                  } else {
+                         if($this->info['status'] == Model_Message::STATUS_SENDING) {
+                                echo '发送中';
+                         } else if($this->info['status'] == Model_Message::STATUS_FINISHED) {
+                                echo '发送成功';
+                         } else if($this->info['status'] == Model_Message::STATUS_FAILED) {
+                                echo '发送失败';
+                         }
+                  }
+              ?>
+
+
+        </td>
+    </tr>
+    <?php endif;?>
+ </table>
+</form>
+<div class="mt36 mb24 tr">
+ <a href="javascript:;" class="f16 clF tc search_btn grey_btn fr" id="cancel_btn">返 回</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;" class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/message.js"></script>

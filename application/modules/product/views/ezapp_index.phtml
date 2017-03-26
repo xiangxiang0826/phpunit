@@ -1,0 +1,259 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+
+	<table class="detail_tabel read_table f14 mt20">
+		<tr class="h56">
+			<th colspan="2" class="platform_title" style="padding-right: 0px;">
+                <a href="javascript:;" class="qr_more fr f16 clF tc" style="padding:0 22px 0 15px;width:61px;margin-right:10px;" data-isezu="1" data-encode="<?php echo urlencode($this->showUrl);?>" data-logo="<?php echo $this->ezuIcon;?>">二维码</a>
+				<span>遥控e族App</span>
+				——遥控e族App是遥控e族产品的默认公共控制平台，支持添加各类智能产品进行控制.
+			</th>
+		</tr>
+		<tr class="h220">
+			<td class="platform_info" style="border-right:#ccc solid  1px;">
+			  <div style="min-width:450px">
+				<p>遥控e族&nbsp;Android版</p>
+				<div class="img_mark_up mr32" >
+				<?php if(!empty($this->androidApp['icon'])) {?>
+				<img src="<?php echo $this->upload['baseUrl'] . $this->androidApp['icon'];?>" width="120px;"  height="120px;" />
+				<?php } else {?>
+				<img src="/static/images/rada.png" alt="雷达图"/>
+				<?php }?>
+				</div>
+				<ul class="app_desc">
+					<li title="<?php echo $this->androidApp['name']?>">App名称：<?php echo mb_strimwidth($this->androidApp['name'],0,25,'...');?></li>
+					<li>系统平台：Android</li>
+					<li>最新版本：<?php echo $this->androidApp['version'];?></li>
+					<li>发布日期：<?php echo $this->androidApp['mtime'];?></li>
+				</ul>
+				<p class="fr mr10">
+				<a  href="<?php echo $this->url(array('action' => 'viewbasic', 'appid' => $this->androidApp['id']));?>"  class="f16 clF tc search_btn mt18" style="display: block;">查看详细</a>
+				<a  href="<?php echo $this->url(array('action'=>'editbasic', 'appid' => $this->androidApp['id']));?>"  class="f16 clF tc search_btn mt14"  style="display: block;">编辑</a>
+				</p>
+			 </div>
+			</td>
+			<td class="platform_info">
+			  <div style="min-width:450px">
+				<p>遥控e族&nbsp;iOS版</p>
+				<div class="img_mark_up mr32" >
+				   <?php if(!empty($this->iosApp['icon'])) {?>
+				   <img src="<?php echo $this->upload['baseUrl'] . $this->iosApp['icon'];?>" width="120px;"  height="120px;" />
+				   <?php } else {?>
+					<img src="/static/images/rada.png" alt="雷达图"/>
+					<?php }?>
+				</div>
+				<ul class="app_desc">
+					<li title="<?php echo $this->iosApp['name']?>">App名称：<?php echo mb_strimwidth($this->iosApp['name'],0,15,'...');?></li>
+					<li>系统平台：IOS</li>
+					<li>最新版本：<?php echo $this->iosApp['version'];?></li>
+					<li>发布日期：<?php echo $this->iosApp['mtime'];?></li>
+				</ul>
+				<p class="fr mr10">
+					<a  href="<?php echo $this->url(array('action' => 'viewbasic', 'appid' => $this->iosApp['id']));?>"  class="f16 clF tc search_btn mt18"  style="display: block;">查看详细</a>
+					<a  href="<?php echo $this->url(array('action' => 'editbasic', 'appid' => $this->iosApp['id']));?>" class="f16 clF tc search_btn mt14"  style="display: block;">编辑</a>
+				</p>
+			  </div>
+			</td>
+		</tr>
+	</table>
+    <form action="" method="get" id="search_form" style="border-left:1px solid #dedede;border-right:1px solid #dedede;border-bottom:1px solid #dedede;">
+	<div class="product_detail_search platform_search clearfix mt40" style="border-left:0px;border-right:0px;">
+		<div class="fl system_drop clearfix ml10 mt16">
+			<label class="fl f20 ml20">版本管理</label>
+		</div>
+	</div>
+    <div class="product_detail_search clearfix">
+           <div class="chart_index fl f14 plantform">
+                <span  style="min-width:56px;display:inline-block;text-align: center;" id="id_<?php echo Model_EnterpriseApp::PLANTFORM_ANDROID;?>" <?php if(!empty($this->search['platform']) && $this->search['platform'] == Model_EnterpriseApp::PLANTFORM_ANDROID ):?>class="on"<?php endif;?>>Android</span>
+	            <span  style="min-width:56px;display:inline-block;text-align: center;" id="id_<?php echo Model_EnterpriseApp::PLANTFORM_IOS;?>" <?php if(!empty($this->search['platform']) && $this->search['platform'] == Model_EnterpriseApp::PLANTFORM_IOS ):?>class="on"<?php endif;?>>iOS</span>
+           </div>
+           <a  href="<?php echo $this->url(array('action'=>'addversion'));?>" class="f16 clF tc search_btn fr mb14 mr10 mt16"  id="add_version">添加新版本</a>
+    </div>
+    </form>    
+	<div class="product_table f14">
+		<table class="table_s tc tc_left auto_table_len" width="100%" border="0">
+			<thead>
+			<tr>
+				<td width="60px;">系统平台</td>
+				<td width="60px;">版本</td>
+				<td >更新摘要</td>
+				<td width="60px;">升级方式</td>
+				<td width="130px;">发布时间</td>
+				<td width="60px;">发布方式</td>
+				<td style="text-align: center;width:150px">操作</td>
+			</tr>
+			</thead>
+			<tbody>
+			<?php if($this->paginator->getTotalItemCount() >0) {?>
+			<?php foreach ($this->paginator as $v){?>
+			<tr <?php if($v['status'] ==Model_Upgrade::STATUS_DISABLE) :?>class="stop"<?php endif;?>>
+				<td><?php echo $v['platform'];?></td>
+				<td><?php echo $v['version']?></td>
+				<td title = "<?php echo $v['description']?>"><?php echo mb_strimwidth($v['description'],0,100,'...');?></td>
+				<td>
+					 <?php
+						  if($v['is_force']) {
+								 echo '强制升级';
+						  } else {
+								echo '提示升级';
+						  }
+					 ?>
+				</td>
+				<td><?php echo $v['mtime']; ?></td>
+				<td>
+					<font <?php if($v['status'] == Model_Upgrade::STATUS_ENABLE):?>color="<?php echo $v['device_type'] == 'test' ? 'red' : 'green'?>"<?php endif;?>> <?php echo $v['device_type'] == 'test' ? '测试发布' : '正式发布' ?>   </font>
+				</td>         
+				<td class="cl0b9600"" style="text-align: center;"><a href="<?php echo $this->url(array('action'=>'versioninfo', 'version_id' => $v['id']));?>" class="check_detail cl0b9600">查看</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+				<a href="<?php echo $this->url(array('action'=>'addversion', 'version_id' => $v['id']));?>" class="check_detail cl0b9600">编辑</a>&nbsp;&nbsp;
+				<?php if($v['device_type'] == 'test' && $v['status'] == 'disable'):?>
+				|&nbsp;&nbsp;<a href="javascript:;" class="check_detail cl0b9600 del_version" id="del_<?php echo $v['id'];?>">删除</a></td>
+				<?php endif;?>
+			</tr>
+			<?php } ?>
+			<?php } else {?>
+			<tr><td colspan="7" style="text-align: center;">暂无版本信息，请添加新版本</td></tr>
+			<?php }?>
+			</tbody>
+		</table>
+	</div>
+	  <?php echo $this->paginationControl($this->paginator, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+</div>
+<div class="mb20"></div>
+
+  <div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice"></p>
+</div>
+<div class="qr_pop">
+    <p class="qr_url"><span id="show_mes"></span><br /><span><a href="" target="_blank" id="show_url"></a></span></p>
+    <div class="clearfix mt18">
+        <p class="fl"><img id="show_img" src="" width="138" height="138" /></p>
+        <ul class="fl ml22 mr26">
+            <li>
+                <input type="radio" id="size8" data-width="258" checked="checked" name="qr_size" /><label for="size8">8cm * 8cm</label>
+            </li>
+            <li>
+                <input type="radio" id="size12" data-width="344" name="qr_size" /><label for="size12">12cm * 12cm</label>
+            </li>
+            <li>
+                <input type="radio" id="size15" data-width="430" name="qr_size" /><label for="size15">15cm * 15cm</label>
+            </li>
+            <li>
+                <input type="radio" id="size30" data-width="860" name="qr_size" /><label for="size30">30cm * 30cm</label>
+            </li>
+            <li>
+                <input type="radio" id="size50" data-width="1280" name="qr_size" /><label for="size50">50cm * 50cm</label>
+            </li>
+        </ul>
+        <a href="javascript:;" data-target-id="0" data-logo="" target="_blank" class="check_more down_qcode f14 clF tc fl mt60">二维码下载</a>
+    </div>
+</div>
+        <script>
+           $('#platform_assort').change(function(){
+               $('#search_form').submit();
+            });
+           $( "#message_dialog" ).dialog({
+       		  autoOpen: false,
+                 width: 540,
+                 height: 240,
+                 show: {
+                     effect: "blind",
+                     duration: 300
+                 },
+                 hide: {
+                     effect: null,
+                     duration: 500
+                 },
+                 dialogClass: "my_message_dialog",
+                 modal: true,
+                 buttons: {
+                     "确定": function() {
+                         $( this ).dialog( "close" );
+                         location.reload();
+                     }
+                 }
+       	}); 
+           $('.del_version').click(function(e){
+               var target = $(e.target);
+               var id = target.attr('id').split('_')[1];
+               if(id) {
+                    $.post('/product/ezapp/delversion', {id : id}, function(response){
+                          if(response.result == '1') {
+                              $('#sys_notice').text('删除成功！');
+                        	  $( "#message_dialog" ).dialog('open');
+                          } else if(response.msg == 505) {
+                              $('#sys_notice').text('亲，你没有这个操作的权限！');
+                        	  $( "#message_dialog" ).dialog('open');
+                          } else {
+                        	  $('#sys_notice').text('删除失败！');
+                        	  $( "#message_dialog" ).dialog('open');
+                          }
+                     }, 'json')
+               }
+           });
+           
+           $(function(){
+               (function () {
+                   $(".qr_more").attr("v", "h");
+                   function get_pos(el, t, l) {
+                       el.css({
+                           "top": t,
+                           "left": l,
+                           "display": "block"
+                       });
+                   }
+
+                   $(document).on("click", function (event) {
+                       var $qr_pop = $(event.target).closest(".qr_pop"),
+                           $qr_pop2 = $(".qr_pop"),
+                           $qr_more = $(event.target).closest(".qr_more");
+                       if ($qr_more.length && $qr_more.attr("v") == "h") {
+                           $('#show_img').attr('src','');
+                           var ezuapp = $qr_more.attr("data-isezu");
+                           var label = ezuapp == '1' ? '<?php echo $this->ezulabel;?>' : '<?php echo $this->label;?>';
+                           var show_url = 'http://api.1719.com/download/app/?label=' + label;
+                           var encode_url = $qr_more.attr("data-encode");
+                           var show_mes = ezuapp == '1' ? '遥控e族APP下载页面地址：' : '企业APP下载页面地址：';
+                           $("#show_url").attr('href',show_url).text(show_url);
+                           $("#show_mes").text(show_mes);
+                           var logo = $qr_more.attr("data-logo");
+                           if(logo != ''){
+                               logo = 'default';
+                           }
+                           var img_url = 'http://api.1719.com/intranet/generate_qr_code/?width=138&height=138&content=' + encode_url + '&logo=' + logo;
+                           var img_url_err = 'http://api.1719.com/intranet/generate_qr_code/?width=138&height=138&content=' + encode_url;
+                           $('#show_img').attr('src',img_url).attr('onerror',"javascript:this.src='"+ img_url_err +"';");
+
+                           $('.down_qcode').attr('data-logo',logo).attr('data-target-label',label);
+                           $('input[type=radio]:first').trigger("click");
+                           var t = $qr_more.offset().top + $qr_more.height() - 78,
+                               l = $qr_more.offset().left - ($qr_pop2.width() - $qr_more.width()*2)-250;
+                           get_pos($qr_pop2, t, l);
+                           $qr_more.attr("v", "s");
+                       } else if (!$qr_pop.length) {
+                           $qr_pop2.css("display", "none");
+                           $('.qr_more').attr("v", "h");
+                       }
+                   });
+
+                   $("input[type=radio]").click(function(){
+                       var tar_width = $(this).attr('data-width');
+                       var target_label = $('.down_qcode').attr('data-target-label');
+                       var tar_logo = $('.down_qcode').attr('data-logo');
+                       var link_url = '/product/ezapp/downqcode?width=' + tar_width + '&label=' + target_label + '&logo=' + tar_logo;
+                       $('.down_qcode').attr('href',link_url);
+                   });
+               })();
+
+               $('.plantform').click(function(e){
+      			 var target = $(e.target);
+      			 if(target.is('span')) {
+      				 var id = target.attr('id');
+      				 var plantform = id.split('_');
+      				 var params = {'search[platform]' : plantform[1]};
+      				 location.href = '/product/ezapp/index?' + jQuery.param(params); 
+      			 }
+      		 });
+           });
+        </script>

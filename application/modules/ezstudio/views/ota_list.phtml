@@ -1,0 +1,200 @@
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+<div class="product_detail_search clearfix">
+       <form action="/ezstudio/ota/list" method="get"  id="search_form">
+                           <div class="product_detail_search clearfix">
+                           	   <div class="fl system_drop clearfix ml10">
+                                    <select id="control_type_id" class="cpy_style product_assort" name ="search[cid]" style="width: 120px;">
+                                        <option value="">所有类型</option>
+                                      <?php foreach ($this->type_map as $v) :?>
+                                     <option value="<?php echo $v['id'];?>" <?php if($v['id'] == $this->search['cid']):?>selected="selected" <?php endif;?>><?php echo $this->Cutstring($this->escape($v['name']), 15, '...');?></option>
+                                     <?php endforeach;?>
+                                    </select>
+                                </div>
+                              <div class="fl system_drop clearfix ml10">
+                                   <input type="text" class="cpy_name w150" id="name"  name ="search[name]" value="<?php echo isset($this->search['name']) ? $this->search['name'] : ''?>" placeholder="请输入资源名称">
+                               </div>
+                               <div class="console_search_wrap fr mr10"><a class="search_icon_btn f16 clF tc" onFocus="blur();" href="javascript:;" id="search"><i class="find_icon"></i>查 询</a></div>
+                           </div>
+                           </form>
+                           
+</div>
+<div class="product_detail_display">
+									<div class="product_table mt24 f14">
+									<div class="product_detail_search clearfix">
+									<div class="console_search_wrap fr mr10" style="margin-top:8px;"><a class="f16 clF tc search_btn ml16" onFocus="blur();" href="javascript:;" id="add">创建新资源</a></div>
+									</div>
+                                       <table class="table_s tc mt24 tc_left auto_table_len" width="100%" border="0">
+                                         <thead>
+                                          <tr>                          
+                                            <td width="60px">资源ID</td>
+                                            <td>资源名称</td>
+                                            <td>资源描述</td>
+                                            <td>升级标识</td>
+                                            <td width="100px">资源类型</td>
+                                            <td width="130px">创建时间</td>
+                                            <td width="100px">最新版本</td>
+                             				<td style="text-align: center;width: 120px">操作</td>
+                                          </tr>
+                                         </thead>
+                                         <tbody>
+                                         <?php if($this->control_list):?>
+                                         	<?php foreach($this->control_list as $item):?>
+                                         	<tr>
+                                            <td><?php echo $item['id']?></td>
+                                            <td title="<?php echo $this->escape($item['name'])?>">
+                                            <?php echo $this->Cutstring($this->escape($item['name']), 40, '...');?>
+                                            </td>
+                                            <td title="<?php echo $this->escape($item['description']); ?>">
+                                            <?php if($item['description']):?>
+                                            <?php echo $this->Cutstring($this->escape($item['description']), 40, '...');?>
+                                            <?php else: ?>
+                                                -
+                                            <?php endif; ?>
+                                                
+                                            </td>
+                                            <td title="<?php echo $this->escape($item['label']); ?>" >
+                                            <?php echo $this->Cutstring($this->escape($item['label']), 40, '...');?>
+                                            </td>
+                                            <td title="<?php echo $this->type_map[$item['cid']]['name'] ?>">
+                                            <?php echo $this->Cutstring($this->type_map[$item['cid']]['name'], 10, '...');?>
+                                            </td>
+                                            <td>
+                                            <?php echo $this->escape($item['ctime'])?>
+                                            </td>
+                                            <td>
+                                            <?php echo $item['version']?$item['version']:'-'; ?>
+                                            </td>
+                                            <td class="cl0b9600" style="text-align: center;"><a class="resource_view" href="#">查看</a> | <a href="/ezstudio/ota/version/tid/<?php echo $item['id']?>">版本</a> 
+ | <a href="javascript:void(0)" delete_id="<?php echo $item['id']; ?>">删除</a>
+</td>
+                                           </tr>
+                                         	<?php endforeach;?>
+                                         	<?php else:?>
+                                         	<tr><td colspan="8" style="text-align: center;">暂无记录</td></tr>
+                                         <?php endif;?>
+                                         </tbody>
+                                   </table>
+                                </div>
+               <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+          </div>
+</div>
+<div id="show_info" style="display:none;" title="资源详情">
+    <table class="detail_tabel form_table f14">
+        <tr class="h24">
+            <td style="width:25%">资源名称:</td>
+            <td id="resource_name"></td>
+        </tr>  
+        <tr class="h24">
+            <td>资源描述:</td>
+            <td id="resource_desc"></td>
+        </tr> 
+        <tr class="h24">
+            <td>升级标识:</td>
+            <td id="resource_upgrade_name"></td>
+        </tr>
+       <tr class="h24">
+            <td>资源类型:</td>
+            <td id="resource_type"></td>
+        </tr>
+        <tr class="h24">
+            <td>创建时间:</td>
+            <td id="resource_ctime">--</td>
+        </tr>
+        <!--  
+        <tr class="h24">
+            <td>创建人:</td>
+            <td>-</td>
+        </tr>
+        -->
+        <tr class="h24">
+            <td>最新版本:</td>
+            <td id="resource_version"></td>
+        </tr>
+    </table>
+</div>
+<div id="delete_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text">您确定删除这个资源吗？</p>
+</div>
+<script language="javascript" type="text/javascript">
+	$(function () {
+		$( "#show_info" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "关闭": function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        });
+        
+		$('#search').click(function () {
+			$('#search_form').submit();
+		});
+		
+		$('#add').click(function () {
+			location.href = '/ezstudio/ota/add';
+		});
+        
+        $('.resource_view').click(function(e){
+            var view_div =$("#show_info");
+            var td_obj_arr = $(this).parent('td').parent('tr').find('td');
+            view_div.find('#resource_name').text(td_obj_arr.eq(1).attr('title').trim());
+            view_div.find('#resource_desc').text(td_obj_arr.eq(2).attr('title').trim());
+            view_div.find('#resource_upgrade_name').text(td_obj_arr.eq(3).attr('title').trim());
+            view_div.find('#resource_type').text(td_obj_arr.eq(4).text().trim());
+            view_div.find('#resource_ctime').text(td_obj_arr.eq(5).text().trim());
+            view_div.find('#resource_version').text(td_obj_arr.eq(6).text().trim());
+            $( "#show_info").dialog( "open" );
+            return false;
+        });
+
+        var delete_id = null;
+ 		$("#delete_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+                	$.post('/ezstudio/ota/delresource', {id:delete_id}, function (result) {
+                		var tip_el = $('#delete_dialog').find('.message_text');
+                		if(result.status == 200) {
+                			tip_el.text('删除成功');
+                			location.reload(true);
+						} else {
+							tip_el.text('删除失败');
+							$("#delete_dialog").dialog("open");
+	                        return false;
+						}	
+        			},'json');
+                }
+            }
+        });
+		$('a[delete_id]').click(function () {
+			delete_id = $(this).attr('delete_id');
+			$( "#delete_dialog" ).dialog( "open");
+		});
+    }); 
+</script>

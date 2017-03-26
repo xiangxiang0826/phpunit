@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<dataset>
+    <EZ_API_ENTERPRISE_GRANT id="1" name="xx" remark="xxtest" app_key="xxx" app_salt="xxx" enterprise_id="1" status="enable" ctime="2010-04-26 12:14:20" mtime="2010-04-26 12:14:20"/>
+</dataset>

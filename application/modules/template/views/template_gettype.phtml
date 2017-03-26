@@ -1,0 +1,4 @@
+<option value=""><?php echo Cms_L::_('select_type'); ?></option>
+<?php foreach($this->tpl_type as $type => $info): ?>
+<option value="<?php echo $type?>"<?php if(isset($this->template_info) && $this->template_info['type'] == $type): ?> selected="selected"<?php endif; ?>><?php echo Cms_L::_($info['i18n_name']); ?></option>
+<?php endforeach; ?>

@@ -1,0 +1,4 @@
+<?xml version="1.0" ?>
+<dataset>
+    <EZ_ENTERPRISE_APP id="1" name="xx" description="xxtest" enterprise_id="1" type="edit" ctime="2010-04-26 12:14:20" mtime="2010-04-26 12:14:20" platform="ios" pack_status="finish" is_ezapp="0" upgrade_type_id="0" version="0.0.1" extend_field=""/>
+</dataset>

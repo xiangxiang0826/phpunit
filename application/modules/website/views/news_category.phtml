@@ -1,0 +1,267 @@
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+    <div class="product_detail_search clearfix">
+        <div class="console_search_wrap fr mr10 product_ctrl" style="margin-top:8px">
+            <a class="f16 clF tc search_btn ml16 manage_open"  onfocus="blur();" id="add_0" href="#">添加分类</a>
+        </div>
+    </div>
+    <div class="product_detail_display">
+        <div class="product_table mt24 f14">
+            <table class="table_s tc tc_left" width="100%" border="0">
+                <thead>
+                    <tr>
+                        <td width="60px"><?php echo $this->t('分类ID'); ?></td>
+                        <td><?php echo $this->t('新闻分类'); ?></td>
+                        <td width="200px"><?php echo $this->t('创建时间'); ?></td>
+                        <td width="200px"><?php echo $this->t('创建人'); ?></td>
+                        <td style="text-align: right;width:200px"><?php echo $this->t('新闻数'); ?></td>
+                        <td style="text-align: center;width:200px"><?php echo $this->t('操作'); ?></td>
+                    </tr>
+                </thead>
+                <tbody>
+        <?php if(!empty($this->results['rows'])) :?>
+                 <?php foreach ($this->results['rows'] as $row) {?>
+                    <?php if(isset($row['name']) && ($row['name'] == '公司新闻')): ?>
+                    <tr>
+                        <td style="color:red;"><?php echo $row['id'];?></td>
+                        <td style="color:red;"><?php echo $row['name'];?></td>
+                        <td style="color:red;">
+                            <?php if($row['ctime']): ?>
+                            <?php echo $this->Cutstring($this->escape($row['ctime']), 120, '...');?>
+                            <?php else: ?>
+                            -
+                            <?php endif; ?>
+                        </td>
+                        <td style="color:red;"><?php echo $row['creator'];?></td>
+                        <td style="color:red;text-align: right;" >
+                            <?php if(isset($this->category_map[$row['id']])): ?>
+                                <?php echo $this->category_map[$row['id']];?>
+                            <?php else: ?>
+                                0
+                            <?php endif; ?>
+                        </td>
+                        <td class="cl0b9600" style="text-align: center;">-</td>
+                    </tr>
+                    <?php else: ?>
+                    <tr <?php if(isset($row['status']) && ($row['status'] == 'disable')):?>class="stop" <?php endif;?>>
+                        <td ><?php echo $this->escape($row['id']); ?></td>
+                        <td ><?php echo $this->escape($row['name']); ?></td>
+                        <td  title="<?php echo $this->escape($row['ctime']);?>">
+                            <?php if($row['ctime']): ?>
+                            <?php echo $this->Cutstring($this->escape($row['ctime']), 30, '...');?>
+                            <?php else: ?>
+                            -
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo $row['creator'];?></td>
+                        <td style="text-align: right;">
+                            <?php if(isset($this->category_map[$row['id']])): ?>
+                                <?php echo $this->category_map[$row['id']];?>
+                            <?php else: ?>
+                                0
+                            <?php endif; ?>
+                        </td>
+                        <td class="cl0b9600 product_ctrl" style="text-align: center;">
+                           <a title="edit" href="javascript:;" id="edit_<?php echo $row['id'];?>" class="manage_open  check_detail cl0b9600" ><?php echo $this->t('编辑');?></a>&nbsp;|
+                           <a href="#" data-href="<?php echo $this->url(array('controller'=>'news', 'action'=>'deletecategory', 'cid'=>$row['id'],  'status' => 'deleted'));?>" data-title="deleted"  class="manager_detail cl0b9600" delete_id="<?php echo $row['id']; ?>"><?php echo $this->t('删除');?></a>
+                        </td>
+                    </tr>       
+                    <?php endif;?>
+                <?php }?>
+        <?php else:?>
+                     <tr><td colspan="6">暂无记录</td></tr>
+       <?php endif;?>
+                </tbody>
+            </table>
+        </div>
+        <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+    </div>
+</div>
+ <div id="manager_div" style="display:none;" title="新闻分类管理">
+  <form class="cmxform"  action="<?php echo $this->url(array('controller'=>'news', 'action' =>'addcategory'));?>" method="post" id="manage_form">
+    <table class="detail_tabel form_table f14">
+        <tr style="height:80px;">
+            <td style="width:25%">分类名称：</td>
+            <td>
+                <input type="text" class="cpy_name w150" style="width:150px;" id="name" name="name" />
+                <input type="hidden" id="cid" name="cid" value="0" />
+            </td>
+        </tr>
+    </table>
+  </form>
+</div>
+<div id="msg_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+</div>
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script>
+$(function(){
+    var url = '';
+    var delete_id = 0;
+    $( "#msg_dialog" ).dialog({
+        autoOpen: false,
+        width: 555,
+        dialogClass: "my-dialog",
+        modal: true,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        buttons: {
+            "确定": function() {
+                $( this ).dialog( "close" );
+            }
+        }
+    });
+    $( "#confirm_dialog" ).dialog({
+        autoOpen: false,
+        width: 555,
+        dialogClass: "my-dialog",
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        buttons: {
+            "取消": function() {
+                $( this ).dialog( "close" );
+            },
+            "确定": function() {
+                $( this ).dialog( "close" );
+                $.post('/website/news/deletecategory', {cid:delete_id}, function (data) {
+                    if(data.status == 200){
+                        location.href = '/website/news/category';
+                    } else if (data.msg == 505) {
+                        $('#msg_dialog .message_text').text('亲，你没有这个操作的权限！');
+                        $("#msg_dialog").dialog("open");
+                        return false;
+                    } else{
+                        $('#msg_dialog .message_text').text(data.msg);
+                        $( "#msg_dialog" ).dialog( "open");
+                        return false;
+                    }
+
+                },'json');
+            }
+        }
+    });
+    
+    $('a[delete_id]').click(function () {
+        delete_id = $(this).attr('delete_id');
+        var notice = '<?php echo $this->t('news_category_deleted_notice');?>';
+        $('#tips_msg').text(notice);
+        $( "#confirm_dialog" ).dialog( "open");
+        return false;
+    });
+    
+    /**
+	 * 产品列表控制
+	 */
+	$('.product_ctrl').click(function(e){
+		var target = $(e.target);
+		var id = target.attr('id');
+		if(id) {
+			var id_arr = id.split('_');
+			var action = id_arr[0];
+		}
+        cid = -1;
+		switch(action) {
+             case 'add':{
+               cid = 0;
+               break;
+             }
+		     case 'edit': {
+                cid = id_arr[1];
+		    	 break;
+		     }
+		}
+        $('#manage_form')[0].reset();
+        if(cid > 0){
+            $.get('/website/news/getcategory', {cid:id_arr[1]}, function(e){
+                $('#manage_form')[0].reset();
+                if(e.status == 200) {
+                    var result = e.result;
+                    var manger_div =$("#manager_div");
+                    manger_div.find('#name').val(result.name);
+                    manger_div.find('#cid').val(result.id);
+                    $( "#manager_div").dialog("option","title", "编辑新闻分类").dialog( "open" );
+                }
+            },'json');
+        }else{
+            var manger_div =$("#manager_div");
+            manger_div.find('#cid').prop('disable', true);
+            $( "#manager_div").dialog("option","title", "添加新闻分类").dialog( "open" );
+        }
+	});
+	$('#manage_form').validate({
+		rules: {
+			'name': {
+                required: true,
+                minlength: 2,
+                maxlength:20
+			}
+		},
+        submitHandler: function(){
+            $('#manager_div').dialog( "close" );
+            var url_add = '';
+            var cid = $("#manager_div").find('#cid').val()
+            if(cid > 0){
+                url_add = '/cid/'+cid;
+            }
+            var name= $("#manager_div").find('#name').val();
+            $.post('/website/news/addcategory'+url_add, {name:name}, function (data) {
+                if(data.status == 200){
+                    window.location = '/website/news/category';
+                    // return;
+                }else{
+                    $('#msg_dialog .message_text').text(data.msg);
+                    $( "#msg_dialog" ).dialog( "open");
+                    return false;
+                }
+            },'json');
+            return false;
+        }
+	});
+    /**
+
+    **/
+   
+	//管理窗口
+	$( "#manager_div" ).dialog({
+        autoOpen: false,
+        width: 655,
+        dialogClass: "my-dialog",
+        modal: true,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        modal: true,
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        buttons: {
+            "取消": function() {
+                $( this ).dialog( "close" );
+            },
+            "确定": function() {
+                $('#manage_form').submit();
+                return ;
+            }
+        }
+    });
+});
+
+
+</script>

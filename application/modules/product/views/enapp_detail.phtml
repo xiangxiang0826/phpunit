@@ -1,0 +1,68 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('查看版本信息 ', '/product/enapp/index'); ?></h3>
+<form action="" method="get" id="form">
+<table class="detail_tabel read_table f14 mt20">      
+	<tr class="h56">
+		<th class="system_drop">
+			  <div class="fl system_drop clearfix ml10">
+			  <span class="fl mt4 mr26">APP详情</span>
+			  <?php if(count($this->langs) >1) {?>
+			  <label class="fl mt4">语言：</label>
+				<select id="cang_assort" class="cpy_style cang_assort" name="lang">
+					<?php foreach ($this->langs as $lang) {?>
+					<option value="<?php echo $lang?>" <?php if($this->currentLang == $lang):?> selected="selected" <?php endif;?>><?php echo $this->t($lang);?></option>
+					<?php }?>
+				</select>
+				<?php }?>
+				</div>
+			<a target="_blank"  href="<?php if(!empty($this->appinfo['file_path'])){ echo $this->uploadServer['baseUrl'] . $this->appinfo['file_path'];}?>"  class="f16 clF tc search_btn grey_btn  fr" >下载</a>
+		</th>
+	</tr>
+
+	<tr class="h150">
+		<td>
+		<div class="img_mark_up mr50"  id="fsUploadProgress">
+		 <?php if(!empty($this->appinfo['icon'])) {?>
+				<img src="<?php echo "{$this->imagesServer['baseUrl']}{$this->appinfo['icon']}";?>" />
+				<input name="app[icon]" value="<?php echo $this->appinfo['icon'];?>"  type="hidden" id="app_icon">
+				<?php } else {?>
+				<img src="/static/images/rada.png" />
+				<input name="app[icon]" value=""  type="hidden" id="app_icon">
+		 <?php }?>
+		 </div>
+			<ul class="app_desc">
+				<li>App名称：<?php echo $this->escape($this->appinfo['m_name']);?></li>
+				<li>所属厂商：<?php echo $this->escape($this->appinfo['company_name']);?></li>
+				<li>系统平台：<?php echo $this->appinfo['platform'];?></li>
+				<li>最新版本：<?php echo $this->appinfo['version'];?></li>
+				<li>发布日期：<?php echo $this->appinfo['mtime'];?></li>
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<th>版本更新说明</th>
+	</tr>
+	<tr class="h150">
+		<td>
+		   <?php if(!empty($this->appinfo['v_description'])) { echo $this->escape($this->appinfo['v_description']);}?>
+		</td>
+	</tr>
+</table>
+</form>
+<div class="mt36 mb24 tr">
+	<a  href="javascript:;" id="cancle_btn" class="f16 clF fr tc search_btn grey_btn" >返 回</a>
+</div>
+ <link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/jquery.mCustomScrollbar.min.css" />
+ <script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.mCustomScrollbar.min.js"></script>
+  <script>
+ $(document).ready(function(){
+	 $('#cancle_btn').click(function(){
+         window.history.go(-1);
+     });
+     $('#cang_assort').change(function(){
+         $('#form').submit();
+     });
+     
+})
+</script>

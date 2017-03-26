@@ -1,0 +1,116 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('查看厂商详情', '/enterprise/index/index'); ?></h3>
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th><?php echo $this->t('account_info');?></th>
+        <th></th>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('enterprise_login_email'); ?>：</td>
+        <td><?php echo $this->escape($this->info['email']);?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('reg_time'); ?>：</td>
+        <td><?php echo $this->info['reg_time'];?></td>
+    </tr>
+   <tr>
+        <th><?php echo $this->t('authentication_info');?></th>
+        <th></th>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('user_type'); ?>：</td>
+        <td><?php if(!empty($this->info['user_type'])) { echo $this->t($this->info['user_type']);}?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('company_name'); ?>：</td>
+        <td><?php echo $this->escape($this->info['company_name']);?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('address'); ?>：</td>
+        <td><?php echo $this->escape($this->info['address']);?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('mobile'); ?>：</td>
+        <td><?php echo $this->info['mobile'];?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('business_scope'); ?>：</td>
+        <td><?php echo $this->info['business_scope'];?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('authentication_type'); ?>：</td>
+        <td>
+              <?php
+                    if($this->info['user_type'] == 'company'):
+                    	echo $this->t('buess_license');
+                    else:
+                        echo $this->t('id_card');
+                    endif;
+              ?>  
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>
+              <img src="<?php echo $this->upload['baseUrl'] . $this->info['certificate'];?>" class="detail_img mb10"/>
+              <a href="<?php echo $this->upload['baseUrl'] . $this->info['certificate'];?>" class="download_a" target="_blank"><?php echo $this->t('donwload');?></a>
+        </td>
+    </tr>
+    <tr>
+        <th><?php echo $this->t('buess_info');?></th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>企业标识：</td>
+        <td><?php if(!empty($this->info['label'])) { echo $this->t($this->info['label']);}?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('company_status'); ?>：</td>
+        <td><?php if(!empty($this->info['status'])) { echo $this->t($this->info['status']);}?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('has_app'); ?>：</td>
+        <td><?php echo $this->t($this->info['is_ezapp']);?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('product_number'); ?>：</td>
+        <td><?php echo $this->info['product_num'];?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('last_login_time'); ?>：</td>
+        <td><?php echo $this->info['last_login_time'];?></td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('inform_status'); ?>：</td>
+        <td>
+            <?php if($this->info['inform_status'] == 3): ?>
+                短信、邮件
+            <?php elseif($this->info['inform_status'] == 2): ?>
+                短信
+            <?php elseif($this->info['inform_status'] == 1): ?>
+                邮件
+            <?php else: ?>
+                
+            <?php endif; ?>
+        </td>
+    </tr>
+    <tr>
+        <th><?php echo $this->t('manage_info');?></th>
+        <th></th>
+    </tr>
+    <tr>
+        <td></td>
+        <td><?php echo $this->escape($this->info['remark']);?></td>
+    </tr>
+</table>
+<div class="mt36 mb24 tr">
+    <a  href="javascript:;" id="cancle_btn" class="f16 fr clF tc search_btn grey_btn" >返 回</a>
+</div>
+<script>
+$(document).ready(function(){
+	 $('#cancle_btn').click(function(){
+         window.history.go(-1);
+     });
+})
+</script>

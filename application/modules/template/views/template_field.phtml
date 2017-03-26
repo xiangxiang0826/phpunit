@@ -1,0 +1,58 @@
+<h3 class="location f14">系统<?php echo $this->menu('字段管理','/template/template/index'); ?></h3>
+<div class="data-box mt22">
+	<table id="datagrid" title="<?php echo Cms_L::_('field_list'); ?>" style="width:auto;"  
+            data-options="singleSelect:false,
+						url:'/template/template/fielddata/site_id/<?php echo $this->site_id; ?>/tpl_id/<?php echo $this->tpl_id; ?>',
+						striped:'true',
+						fitColumns:'true'">
+		
+	</table>
+</div>
+<script>
+var $datagrid = $('#datagrid');
+var site_id = <?php echo $this->site_id; ?>;
+var tpl_id = <?php echo $this->tpl_id; ?>;
+
+$(function(){
+	$datagrid.datagrid({
+		toolbar : [
+			{text:'<?php echo Cms_L::_('add'); ?>', iconCls:'icon-add', handler:edit_field}
+		],
+		columns : [[
+			{field:'id', width:80, checkbox:true},
+			{field:'field_id', title:'<?php echo Cms_L::_('field'); ?>ID', width:80},
+			{field:'input_label', title:'<?php echo Cms_L::_('field_name'); ?>', width:150},
+			{field:'action', title:'<?php echo Cms_L::_('action'); ?>', width:200, align:'center', formatter:function(val, row, idx){
+				var html;
+				html = '<a href="javascript:;" onclick="edit_field(' + row.id + ')"><?php echo Cms_L::_('edit'); ?></a>';
+				html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="delete_field(' + row.id + ')"><?php echo Cms_L::_('delete'); ?></a>';
+				return html;
+			}}
+		]]
+	});
+});
+
+function edit_field(id) {
+	var title;
+	if(typeof id == 'number'){
+		title = '<?php echo Cms_L::_('edit_field'); ?> - [' + id + ']';
+	} else {
+		title = '<?php echo Cms_L::_('add_field'); ?>';
+		id = 0;
+	}
+	
+	$.nav_tab.add(title, '/template/template/editfield', {site_id:site_id, tpl_id:tpl_id, field_id:id});
+}
+
+function delete_field(field_id) {
+	$.messager.confirm('<?php echo Cms_L::_('tip'); ?>', '<?php echo Cms_L::_('delete_confirm'); ?>', function(is_del){
+		if(is_del) {
+			$.post('/template/template/deletefield', {site_id:site_id, field_id:field_id}, function(data){
+				if(data.state == 'ok'){
+					$datagrid.datagrid('reload');
+				}
+			}, 'json');
+		}
+	});
+}
+</script>

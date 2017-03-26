@@ -1,0 +1,4 @@
+<option value=""><?php echo Cms_L::_('select_template'); ?></option>
+<?php foreach($this->tpl_list as $key => $info): ?>
+<option value="<?php echo $info['tpl_id'];?>"><?php echo  $info['name']; ?></option>
+<?php endforeach; ?>

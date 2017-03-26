@@ -1,0 +1,27 @@
+<ul class="vertical_nav f14">
+	<?php if($this->menus):?>
+		<?php foreach($this->menus as $menu):?>
+			<li>
+			<?php if(empty($menu['url'])):?>
+			<span class="expanded"><i class="<?php echo $menu['id']?>_icon"></i><?php echo $menu['name']?></span>
+			    <?php if(isset($menu['children'])):?>
+				<ul class="vertical_nav_child">
+				<?php foreach($menu['children'] as $child): //class="current"?>
+				<?php 	$child['url'] = strpos($child['url'],'http') !== false ? $child['url'] : '/'.ltrim($child['url'],'/');
+				?>
+					<li><a <?php if($this->visit_url == $child['url']):?> class="current" <?php endif;?> href="<?php echo $child['url']?>" menu_id="<?php echo $child['id']?>"><?php echo $child['name']?></a></li>
+				<?php endforeach;?>
+				</ul>
+			    <?php endif;?>
+			<?php else:?>
+			     <ul class="vertical_nav_child">
+			     	<?php
+			     	 	$menu['url'] = strpos($menu['url'],'http') !== false ? $menu['url'] : '/'.ltrim($menu['url'],'/');
+				    ?>
+			     <li style="margin-top:5px;"><a <?php if($this->visit_url == $menu['url']):?> class="current" <?php endif;?> href="<?php echo $menu['url']?>" menu_id="<?php echo $menu['id']?>"><?php echo $menu['name']?></a></li>
+			     </ul>
+			<?php endif;?>
+			</li>
+		<?php endforeach;?>
+	<?php endif;?>
+</ul>

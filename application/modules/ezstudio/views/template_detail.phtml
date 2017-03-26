@@ -1,0 +1,279 @@
+<!--页面位置-->
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.queue.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/fileprogress.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/handlers.js"></script>
+<h3 class="location f14"><?php echo $this->menu('编辑模板','/ezstudio/template/index'); ?></h3>
+	<form class="cmxform"  action="/ezstudio/template/update" method="post" id="form_update_action">
+            <table class="detail_tabel psw_table f14 mt20">
+                <tr>
+                    <td>模板名称：</td>
+                    <td>
+                        <input type="text" class="cpy_name" placeholder="请输入功能名称" id="name" name="name" value="<?php echo $this->template_info['name']?>" class="required"/>
+                        <input type="hidden" name ="id" value="<?php echo $this->template_info['id']?>">
+                    </td>
+                </tr>
+	            <tr>
+	            <td>上级品类:</td>
+	            <td id="product_enterprise"  class="system_drop pb14">
+	            	<select id="cang_assort" class="cpy_style cang_assort" name="product_category_id" style="width:252px;" >
+		                  <?php foreach ($this->category as $v) :?>
+	                             <option value="<?php echo $v['id'];?>" <?php if($v['id'] == $this->template_info['product_category_id']):?>selected="selected"<?php endif;?>><?php echo $v['levelstr'] . $v['name'];?></option>
+	                        <?php endforeach;?>
+	                </select>
+	            </td>
+	        	</tr>
+              <tr>
+                    <td>类型：</td>
+                    <td class="system_drop">
+                    	<select id="template_type_id" class="cpy_style product_assort" name ="template_type_id">
+                          <?php foreach ($this->type_map as $v) :?>
+                               <option value="<?php echo $v['id'];?>" <?php if($v['id'] == $this->template_info['template_type_id']):?>selected="selected"<?php endif;?>><?php echo $v['name'];?></option>
+                          <?php endforeach;?>
+                       </select>
+                    </td>
+                </tr>
+                <tr>
+					<td>资源包上传：</td>
+					<td>
+					<span class="fieldset flash" id="fsUploadProgress_package"><a href="<?php echo $this->template_info['full_save_path']?>"  target="_blank"><?php echo $this->template_info['file_name']?></a></span>
+					<span id="upload_status_package"></span>
+					<a  id="upload_package" class="f14 clF tc search_btn brue_btn ml56" onfocus="blur();" href="javascript:void(0)">上传</a>
+					<input id="btnCancel__package" type="button" value="取消上传" disabled="disabled" style="display:none" />
+					<input type="hidden" name="save_path" id="file_path" value="<?php echo $this->template_info['save_path']?>">
+					</td>
+				</tr>
+                <tr>
+					<td>封面：</td>
+					<td>
+					<span class="fieldset flash" id="fsUploadProgress_icon"><img  src="<?php echo $this->template_info['full_icon']?>" class="cut_make_up" width="100" height="100"></span>
+					<span id="upload_status_icon"></span>
+					<a  id="upload_icon" class="f14 clF tc search_btn brue_btn ml56" onfocus="blur();" href="javascript:void(0)">上传</a>
+					<input id="btnCancel_icon" type="button" value="取消上传" disabled="disabled" style="display:none" />
+					<input type="hidden" name="icon" id="icon" value="<?php echo $this->template_info['icon']?>">
+					</td>
+				</tr>
+                <tr>
+                    <td>备注：</td>
+                    <td>
+                    	<textarea rows="8" cols="60" class="text_cls mt10" id="remark" name="remark"><?php echo $this->template_info['remark']?></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>状态：</td>
+                    <td class="system_drop">
+                        <select  class="cpy_style product_assort mt_12" name ="status">
+                          <?php foreach ($this->status_map as $k=>$v) :?>
+                               <option value="<?php echo $k;?>" <?php if($k == $this->template_info['status']):?>selected="selected"<?php endif;?>><?php echo $v;?></option>
+                          <?php endforeach;?>
+                       </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a id="save_action"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">保存</a>
+                    </td>
+                </tr>
+</table>
+</form>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">保存成功！</p>
+    <a id="close_message"  onfocus="blur();" href="javascript:void(0)" class="f16 clF tc search_btn brue_btn" >确 定</a>
+</div>
+<div id="tips_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script language="javascript" type="text/javascript">
+    $(function() {
+    	$( "#tips_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "确定": function() {
+                	$( this ).dialog( "close" );
+        		}
+            }
+        });
+        
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        $("#close_message").on("click",function() {
+            $( "#message_dialog" ).dialog( "close" );
+			location.href = '/ezstudio/template/index';
+        });
+	
+    	$('#form_update_action').validate({
+    		rules: {
+    			'name': {
+    				required: true,
+    				minlength: 2,
+    				maxlength:150
+    			},
+    			'icon': {
+    				required: true,
+    				minlength: 5,
+    				maxlength:255
+    			},
+    			'save_path': {
+    				required: true,
+    				minlength: 5,
+    				maxlength:512
+    			},
+    			'remark': {
+    				minlength: 5,
+    				maxlength:512
+    			}
+    		},
+    		messages: {   //自定义提示信息
+    			
+    		},
+    		ignore : ''
+    	});
+    	$('#save_action').click(function () {
+			if($('#form_update_action').valid()) {
+				$('#form_update_action').ajaxSubmit({
+					url:'/ezstudio/template/update', //提交给哪个执行
+					type:'POST',
+					dataType: 'json',
+					success: function (result) {
+						if(result.status == 200) {
+							$( "#message_dialog" ).dialog( "open" );
+						} else {
+							$('#tips_msg').text(result.msg);
+							$( "#tips_dialog" ).dialog( "open" );
+						}
+					}
+				});
+				return false;
+			}
+		});
+    	//icon上传
+    	var settings = {
+				flash_url : "<?php echo $this->static;?>/js/libs/swfupload/swfupload.swf",
+				upload_url: "/api/upload/index",
+				post_params: {"type" : "template"},
+				file_size_limit : "2 MB",
+				file_types : "*.jpg;*.png;*.gif;*.bmp",
+				file_types_description : "All Files",
+				file_upload_limit : 100,  //配置上传个数
+				file_queue_limit : 1,
+				custom_settings : {
+					progressTarget : "fsUploadProgress_icon",
+					cancelButtonId : "btnCancel_icon",
+					ProgressStatusId:'upload_status_icon'
+				},
+				debug: false,
+				button_window_mode:'Opaque',
+				// Button settings
+				button_image_url: "<?php echo $this->static;?>/images/TestImageNoText_65x29.png",
+				button_width: "65",
+				button_height: "29",
+				button_placeholder_id: "upload_icon",
+				button_text: '<span class="falsh_upload_button">上传</span>',
+				button_text_style: '.falsh_upload_button{color:#FFFFFF;}',
+				button_text_left_padding: 16,
+				button_text_top_padding: 5,
+				button_text_top_margin: 10,
+				file_queued_handler : fileQueued,
+				file_queue_error_handler : fileQueueError,
+				file_dialog_complete_handler : fileDialogComplete,
+				upload_error_handler : uploadError,
+				upload_success_handler : function(file, serverData) {
+					try {
+						serverData = eval("("+ serverData +")");
+						var progress_div_id = this.customSettings.progressTarget;
+						var progress = new FileProgress(file, progress_div_id);
+						progress.setComplete();
+						progress.setStatus("上传成功");
+						progress.toggleCancel(false);
+						var img = '<img  src="'+ serverData.result.url +'" class="cut_make_up" width="100" height="100">';
+						var link = '<a target="_blank" href="'+ serverData.result.url +'">'+ img +'</a>';
+						$('#icon').val(serverData.result.path);
+						var file_container = '<span class="mr10">'+ link +'</span>';
+						$("#"+progress_div_id).html(file_container);
+					} catch (ex) {
+						this.debug(ex);
+					}
+				},
+				upload_complete_handler : uploadComplete,
+				queue_complete_handler : queueComplete
+		};
+		var swfu01 = new SWFUpload(settings);
+
+		//资源包
+    	var settings = {
+				flash_url : "<?php echo $this->static;?>/js/libs/swfupload/swfupload.swf",
+				upload_url: "/api/upload/index",
+				post_params: {"type" : "template"},
+				file_size_limit : "50 MB",
+				file_types : "*.rar;*.zip",
+				file_types_description : "All Files",
+				file_upload_limit : 100,  //配置上传个数
+				file_queue_limit : 1,
+				custom_settings : {
+					progressTarget : "fsUploadProgress_package",
+					cancelButtonId : "btnCancel__package",
+					ProgressStatusId:'upload_status_package'
+				},
+				button_window_mode:'Opaque',
+				debug: false,
+				// Button settings
+				button_image_url: "<?php echo $this->static;?>/images/TestImageNoText_65x29.png",
+				button_width: "65",
+				button_height: "29",
+				button_placeholder_id: "upload_package",
+				button_text: '<span class="falsh_upload_button">上传</span>',
+				button_text_style: '.falsh_upload_button{color:#FFFFFF;}',
+				button_text_left_padding: 16,
+				button_text_top_padding: 5,
+				button_text_top_margin: 10,
+				file_queued_handler : fileQueued,
+				file_queue_error_handler : fileQueueError,
+				file_dialog_complete_handler : fileDialogComplete,
+				upload_error_handler : uploadError,
+				upload_success_handler : function(file, serverData) {
+					try {
+						serverData = eval("("+ serverData +")");
+						var progress_div_id = this.customSettings.progressTarget;
+						var progress = new FileProgress(file, progress_div_id);
+						progress.setComplete();
+						progress.setStatus("上传成功");
+						progress.toggleCancel(false);
+						var link = '<a target="_blank" href="'+ serverData.result.url +'">'+ serverData.result.file_name +'</a>';
+						$('#file_path').val(serverData.result.path);
+						var file_container = '<span class="mr10">'+ link +'</span>';
+						$("#"+progress_div_id).html(file_container);
+					} catch (ex) {
+						this.debug(ex);
+					}
+				},
+				upload_complete_handler : uploadComplete,
+				queue_complete_handler : queueComplete
+			};
+		var swfu02 = new SWFUpload(settings);    
+})
+</script>

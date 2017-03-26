@@ -1,0 +1,23 @@
+<phpunit bootstrap="./TestHelper.php" colors="false">
+    <testsuites>
+        <testsuite name="Unit test suite">
+            <directory>./</directory>
+        </testsuite>
+        <testsuite name="Unit test model">
+            <directory>./models</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../application/</directory>
+            <exclude>
+                <directory suffix=".phtml">../application/</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+    <logging>
+        <log type="testdox-html" target="" />
+    </logging>
+</phpunit>

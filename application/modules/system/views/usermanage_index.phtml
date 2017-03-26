@@ -1,0 +1,220 @@
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+   <div class="product_detail_search clearfix">
+	   	<form action="/system/usermanage/index" method="get"  id="search_form">
+           	<div class="product_detail_search clearfix">
+           	<div class="fl system_drop clearfix ml10">
+              <input type="text" class="cpy_name w150" id="name"  name ="search[name]" value="<?php echo isset($this->search['name']) ? $this->search['name'] : ''?>" placeholder="请输入用户名">
+           </div>
+           	<div class="fl system_drop clearfix">
+			   <select id="cang_assort" class="cpy_style cang_assort" name="search[group_id]" style="width: 120px;">
+				   <option value="">选择用户组</option>
+				 <?php foreach ($this->groups as $k=>$v):?>
+				 <option value="<?php echo $v['id'];?>" <?php if(isset($this->search['group_id']) && $v['id'] == $this->search['group_id']):?>selected="selected" <?php endif;?>><?php echo $v['name'];?></option>
+				 <?php endforeach;?>
+			   </select>
+			</div>
+		   <div class="console_search_wrap fr"><a class="search_icon_btn f16 clF tc" onFocus="blur();" id="search_submit"  href="javascript:;"><i class="find_icon"></i>查 询</a></div>
+		   </div>
+		</form>
+	</div>
+    <div class="product_detail_search clearfix mt20 mb20">
+        <div class="fl system_drop fr clearfix ml10">
+            <a class="f16 clF tc search_btn ml16" onfocus="blur();" href="javascript:void(0)" id="add">添加子账号</a>
+        </div>
+    </div>
+    
+    <div class="product_detail_display">
+        <div class="product_table mt24 f14">
+            <table class="table_s tc tc_left" width="100%" border="0">
+                <thead>
+                    <tr>
+                        <td>用户名</td>
+                        <td>姓名</td>
+                        <td>权限组</td>
+                        <td width="100px">创建时间</td>
+                        <td width="100px">上次登录</td>
+                        <td width="100px">状态</td>
+                        <td style="text-align: center;width: 100px;">操作</td>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php if($this->users):?>
+        		<?php foreach($this->users as $user):?>
+        			<tr <?php if($user['status'] == Model_User::STATUS_DISABLE):?>class="stop"<?php endif?>>
+                        <td><?php echo $user['user_name']?></td>
+                        <td><?php echo $user['real_name']?></td>
+                        <td>
+                        <?php if(isset($this->user_group[$user['id']]['groups'])):?>
+                        	<?php foreach($this->user_group[$user['id']]['groups'] as $grp_id):?>
+                        		<?php echo $this->group_map[$grp_id]['name'];?>
+                        	<?php endforeach;?>
+                        	<?php else:?>
+                        	-
+                        <?php endif;?>
+                        </td>
+                        <td><?php echo $user['ctime']?></td>
+                        <td><?php echo $user['last_login_time']?></td>
+                        <td>
+                        <?php if($user['status'] == Model_User::STATUS_ENABLE):?>
+                        	正常
+                        <?php else:?>
+                        	已停用
+                        <?php endif;?>
+                        </td>
+                        <td class="cl0b9600" style="text-align: center;"><a href="/system/usermanage/account/uid/<?php echo $user['id']?>">编辑</a> &nbsp;|&nbsp;
+                        <?php if($user['status'] == Model_User::STATUS_ENABLE):?>
+                        <a href="javascript:void(0)" uid="<?php echo $user['id']?>" usr_action="enable">停用</a>
+                        <?php else:?>
+                        <a href="javascript:void(0)" uid="<?php echo $user['id']?>" usr_action="disable" style="color:red">启用</a>
+                        <?php endif;?></td>
+                    </tr>
+        		<?php endforeach;?>
+        		<?php else:?>
+        		<tr><td colspan="7" style="text-align: center;">暂无记录</td></tr>
+        		<?php endif;?>
+                </tbody>
+            </table>
+        </div>
+        <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+    </div>
+</div>
+<style>
+ 	.ui-dialog{overflow: visible;} 
+ 	.ui-dialog .ui-dialog-content{overflow: visible;} 
+</style>
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<div id="adduser_dialog" title="添加子账号" class="product_detail">
+  <form class="cmxform"  action="<?php echo $this->url(array('controller'=>'usermanager', 'action' =>'adduser'));?>" method="post" id="add_form">
+    <table class="detail_tabel form_table f14">
+        <tr class="h60">
+            <td>用户名：</td>
+            <td><input type="text" name="user_name" id="user_name" class="cpy_name wp50"></td>
+        </tr>
+        <tr>
+            <td>权限组：</td>
+            <td class="system_drop">
+               <select id="cang_assort_01" class="cpy_style cang_assort" name="group_id">
+				   <option value="">选择用户组</option>
+				 <?php foreach ($this->groups as $k=>$v):?>
+				 <option value="<?php echo $v['id'];?>"><?php echo mb_strimwidth($v['name'],0,'15','...');?></option>
+				 <?php endforeach;?>
+			   </select>
+			</td>
+        </tr>
+    </table>
+ </form>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<script>
+$(function(){
+    var url = '';
+    $( "#confirm_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "确定": function() {
+        			window.location.reload();
+                }
+            }
+    });
+
+    $( "#adduser_dialog" ).dialog({
+        autoOpen: false,
+        width: 555,
+        height: 300,
+        dialogClass: "my-dialog",
+        modal: true,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        buttons: {
+            "取消": function() {
+                $( this ).dialog( "close" );
+            },
+            "确定": function() {
+                if($('#add_form').valid()) {
+    				$('#add_form').ajaxSubmit({
+    					url:'/system/usermanage/adduser', //提交给哪个执行
+    					type:'POST',
+    					dataType: 'json',
+    					success: function (result) {
+    						$( "#adduser_dialog" ).dialog( "close" );
+        					if(result.status == 200) {
+    							$('#tips_msg').text('账户添加成功！');
+    							$( "#confirm_dialog" ).dialog( "open" );
+    							return false;
+    						}
+        					if (result.msg == 505) {
+    	                        $('#tips_msg').text('亲，你没有这个操作的权限！');
+    	                        $("#confirm_dialog").dialog("open");
+    	                        return false;
+    	                    } 
+    						$('#tips_msg').text(result.msg);
+    						$( "#confirm_dialog" ).dialog( "open" );
+    						return false;
+    					}
+    				},'json');
+    				return false;
+    			}
+			}
+        }
+    });
+
+    $('#add_form').validate({
+		rules: {
+			'user_name': {
+				required: true,
+				maxlength:20
+			},
+			'group_id': {
+				required: true
+			}
+		}
+	});	
+	
+    $('#add').click(function () { //弹出增加用户对话框
+        $('#user_name').val('');
+    	$( "#adduser_dialog" ).dialog("open");
+	});
+    $('#search_submit').click(function(){ // 搜索表单
+        $('#search_form').submit();
+    });
+	$('[usr_action]').click(function () {
+			var uid = $(this).attr('uid');
+			var act = $(this).attr('usr_action');
+			$.post('/system/usermanage/setstatus',{'status':act,'uid':uid},function(ret) {
+				if(ret.status == 200) {
+					$('#tips_msg').text('恭喜，设置成功！');
+			        $( "#confirm_dialog" ).dialog("open");
+					return false;
+				}
+				if (ret.msg == 505) {
+                    $('#tips_msg').text('亲，你没有这个操作的权限！');
+                    $("#confirm_dialog").dialog("open");
+                    return false;
+                } 
+				$('#tips_msg').text(ret.msg);
+		        $( "#confirm_dialog" ).dialog("open");
+			},'json');
+	});
+});
+</script>

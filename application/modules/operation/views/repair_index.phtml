@@ -1,0 +1,122 @@
+<h3 class="location f14">
+	<?php
+	    if($this->type == 'pending') {
+	    	echo $this->menu('待处理', '/operation/repair/index');
+	    } elseif ($this->type == 'all') {
+	    	echo $this->menu('所有', '/operation/repair/index');
+	    } 	    
+	?>
+</h3>
+<div class="product_detail_display_tab_wrap clearfix" style="margin-top: 15px;">
+	<div class="fl product_detail_display_tab" id="tab_toggle">
+		<span <?php if($this->type == 'pending'):?> class="on" <?php else:?> class="last" <?php endif;?> href="<?php echo $this->url(array('action' => 'index' , 'type' =>'pending'));?>">待处理</span><span <?php if($this->type == 'all'):?> class="on" <?php else:?> class="last" <?php endif;?> href="<?php echo $this->url(array('action' => 'index' , 'type' =>'all'));?>">所有</span>
+	</div>
+</div>
+<form action="" method="get" id="search_form">
+	<div class="product_detail_search clearfix  mt20 mb20">
+	<div class="fl system_drop clearfix">
+	   <select class="cpy_style cang_assort" name="search[enterprise]" style="width: 185px;">
+		   <option value="">所有厂商</option>
+		   <?php foreach ($this->enterprise as $k=>$v):?>
+		 <option value="<?php echo $k;?>" <?php if(!empty($this->search['enterprise']) && $k == $this->search['enterprise']):?>selected="selected" <?php endif;?>><?php echo mb_strimwidth($v,0,26,'...');?></option>
+		 <?php endforeach;?>
+	   </select>
+   </div>
+   	<div class="fl system_drop clearfix">
+	   <select id="cang_assort" class="cpy_style product_assort" name="search[category]" style="width: 120px;">
+			<option value="">所有品类</option>
+		 <?php foreach ($this->category as $row) {?>
+		 <option value="<?php echo $row['id'];?>" <?php if(!empty($this->search['category']) && $row['id'] == $this->search['category']):?>selected="selected" <?php endif;?>><?php echo $row['levelstr'] . mb_strimwidth($row['name'],0,18,'...');?></option>
+		 <?php }?>
+		</select>
+	</div>
+	<div class="fl system_drop clearfix">
+	   <select id="produt_assort" class="cpy_style product_assort" name="search[product_id]" style="width: 120px;">
+			<option value="">所有产品</option>
+		 <?php foreach ($this->products as $key=>$v) {?>
+		 <option value="<?php echo $key;?>" <?php if(!empty($this->search['product_id']) && $key == $this->search['product_id']):?>selected="selected" <?php endif;?>><?php echo  mb_strimwidth($v,0,18,'...');?></option>
+		 <?php }?>
+		</select>
+	</div>
+	 <div class="fl system_drop clearfix">
+		<select class="cpy_style product_assort" name="search[status]" style="width: 120px;">
+			<option value="">所有状态</option>
+		 <?php foreach ($this->status as $key=>$name) {?>
+		 <option value="<?php echo $key;?>" <?php if(!empty($this->search['status']) && $key == $this->search['status']):?>selected="selected" <?php endif;?>><?php echo $this->t($name);?></option>
+		 <?php }?>
+		</select>
+	</div>
+	<div class="fl clearfix">
+		<input type="text" class="cpy_name w150" id="cpy_name" name="search[number]" value="<?php if(!empty($this->search['number'])){ echo $this->search['number'];}?>" placeholder="输入单号查询">
+	</div>
+	<div class="fl clearfix">
+		<input type="text" class="cpy_name w150" id="cpy_name" name="search[sn]" value="<?php if(!empty($this->search['sn'])){ echo $this->search['sn'];}?>" placeholder="输入序列号查询">
+	</div>
+	<div class="console_search_wrap fr mr10">
+			<a type="submit" onfocus="blur();" id="search_submit"   href="javascript:;" class="f16 clF tc ml10 search_icon_btn"><i class="find_icon"></i>查询</a>
+	</div>
+	</div>
+</form>
+<table class="baoxiu_table" border="0" style="clear: both;">
+	<thead>
+		<tr>
+			<td style="width: 150px;">单号</td>
+			<td>故障描述</td>
+			<td style="width: 150px">提交时间</td>
+			<td style="width: 150px">最后处理时间</td>
+			<td style="width: 60px">状态</td>
+			<td style="width: 50px">操作</td>
+		</tr>
+	</thead>
+	<tbody>
+	   <?php if($this->pagination->getTotalItemCount() >0) :?>
+				<?php foreach ($this->pagination as $v):?>
+				<tr>
+					<td ><?php echo $v['number'];?></td>
+					<td title="<?php echo $v['content']?>" class="baoxiu_info"><?php echo mb_strimwidth($this->escape($v['content']),0,100,'...');?></td>
+					<td class="datetime"><?php echo $v['ctime'];?></td>
+					<td class="datetime"><?php echo ($v['mtime'] != '0000-00-00 00:00:00') ? $v['mtime'] : '-'; ?></td>
+					<?php
+					    switch ($v['status']) {
+                             case Model_DeviceRepair::STATUS_NEW:
+                             	$class = 'status_new';break;
+                             case Model_DeviceRepair::STATUS_PROCESS:
+                                $class = 'status_chuli';break;
+                             case Model_DeviceRepair::STATUS_FINISH:
+                                $class = '';break;
+                             case Model_DeviceRepair::STATUS_CANCLE:
+                                $class = 'status_unhandle';break;
+                             case Model_DeviceRepair::STATUS_CLOSE:
+                                $class = 'status_unhandle';break;
+                             	
+                        } 
+					?>
+					<td class="<?php echo $class;?>">
+					<?php if(isset($this->status[$v['status']])) { 
+						echo $this->status[$v['status']];
+					 } ?>
+					</td>
+					<td class="blue_td">
+					    <a href="<?php echo $this->url(array('action' => 'detail' , 'id' => $v['id']));?>">查看</a>
+					</td>
+				</tr>
+				<?php endforeach; ?>
+		<?php else: ?>
+				<tr>
+					<td colspan="6" style="text-align: center;">暂无记录</td>
+				</tr>
+	   <?php endif;?>
+	</tbody>
+</table>
+<?php echo $this->paginationControl($this->pagination, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+<script>
+$('document').ready(function(){
+    $('#tab_toggle').click(function(e){
+       var target = $(e.target);
+       var href = target.attr('href');
+       if(href) {
+           location.href = href;
+       }
+    })
+})
+</script>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <EZ_SERVICE_REPAIR_ATTACHMENT  id="1" repair_id="100" record_id="user" filename="a.zip" filepath="/www/doc/a.zip" ctime="2010-04-26 12:14:20" filetype="zip" filesize="2M"/>
+    <EZ_SERVICE_REPAIR_ATTACHMENT  id="2" repair_id="100" record_id="user" filename="b.zip" filepath="a/ab/c/b.zip" ctime="2010-04-26 12:14:20" filetype="zip" filesize="1M"/>
+</dataset>

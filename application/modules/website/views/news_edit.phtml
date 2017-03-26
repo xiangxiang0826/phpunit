@@ -1,0 +1,229 @@
+<!--页面位置-->
+<script type="text/javascript"	src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<script type="text/javascript"	src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.js"></script>
+<script type="text/javascript"	src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.queue.js"></script>
+<script type="text/javascript"	src="<?php echo $this->static;?>/js/libs/swfupload/fileprogress.js"></script>
+<script type="text/javascript"	src="<?php echo $this->static;?>/js/libs/swfupload/handlers.js"></script>
+<script type="text/javascript"	src="<?php echo $this->static;?>/js/libs/kindeditor/kindeditor-min.js"></script>
+<h3 class="location f14">
+	<?php echo $this->menu('编辑新闻','/website/news/index'); ?>
+</h3>
+<form class="cmxform" action="/enterprise/announce/donews" method="post"	id="form_news">
+	<table class="detail_tabel psw_table f14 mt20">
+		<tr>
+			<td>新闻分类:</td>
+			<td id="product_enterprise" class="system_drop pb14">
+				<select	id="cang_assort" class="cpy_style cang_assort"	name="info[category_id]" style="width: 252px;">
+					<?php foreach ($this->info['tree'] as $v) :?>
+						<option value="<?php echo $v['id'];?>"
+							<?php if($v['id'] == $this->info['category_id']):?>
+							selected="selected" <?php endif;?>>
+							<?php echo mb_strimwidth($v['levelstr'] . $v['name'],0,20,'...');?>
+						</option>
+					<?php endforeach;?>
+			</select></td>
+		</tr>
+		<tr>
+			<td>新闻标题：</td>
+			<td>
+				<input type="text" class="cpy_name" placeholder="请输入新闻标题"	id="name" name="info[title]"	value="<?php echo $this->info['title']?>" /> <input type="hidden"	name="info[id]" value="<?php echo $this->info['id']?>">
+			</td>
+		</tr>
+		<tr>
+			<td>新闻内容：</td>
+			<td class="system_drop">
+				<textarea name="info[content]"	id="content" cols="100" rows="20"> <?php echo $this->info['content']?></textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>新闻导图：</td>
+			<td>
+				<span class="fieldset flash" id="fsUploadProgress_icon">
+					<?php if(!empty($this->info['list_img'])):?>
+						<img	src="<?php echo $this->static_domain.$this->info['list_img']?>"	class="cut_make_up" width="100" height="100" alt="">
+					<?php endif;?>
+				</span> 
+				<span id="upload_status_icon"></span> 
+				<a	id="upload_icon" class="f14 clF tc search_btn brue_btn ml56"	onfocus="blur();" href="javascript:void(0)">上传</a> 
+				<input	id="btnCancel_icon" type="button" value="取消上传" disabled="disabled"	style="display: none" /> 
+				<input type="hidden" name="info[list_img]"	id="icon" value="<?php echo $this->info['list_img']?>">
+			</td>
+		</tr>
+		<tr>
+			<td>Banner显示：</td>
+			<td>
+				<input type="checkbox" name="info[is_banner]"	<?php if('1' == $this->info['is_banner']):?> checked="on"	<?php endif;?> />
+			</td>
+		</tr>
+		<tr>
+			<td>置顶显示：</td>
+			<td>
+				<input type="checkbox" name="info[is_top]"	<?php if('1' == $this->info['is_top']):?> checked="on"	<?php endif;?> />
+			</td>
+		</tr>
+		<tr>
+			<td><a id="save_action" onfocus="blur();"
+				class="f16 clF tc search_btn brue_btn" href="javascript:void(0)">保存</a>
+			</td>
+		</tr>
+	</table>
+</form>
+<div id="message_dialog" style="display: none;" title="系统提醒">
+	<p class="message_text">保存成功！</p>
+	<a id="close_message" onfocus="blur();" href="javascript:void(0)"	class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<div id="tips_dialog" style="display: none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script language="javascript" type="text/javascript">
+    $(function() {
+        $( "#tips_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "确定": function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        });
+
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        $("#close_message").on("click",function() {
+            $( "#message_dialog" ).dialog( "close" );
+            location.href = '/website/news/index';
+        });
+
+        $('#form_news').validate({
+    		rules: {
+    			'info[title]': {
+    				required: true,
+    				minlength: 2,
+    				maxlength:100
+    			},
+    			'info[content]': {
+    				required: true,
+    				minlength: 2
+    			},
+    			'info[list_img]': {
+    				required: true,
+    				maxlength: 250
+    			},
+    			'info[sort]': {
+    				digits : true,
+    				maxlength : 5,
+    				min:1
+    			}
+    		},
+    		messages: {   //自定义提示信息
+    			'info[list_img]':'需要上传新闻导图'
+    		},
+    		ignore : ''
+    	});
+
+        $('#save_action').click(function () {
+            if($('#form_news').valid()) {
+                $('#form_news').ajaxSubmit({
+                    url:'/website/news/add', //提交给哪个执行
+                    type:'POST',
+                    dataType: 'json',
+                    success: function (result) {
+                        if(result.status == 200) {
+                            $( "#message_dialog" ).dialog( "open" );
+                        } else if (result.msg == 505) {
+	                        $('#tips_msg').text('亲，你没有这个操作的权限！');
+	                        $("#tips_dialog").dialog("open");
+	                    } else {
+                            $('#tips_msg').text(result.msg);
+                            $( "#tips_dialog" ).dialog( "open" );
+                        }
+                    }
+                });
+                return false;
+            }
+        });
+        //icon上传
+        var settings = {
+            flash_url : "<?php echo $this->static;?>/js/libs/swfupload/swfupload.swf",
+            upload_url: "/api/upload/index",
+            post_params: {"type" : "news"},
+            file_size_limit : "2 MB",
+            file_types : "*.jpg;*.png;*.gif;*.bmp",
+            file_types_description : "All Files",
+            file_upload_limit : 100,  //配置上传个数
+            file_queue_limit : 1,
+            custom_settings : {
+                progressTarget : "fsUploadProgress_icon",
+                cancelButtonId : "btnCancel_icon",
+                ProgressStatusId:'upload_status_icon'
+            },
+            debug: false,
+            button_window_mode:'Opaque',
+            // Button settings
+            button_image_url: "<?php echo $this->static;?>/images/TestImageNoText_65x29.png",
+            button_width: "65",
+            button_height: "29",
+            button_placeholder_id: "upload_icon",
+            button_text: '<span class="falsh_upload_button">上传</span>',
+            button_text_style: '.falsh_upload_button{color:#FFFFFF;}',
+            button_text_left_padding: 16,
+            button_text_top_padding: 5,
+            button_text_top_margin: 10,
+            file_queued_handler : fileQueued,
+            file_queue_error_handler : fileQueueError,
+            file_dialog_complete_handler : fileDialogComplete,
+            upload_error_handler : uploadError,
+            upload_success_handler : function(file, serverData) {
+                try {
+                    serverData = eval("("+ serverData +")");
+                    var progress_div_id = this.customSettings.progressTarget;
+                    var progress = new FileProgress(file, progress_div_id);
+                    progress.setComplete();
+                    progress.setStatus("上传成功");
+                    progress.toggleCancel(false);
+                    var img = '<img  src="'+ serverData.result.url +'" class="cut_make_up" width="100" height="100">';
+                    var link = '<a target="_blank" href="'+ serverData.result.url +'">'+ img +'</a>';
+                    $('#icon').val(serverData.result.path);
+                    var file_container = '<span class="mr10">'+ link +'</span>';
+                    $("#"+progress_div_id).html(file_container);
+                } catch (ex) {
+                    this.debug(ex);
+                }
+            },
+            upload_complete_handler : uploadComplete,
+            queue_complete_handler : queueComplete
+        };
+        var swfu01 = new SWFUpload(settings);
+
+        var editor;
+        KindEditor.ready(function(K) {
+            editor = K.create('textarea[name="info[\'content\']"]', {
+                allowFileManager : true,
+                afterBlur: function(){this.sync();}
+            });
+        });
+    })
+</script>

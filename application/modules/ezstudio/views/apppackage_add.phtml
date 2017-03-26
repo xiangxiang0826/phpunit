@@ -1,0 +1,226 @@
+<!--页面位置-->
+<link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/jquery.mCustomScrollbar.min.css" />
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.mCustomScrollbar.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.queue.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/fileprogress.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/handlers.js"></script>
+
+<h3 class="location f14"><?php echo $this->menu('添加核心包', '/ezstudio/apppackage/index'); ?></h3>
+	<form class="cmxform"  action="" method="post" id="form_apppackage">
+			<table class="detail_tabel remote_table f14 mt20">
+               <tbody>
+            	<tr>
+                    <th>核心包信息</th>
+                    <th></th>
+                </tr>
+            	<tr class="system_drop">
+                    <td>所属平台：</td>
+                    <td>
+                        <select id="platform" class="cpy_style product_assort mt_12" name ="resource[platform]">
+                          <option value="">选择资源类型</option>
+                          <?php foreach ($this->platform_map as $k=>$v) :?>
+                               <option value="<?php echo $v;?>"><?php echo $v;?></option>
+                          <?php endforeach;?>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>核心包名称：</td>
+                    <td>
+                        <input type="text" class="cpy_name" id="name"  name ="resource[name]" value="" placeholder="例如:android迎春贺岁版">
+                    </td>
+                </tr>
+                <tr>
+                    <td>版本号：</td>
+                    <td>
+                        <input type="text" class="cpy_name" id="version"  name ="resource[version]" value="" placeholder="例如:2.01.09">
+                    </td>
+                </tr>
+                <tr>
+					<td>上传核心包：</td>
+					<td>
+					<span class="fieldset flash" id="fsUploadProgress_package"></span>
+					<span id="upload_status_package"></span>
+					<a  id="upload_package" class="f14 clF tc search_btn brue_btn ml56" onfocus="blur();" href="javascript:void(0)">上传</a>
+					<input id="btnCancel_package" type="button" value="取消上传" disabled="disabled" style="display:none" />
+					<input type="hidden" name="resource[file_path]" id="file_path" value="">
+					<input type="hidden" name="resource[check_sum]" id="check_sum" value="">
+					</td>
+				</tr>
+				<tr>
+                    <td>描述：</td>
+                    <td>
+                        <textarea rows="10" cols="60" class="text_cls wp60" id="description" name="resource[description]"></textarea>
+                    </td>
+                </tr>
+                </tbody>
+                </table>
+            <div class="mt36 mb24 tr">
+                <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+                <a  onfocus="blur();" href="javascript:void(0)" id="sub_btn" class="f16 clF tc search_btn" >提 交</a>
+            </div>
+</form>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice">数据保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)" >确 定</a>
+</div>
+
+<script language="javascript" type="text/javascript">
+    $(function() {
+        var G_validate = false;
+        var img_container = '';
+    	$( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        
+        $("#close_message").on("click",function() {
+        	$( "#message_dialog" ).dialog( "close" );
+            if($('#sys_notice').text() == '数据保存成功！'){
+                location.href = '/ezstudio/apppackage/index/rand/'+Math.ceil(Math.random()*10);
+            }
+            return false;
+        });
+
+       jQuery.validator.addMethod("version", function(value, element) {
+            var ver = /^\d\.\d{2}\.\d{2}$/;
+            return this.optional(element) || (ver.test(value));
+       }, "版本号格式错误，请填写形如：2.01.21这样的格式");
+        
+       $('#form_apppackage').validate({
+    		rules: {
+    			'resource[platform]': {
+    				required: true
+    			},
+    			'resource[name]': {
+    				maxlength:20,
+    				minlength:2,
+    				required: true
+    			},
+    			'resource[version]': {
+    				required: true,
+    				minlength:5,
+    				maxlength:16,
+    				version:true
+    			},
+    			'resource[description]': {
+    				maxlength:100,
+    				minlength:5
+    			},
+    			'resource[file_path]': {
+    				required: true
+    			},
+    		},
+    		messages: {   //自定义提示信息
+    			'resource[file_path]': {
+    				required:"请上传核心包"
+        		},
+        		'resource[platform]': {
+    				required:"请选择所属平台 "
+        		}
+    		},
+    		ignore : '',
+    		errorPlacement: function(error, element) {
+                error.appendTo(element.parents('td'));
+            }
+    	});	
+		// 提交表单
+    	$('#sub_btn').click(function () {
+			if($('#form_apppackage').valid()) {
+				$('#form_apppackage').ajaxSubmit({
+					url:'/ezstudio/apppackage/add', //提交给数据保存接口
+					type:'POST',
+					dataType: 'json',
+					success: function (result) {
+						if(result.status == 200) {
+							G_validate =  true;
+							$('#sys_notice').text('数据保存成功！');
+						} else if(result.status == 500) {
+							G_validate =  false;
+							$('#sys_notice').text('系统繁忙，请稍后再试！');
+						} else if(result.msg == 505) {
+							G_validate =  false;
+							$('#sys_notice').text('亲，你没有这个操作的权限！');
+						} else {
+							G_validate =  false;
+							$('#sys_notice').text(result.msg);
+						}
+						$( "#message_dialog" ).dialog( "open" );
+						return ;
+					}
+				});
+				return false;
+			}
+		});
+		$('#cancel_btn').click(function () {
+			// history.go(-1);
+            location.href = '/ezstudio/ota/list/rand/'+Math.ceil(Math.random()*10);
+		});
+		
+		//核心包上传
+    	var settings = {
+				flash_url : "<?php echo $this->static;?>/js/libs/swfupload/swfupload.swf",
+				upload_url: "/api/upload/index",
+				post_params: {"type" : "app"},
+				file_size_limit : "50 MB",
+				file_types : "*.zip;*.rar;*.gz;*.tar;*.tgz;*.jpg",
+				file_types_description : "All Files",
+				file_upload_limit : 100,  //配置上传个数
+				file_queue_limit : 1,
+				custom_settings : {
+					progressTarget : "fsUploadProgress_package",
+					cancelButtonId : "btnCancel_package",
+					ProgressStatusId:'upload_status_package'
+				},
+				debug: false,
+				button_window_mode:'Opaque',
+				// Button settings
+				button_image_url: "<?php echo $this->static;?>/images/TestImageNoText_65x29.png",
+				button_width: "65",
+				button_height: "29",
+				button_placeholder_id: "upload_package",
+				button_text: '<span class="falsh_upload_button">上传</span>',
+				button_text_style: '.falsh_upload_button{color:#FFFFFF;}',
+				button_text_left_padding: 16,
+				button_text_top_padding: 5,
+				button_text_top_margin: 10,
+				file_queued_handler : fileQueued,
+				file_queue_error_handler : fileQueueError,
+				file_dialog_complete_handler : fileDialogComplete,
+				upload_error_handler : uploadError,
+				upload_success_handler : function(file, serverData) {
+					try {
+						serverData = eval("("+ serverData +")");
+						var progress_div_id = this.customSettings.progressTarget;
+						var progress = new FileProgress(file, progress_div_id);
+						progress.setComplete();
+						progress.setStatus("上传成功");
+						progress.toggleCancel(false);
+						var link = '<a target="_blank" href="'+ serverData.result.url +'">'+ serverData.result.file_name +'</a>';
+						$('#file_path').val(serverData.result.path);
+						$('#check_sum').val(serverData.result.md5);
+						var file_container = '<span class="mr10">'+ link +'</span>';
+						$("#"+progress_div_id).html(file_container);
+					} catch (ex) {
+						this.debug(ex);
+					}
+				},
+				upload_complete_handler : uploadComplete,
+				queue_complete_handler : queueComplete
+		};
+		var swfu01 = new SWFUpload(settings);
+	});
+</script>

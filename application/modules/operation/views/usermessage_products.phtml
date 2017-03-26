@@ -1,0 +1,127 @@
+                   <div class="product_detail_display">
+                        <form id="search_form">
+                            <div class="product_detail_search clearfix">
+                               <div class="fl system_drop clearfix">
+                                   <select id="enterprise_id" class="cpy_style cang_assort product_assort" name="search[enterprise_id]" style="width:120px;">
+                                       <option value="">选择厂商</option>
+                                     <?php foreach ($this->enterprises as $k=>$v) {?>
+                                     <option value="<?php echo $k;?>" <?php if($k == $this->search['enterprise_id']):?>selected="selected" <?php endif;?>>
+                                     <?php echo mb_strimwidth($v,0,20,'...');?></option>
+                                     <?php }?>
+                                   </select>
+                               </div>
+                                <div class="fl system_drop clearfix">
+                                    <select id="produt_assort" class="cpy_style product_assort" name="search[category]" style="width:120px;">
+                                        <option value="">选择品类</option>
+                                     <?php foreach ($this->category as $v) {?>
+                                     <option value="<?php echo $v['id'];?>" <?php if($v['id'] == $this->search['category']):?>selected="selected" <?php endif;?>><?php echo $v['levelstr'] . $v['name'];?></option>
+                                     <?php }?>
+                                    </select>
+                                </div>
+                                <div class="fl">
+                                    <input type="text" class="cpy_name wp50" id="cpy_name" name="search[product_name]" style="width:150px;" value="<?php if(!empty($this->search['product_name'])){ echo $this->search['product_name'];}?>" placeholder="请填写产品名称">
+                                </div>
+                                <input type="hidden" name="selectmodel" value="<?php echo $this->select_model; ?>">
+                                <div class="console_search_wrap fr mr10"><a style="color:#FFFFFF;" class="search_icon_btn f16 clF tc" onFocus="blur();" id="search_submit"  href="javascript:;"><i class="find_icon"></i>查 询</a></div>
+                           </div>
+                           </form>
+                           <div class="product_table mt10 f14">
+                                       <table class="table_s tc" width="100%" border="0">
+                                         <thead>
+                                          <tr>                          
+                                            <td></td>
+                                            <td>产品名称（型号）</td>
+                                            <td>品类</td>
+                                            <td>厂商</td>
+                                          </tr>
+                                         </thead>
+                                         <tbody>
+           <?php if($this->paginator->getTotalItemCount() >0) :?>
+                        <?php foreach ($this->paginator as $v):?>
+                                             
+                        <tr>
+                            <?php if($this->select_model == 'radio'): ?>
+                                <td><input type="radio" name='sel' class="checkbox" value="<?php echo $v['id'];?>"></td>
+                            <?php else: ?>
+                                <td><input type="checkbox"  class="checkbox" value="<?php echo $v['id'];?>"></td>
+                            <?php endif; ?>
+                            
+                            <td title="<?php echo $v['name'];?>"><?php echo $v['name'];?></td>
+                             <td>
+                                 <?php echo $v['c_name'];?>
+                            </td>
+                            <td title="<?php if($v['company_name']) { echo $v['company_name'];} else { echo '遥控e族';};?>">
+                                 <?php if($v['company_name']) { echo mb_strimwidth($v['company_name'], 0, 40,'...');} else { echo '遥控e族';};?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+             <?php else: ?>
+                        <tr><td colspan="5">暂无记录</td></tr>
+             <?php endif;?>
+                                         </tbody>
+                                   </table>
+                          </div>
+                              <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+                 </div>
+                <input type='hidden' value='<?php echo $this->select_model; ?>' name='select_model' id='select_model' />
+        <script>
+        $(document).ready(function(){
+			$("#enterprise_id").dropkick();
+			$("#produt_assort").dropkick();
+        	$('.checkbox').each(function(){
+            	var current = $(this);
+            	if(products_map.containsKey(current.val())) {
+            		$(this).attr('checked', true);
+            	}
+             })
+            $('#checkAll').click(function(){
+                var current = $(this)
+                $('.checkbox').each(function(){
+               	 if(current.is(':checked')) {
+               		 $(this).prop('checked', true);
+               	 } else {
+               		 $(this).prop('checked', false);
+               	 }
+                });
+            })
+            $('.checkbox').click(function(){
+           	     var current = $(this);
+           	     var p_name = current.parent().next().attr('title');
+           	     var val = current.val();
+                 var model = $('#select_model').val();
+                 if(model == 'radio'){
+                    products_map.clear()
+                    if (val && current.is(':checked') == true) {
+                        products_map.put(val, p_name);
+                    }
+                 }else{
+                    if (val && current.is(':checked') == true) {
+                        products_map.put(val, p_name);
+                    } else if(val && current.is(':checked') == false){
+                        products_map.remove(val, p_name);
+                    } 
+                 }
+            });
+            $('#search_submit').click(function(){
+                   var params = $('#search_form').serialize();
+       		       $( "#product_list_div").load('/operation/usermessage/products',params,function(){
+    			 
+    		       })
+             });
+           $('.my-navigation a').click(function(){
+               var href = $(this).attr('href');
+               if(href.substring(href.indexOf('&')).length <= 27)
+                   return false;
+               var url = '/operation/usermessage/products' + href;
+   		       $( "#product_list_div").load(url,function(){
+		       })
+		       return false;
+           });
+           $('.simple-pagination-select-specific-page').unbind('change');
+           $('.simple-pagination-select-specific-page').change(function(){
+        		var href =  $(this).find('option:selected').attr('href');
+        	    var url = '/operation/usermessage/products' + href;
+    		       $( "#product_list_div").load(url);
+        	})
+         })
+        </script>

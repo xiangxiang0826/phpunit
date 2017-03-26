@@ -1,0 +1,70 @@
+<!--页面位置-->
+<h3 class="location f14">
+	<?php echo $this->menu("查看公告",'/enterprise/announce/index'); ?>
+</h3>
+<form action="" id="check_form">
+	<table class="detail_tabel f14 mt20">
+		<tr>
+			<th>公告内容</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td>公告标题：</td>
+			<td><?php echo $this->escape($this->info['title'])?></td>
+		</tr>
+		<tr>
+			<td>内容详情：</td>
+			<td class="notice_content"><?php echo stripcslashes($this->info['content'])?></td>
+		</tr>
+
+		<tr>
+			<th>发送设置</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td>发送对象：</td>
+			<td class="system_drop"><?php 
+                   if(empty($this->info['enterprise_ids'])):
+                       echo '所有厂商';
+                   else:
+                       echo $this->info['enterprise_name'];
+                   endif;
+               ?>
+			</td>
+		</tr>
+
+		<tr>
+			<td>发送时间：</td>
+			<td class="system_drop"><?php echo $this->info['actual_time']?>
+			</td>
+		</tr>
+
+	</table>
+</form>
+<div class="mt36 mb24 tr">
+	<a href="javascript:;" class="f16 clF tc search_btn grey_btn fr"
+		id="cancel_btn">返 回</a>
+</div>
+<div id="message_dialog" style="display: none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;"
+		class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<style>
+.notice_content h1{ font-size:2em; margin:0.67em 0; }
+.notice_content h2{ font-size:1.8em; margin:0.5em 0; }
+.notice_content h3{ font-size:1.5em; margin:0.5em 0; }
+.notice_content h4{ font-size:1.2em; margin:0.5em 0;color:#333; }
+.notice_content h5{ font-size:1.2em; margin:0.5em 0; }
+.notice_content h6{ font-size:1em; margin:0.5em 0; }
+.notice_content ul {list-style-type: disc; padding-left:2em; } 
+.notice_content ol {list-style-type: decimal; padding-left:2em; }
+.notice_content i, em {font-style: italic;}
+</style>
+<script type="text/javascript">
+$(function () {
+	$('#cancel_btn').click(function(){
+	  	window.history.go(-1); 
+	});
+});
+</script>

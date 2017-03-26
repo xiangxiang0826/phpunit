@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title><?php echo $this->translate('site_name'); ?></title>
+<?php echo $this->render('static.phtml');?>
+</head>
+<body>
+<div class="header">
+    <div class="header-content">
+        <?php echo $this->render('header.phtml');?>
+   </div>
+</div>
+<div class="body clearfix">
+<div id="aside-menu" class="aside">
+      <?php echo $this->render('left-menu.phtml');?>
+</div><!-- #EndLibraryItem -->
+<div id="main-body" class="main">
+<div class="content clearfix">
+     <?php echo $this->layout()->content;?>
+</div>
+   </div>
+    </div>
+</body>
+</html>

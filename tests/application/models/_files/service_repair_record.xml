@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<dataset>
+    <EZ_SERVICE_REPAIR_RECORD  id="1" repair_id="100" type="user" name="admin" content="content1" ctime="2010-04-26 12:14:20" mtime="2010-04-26 12:14:20" status="new"/>
+    <EZ_SERVICE_REPAIR_RECORD  id="2" repair_id="100" type="user" name="admin" content="content2" ctime="2010-04-26 12:14:20" mtime="2010-04-26 12:14:20" status="new"/>
+</dataset>

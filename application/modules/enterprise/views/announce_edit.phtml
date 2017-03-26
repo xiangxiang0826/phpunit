@@ -1,0 +1,110 @@
+<script type="text/javascript"	src="<?php echo $this->static;?>/js/libs/kindeditor/kindeditor-min.js"></script>
+<!--页面位置-->
+<?php $menuName = ($this->announceId)?'修改公告':'创建公告'; ?>
+<h3 class="location f14">
+	<?php echo $this->menu($menuName,'/enterprise/announce/index'); ?>
+</h3>
+<h3></h3>
+<form action="" id="announce_form">
+	<table class="detail_tabel f14 mt20">
+		<tr>
+			<th>公告内容</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td>公告标题：</td>
+			<td>
+				<input type="text" class="cpy_name" placeholder="请输入公告标题"	value="<?php if(!empty($this->info['title'])): echo $this->info['title'];endif;?>"	id="title" name="announce[title]" class="required" />
+			</td>
+		</tr>
+		<tr>
+			<td>内容详情：</td>
+			<td style="padding-top: 5px;padding-bottom: 5px;">
+				<textarea name="announce[content]"	id="content" cols="100" rows="20"><?php if(!empty($this->info['content'])): echo $this->info['content'];endif;?></textarea>				
+			</td>
+		</tr>
+
+
+		<tr>
+			<th>发送设置</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td>发送对象：</td>
+			<td class="system_drop"><input type="radio" class="receive_type"
+				id="pass_radio" name="send_type" value="all"
+				<?php if(empty($this->info['enterprise_ids'])):?> checked="checked"
+				<?php endif;?>> 所有厂商 <input type="radio"
+				class="receive_type" value="special" name="send_type"
+				<?php if($this->info['enterprise_ids']):?> checked="checked"
+				<?php endif;?>> 特定厂商</td>
+		</tr>
+		<!-- <tr style="display:none;" id="area_list_tr">
+        <td>地域设定：</td>
+        <td class="system_drop" >
+        </td>
+    </tr> -->
+		<tr style="display: none;" id="products_list_tr">
+			<td>厂商设定：</td>
+			<td class="system_drop">
+				<div id="products_div">
+					<?php if(!empty($this->info['enterprise_name'])) :?>
+					<?php echo $this->info['enterprise_name'];?>
+					<?php endif;?>
+				</div> &nbsp;&nbsp;&nbsp; <a href="javascript:;" style="color: #216ed9"
+				id="select_enterprise">选择厂商</a> <input type="hidden"
+				value="<?php if(!empty($this->info['enterprise_ids'])) { echo $this->info['enterprise_ids'];} ?>"
+				name="announce[enterprise_ids]" id="products_hidden"
+				enterprise_info='<?php if(!empty($this->info['enterprise_str_info'])) { echo $this->info['enterprise_str_info'];}?>' />
+				<?php if($this->announceId): ?> <input type="hidden"
+				name="announce[status]" value="<?php echo $this->info['status']?>" />
+				<?php endif;?>
+			</td>
+		</tr>
+	</table>
+</form>
+
+<div class="mt36 mb24 tr">
+	<a onfocus="blur();" href="javascript:void(0)" id="cancel_btn"
+		class="f16 clF fr ml16 tc search_btn grey_btn">返 回</a> <a
+		onfocus="blur();" href="javascript:void(0)" id="edit_btn"
+		class="f16 clF tc search_btn"><?php echo ($this->announceId)?'提 交':'发 送'; ?></a>
+</div>
+<div id="message_dialog" style="display: none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;"
+		class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<div id="product_list_div" style="display: none;" title="选择厂商"></div>
+<script type="text/javascript"
+	src="<?php echo $this->static;?>/js/hashmap.js"></script>
+<script type="text/javascript"
+	src="<?php echo $this->static;?>/js/json2.js"></script>
+<script type="text/javascript">
+   $(document).ready(function(){	 
+    <?php if(!empty($this->announceId) && !empty($this->enterprise_ids)):?>
+       $('#products_hidden').val('<?php echo $this->info['enterprise_ids'];?>');
+       $('#products_div').text('<?php echo $this->info['enterprise_name'];?>')
+    <?php endif;?>
+   });
+
+   var products_map = new HashMap();
+	 var products_hidden = $('#products_hidden');
+	 if (products_hidden.val()) {
+		 var product_info = products_hidden.attr('enterprise_info');
+		 var products = JSON.parse(product_info); 
+		 for(var m in products) {
+			 products_map.put(m, products[m]);
+		 }
+	 }
+	
+	 if($('.receive_type').is(':checked')) {
+		 var val = $('.receive_type').filter(':checked').val();
+		 if (val == 'special') {
+			 $('#products_list_tr').show();
+		 }
+	 }
+</script>
+
+<script type="text/javascript"
+	src="<?php echo $this->static;?>/js/announce.js"></script>

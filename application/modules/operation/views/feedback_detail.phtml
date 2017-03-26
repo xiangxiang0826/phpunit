@@ -1,0 +1,199 @@
+
+	<!--页面位置-->
+	<h3 class="location f14"><?php echo $this->menu('问题ID（'.$this->info['id'].'）', '/operation/feedback/index'); ?></h3>
+	<form class="cmxform"  action="" method="post" id="form_feedback">
+	<table class="detail_tabel f14 mt20">
+		<tr>
+			<th>问题详情</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td>问题ID：</td>
+			<td id="feedback_id"><?php echo $this->info['id'];?></td>
+		</tr>
+		<tr>
+			<td>内容详情：</td>
+			<td><?php echo $this->escape($this->info['content']);?></td>
+		</tr>
+		<tr>
+			<td>产品：</td>
+			<td><?php echo $this->info['p_name'];?></td>
+		</tr>
+		<tr>
+			<td>激活时间：</td>
+			<td><?php echo $this->info['user_activate_time'];?></td>
+		</tr>
+		<tr>
+			<td>反馈时间：</td>
+			<td><?php echo $this->info['ctime'];?></td>
+		</tr>
+		<tr>
+			<th>问题处理</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td>分类设置：</td>
+			<td class="system_drop"><select class="cpy_style cang_assort" name="search[feedback_type]" id="category_id">
+					<?php foreach ($this->feedbackType as $v) {?>
+					<option value="<?php echo $v['id'];?>"
+					<?php if($v['id'] == $this->info['feedback_type_id']):?>
+						selected="selected" <?php endif;?>>
+						<?php echo $v['levelstr'] . $v['name'];?>
+					</option>
+					<?php }?>
+			</select>
+			</td>
+		</tr>
+		<tr>
+			<td>状态处理：</td>
+			<td class="system_drop">
+					<select class="cpy_style product_assort" name="search[status]" id="status_id">
+					<?php foreach ($this->status as $key=>$name) :?>
+					<option value="<?php echo $key;?>"
+					<?php if(!empty($this->info['status']) && $key == $this->info['status']):?>
+						selected="selected" <?php endif;?>>
+						<?php echo $this->t($name);?>
+					</option>
+					<?php endforeach;?>
+					</select>
+			</td>
+		</tr>
+		<tr height="100">
+			<td>备注：</td>
+			<td><textarea rows="10" cols="50" id="remark" name="remark" class="text_cls wp60 mt10 mb10"><?php echo $this->info['remark'];?></textarea>
+			</td>
+		</tr>
+		<?php if(!empty($this->info['user_info'])) :?>
+		<tr>
+			<th>用户信息</th>
+			<th></th>
+		</tr>
+		<tr>
+			<td>用户名：</td>
+			<td><?php echo $this->info['user_info']['name'];?></td>
+		</tr>
+		<tr>
+			<td>注册时间：</td>
+			<td><?php echo $this->info['user_info']['reg_time']?></td>
+		</tr>
+		<tr>
+			<td>设备绑定：</td>
+			<td><?php
+			if(!empty($this->info['user_info']['devices'])):
+            	echo implode('，', $this->info['user_info']['devices']);
+            endif;
+            ?>
+			</td>
+		</tr>
+		<tr>
+			<td>邮箱：</td>
+			<td><?php echo $this->info['user_info']['email']?></td>
+		</tr>
+		<tr>
+			<td>电话：</td>
+			<td><?php echo $this->info['user_info']['phone']?></td>
+		</tr>
+	</table>
+	<table class="detail_tabel f14 " width="100%" border="0">
+		<thead>
+		  <tr>
+		   <th>反馈记录</th><th colspan="3"></th>
+		   </tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td  class="pl14">问题ID</td>
+				<td  class="pl14">反馈时间</td>
+				<td  class="pl14">反馈产品</td>
+				<td  class="pl14">反馈内容</td>
+			</tr>
+			<?php foreach ($this->info['user_feedback_list'] as $row):?>
+			<tr>
+				<td class="pl14"><?php echo $row['id'];?></td>
+				<td class="pl14"><?php echo $row['ctime'];?></td>
+				<td class="pl14"><?php echo $row['p_name'] ? $row['p_name'] : '-';?></td>
+				<td class="pl14">
+				<a class="nolink" title="<?php echo $this->escape($row['content']);?>"><?php echo $this->escape(mb_strimwidth($row['content'],0,50,'...'));?></a>
+				</td>
+			</tr>
+			<?php endforeach;?>
+		</tbody>
+	</table>
+	<?php else:?>
+	</table>
+	<?php endif;?>
+	</form>
+	<div class="mt36 mb24 tr">
+		<a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+        <a  onfocus="blur();" href="javascript:void(0)" id="save_btn" class="f16 clF tc search_btn" >提 交</a>
+	</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;"
+		class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<script>
+     $(document).ready(function(){
+        	   $( "#message_dialog" ).dialog({
+        	  		  autoOpen: false,
+        	            width: 540,
+        	            height: 240,
+        	            show: {
+        	                effect: "blind",
+        	                duration: 300
+        	            },
+        	            hide: {
+        	                effect: null,
+        	                duration: 500
+        	            },
+        	            dialogClass: "my_message_dialog",
+        	            modal: true
+        	  	}); 
+
+        	   $('#form_feedback').validate({
+	           		rules: {
+	           			'remark': {
+	           				maxlength:100,
+	           				minlength:2
+	           			}
+	           		},
+	           		messages: {   //自定义提示信息
+	           			//old_password: "原密码输入错误",
+	           		},
+	           		ignore : ''
+           		});	
+
+				$('#cancel_btn').click(function(){
+            	   location.href='/operation/feedback/index';
+                });
+               $('#save_btn').click(function(){
+            	   	 if(!$('#form_feedback').valid()) {
+						return false;
+                	 }
+                      var status = $('#status_id').val();
+                      var remark = $('#remark').val();
+                      var category_id = $('#category_id').val();
+                      $.post('/operation/feedback/update/id/'+$('#feedback_id').text() , {'status' :status, 'remark':remark, 'category':category_id},function(result){
+                            if(result.status == 200) {
+                                $('#message_dialog').find('.message_text').text('更新成功！');
+                                $('#close_message').click(function(){
+                                	location.href='/operation/feedback/index';
+                                });
+                            	$( "#message_dialog" ).dialog( "open" );
+                            } else if (result.msg == 505) {
+                                $('#message_dialog .message_text').text('亲，你没有这个操作的权限！');
+                                $('#close_message').click(function(){
+                              	  $( "#message_dialog" ).dialog( "close" ); 
+                                });
+                                $("#message_dialog").dialog("open");
+                            } else {
+                            	  $('#message_dialog').find('.message_text').text('更新失败！');
+                                  $('#close_message').click(function(){
+                                	  $( "#message_dialog" ).dialog( "close" ); 
+                                  });
+                              	$( "#message_dialog" ).dialog( "open" );
+                            }
+                      }, 'json');
+               });
+            });
+        </script>

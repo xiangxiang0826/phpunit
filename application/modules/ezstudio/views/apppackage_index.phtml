@@ -1,0 +1,146 @@
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+<div class="product_detail_search clearfix">
+       <form action="<?php echo $this->url(array('controller'=>'apppackage', 'action'=>'index'))?>" method="get"  id="search_form">
+                           <div class="product_detail_search clearfix">
+                           	   <div class="fl system_drop clearfix ml10">
+                                    <select id="control_type_id" class="cpy_style product_assort" name ="search[platform]" style="width: 120px;">
+                                        <option value="">所有类型</option>
+                                      <?php foreach ($this->platform_map as $k => $v) :?>
+                                     <option value="<?php echo $v;?>" <?php if($v == $this->search['platform']):?>selected="selected" <?php endif;?>><?php echo $v?></option>
+                                     <?php endforeach;?>
+                                    </select>
+                                </div>
+                              <div class="fl system_drop clearfix ml10">
+                                   <input type="text" class="cpy_name w150" id="name"  name ="search[name]" value="<?php echo isset($this->search['name']) ? $this->search['name'] : ''?>" placeholder="请输入包名">
+                               </div>
+                               <div class="console_search_wrap fr mr10"><a class="search_icon_btn f16 clF tc" onFocus="blur();" href="javascript:;" id="search"><i class="find_icon"></i>查 询</a></div>
+                           </div>
+                           </form>
+                           
+</div>
+<div class="product_detail_display">
+									<div class="product_table mt24 f14">
+									<div class="product_detail_search clearfix">
+									<div class="console_search_wrap fr mr10" style="margin-top:8px;"><a class="f16 clF tc search_btn ml16" onFocus="blur();" href="javascript:;" id="add">新增</a></div>
+									</div>
+                                       <table class="table_s tc mt24 tc_left auto_table_len" width="100%" border="0">
+                                         <thead>
+                                          <tr>                          
+                                            <td width="60px">ID</td>
+                                            <td>包名</td>
+                                            <td>描述</td>
+                                            <td>版本</td>
+                                            <td width="100px">所属平台</td>
+                                            <td width="130px">创建时间</td>
+                                            <td style="text-align: center;width: 120px">操作</td>
+                                          </tr>
+                                         </thead>
+                                         <tbody>
+                                         <?php if($this->package_list):?>
+                                         	<?php foreach($this->package_list as $item):?>
+                                         	<tr>
+                                            <td><?php echo $item['id']?></td>
+                                            <td title="<?php echo $this->escape($item['name'])?>">
+                                            <?php echo $this->Cutstring($this->escape($item['name']), 40, '...');?>
+                                            </td>
+                                            <td title="<?php echo $this->escape($item['description']); ?>">
+                                            <?php if($item['description']):?>
+                                            <?php echo $this->Cutstring($this->escape($item['description']), 40, '...');?>
+                                            <?php else: ?>
+                                            -
+                                            <?php endif; ?>
+                                            </td>
+                                            <td title="<?php echo $item['version']; ?>" >
+                                            <?php echo $item['version'];?>
+                                            </td>
+                                            <td title="<?php echo $item['platform']; ?>" >
+                                            <?php echo $item['platform'];?>
+                                            </td>
+                                            <td>
+                                            <?php echo $item['ctime']?>
+                                            </td>
+                                            <td class="cl0b9600" style="text-align: center;"><a href="/ezstudio/apppackage/update/id/<?php echo $item['id']?>">编辑</a> 
+ | <a href="javascript:void(0)" delete_id="<?php echo $item['id']; ?>">删除</a>
+</td>
+                                           </tr>
+                                         	<?php endforeach;?>
+                                         	<?php else:?>
+                                         	<tr><td colspan="7" style="text-align: center;">暂无记录</td></tr>
+                                         <?php endif;?>
+                                         </tbody>
+                                   </table>
+                                </div>
+               <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+          </div>
+</div>
+<div id="delete_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text">您确定删除这个资源吗？</p>
+</div>
+<script language="javascript" type="text/javascript">
+	$(function () {
+		$( "#show_info" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "关闭": function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+        });
+        
+		$('#search').click(function () {
+			$('#search_form').submit();
+		});
+		
+		$('#add').click(function () {
+			location.href = '/ezstudio/apppackage/add';
+		});
+        
+     	var delete_id = null;
+ 		$("#delete_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+                	$.post('/ezstudio/apppackage/delete', {id:delete_id}, function (result) {
+                		var tip_el = $('#delete_dialog').find('.message_text');
+                		if(result.status == 200) {
+                			location.reload(true);
+						} else {
+							$("#delete_dialog").dialog("open");
+	                        return false;
+						}	
+        			},'json');
+                }
+            }
+        });
+		$('a[delete_id]').click(function () {
+			delete_id = $(this).attr('delete_id');
+			$( "#delete_dialog" ).dialog( "open");
+		});
+    }); 
+</script>

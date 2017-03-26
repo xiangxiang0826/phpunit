@@ -1,0 +1,227 @@
+<!--页面位置-->
+  <?php $menuName = ($this->versionId)?"编辑版本信息":"添加新版本"; ?>
+  <h3 class="location f14"><?php echo $this->menu($menuName, '/product/ezapp/index'); ?></h3>
+  <form class="cmxform"  action="<?php echo $_SERVER['REQUEST_URI']?>" method="post" id="form_app">
+  <table class="detail_tabel remote_table f14 mt20">
+      <tr>
+          <th>发布内容</th>
+          <th></th>
+      </tr>
+      <tr>
+          <td>系统平台：</td>
+          <td class="pb14 system_drop">
+              <select id="platform" name="app[platform]"  class="cpy_style cang_assort <?php if(!empty($this->appinfo['platform'])): ?>gd-disable <?php endif; ?>" >
+                  <option value="" >请选择</option>
+                  <option value="<?php echo Model_EnterpriseApp::PLANTFORM_ANDROID;?>"<?php if(!empty($this->appinfo['platform']) && $this->appinfo['platform'] ==Model_EnterpriseApp::PLANTFORM_ANDROID) :?> selected="selected" <?php endif;?>>Android</option>
+                  <option value="<?php echo Model_EnterpriseApp::PLANTFORM_IOS;?>" <?php if(!empty($this->appinfo['platform']) && $this->appinfo['platform'] ==Model_EnterpriseApp::PLANTFORM_IOS) :?> selected="selected" <?php endif;?>>IOS</option>
+              </select>
+          </td>
+      </tr>
+      <tr>
+          <td>APP包：</td>
+          <td id="fsUploadProgress">
+              <span id="file_name">
+              <?php if(!empty($this->appinfo['file_path'])):?>
+              <a href="<?php echo $this->static_domain.$this->appinfo['file_path']?>" target="_blank"><?php echo  pathinfo($this->appinfo['file_path'], PATHINFO_BASENAME);?></a>
+              <?php endif;?>
+             </span>
+              <a  onfocus="blur();" id="upload_img" class="f14 clF tc search_btn brue_btn ml56" >上传</a>
+              <input id="btnCancel" type="button" value="取消上传" disabled="disabled" style="display:none" />
+              <label class="clFF0 ml20">（*.apk;*.ipa）</label>
+              <input type="hidden" name="app[file_path]"  id="file_path"  value="<?php if(!empty($this->appinfo['file_path']) ){ echo  $this->appinfo['file_path'];} ?>"/>
+              <input type="hidden" name="app[check_sum]" id="check_sum" value="<?php echo !empty($this->appinfo['check_sum']) ? $this->appinfo['check_sum'] : '';?>">
+          </td>
+      </tr>
+      <tr>
+          <td>版本号：</td>
+          <td>
+              <input type="text" name="app[version]"  class="cpy_name" value="<?php if(!empty($this->appinfo['version']) ){ echo  $this->appinfo['version'];} ?>" <?php if(!empty($this->appinfo['version'])):?> readonly<?php endif;?>/>
+          </td>
+      </tr>
+      <tr>
+          <td>升级方式：</td>
+          <td class="system_drop">
+              <select id="update_style" name="app[is_force]"  class="cpy_style cang_assort">
+                   <option value="">请选择</option>
+                  <option value="1" <?php if(isset($this->appinfo['is_force']) && $this->appinfo['is_force'] =='1') :?> selected="selected" <?php endif;?>>强制升级</option>
+                  <option value="0" <?php if(isset($this->appinfo['is_force']) && $this->appinfo['is_force'] =='0') :?> selected="selected" <?php endif;?>>提示升级</option>
+              </select>
+          </td>
+      </tr>
+    <tr>
+          <td>发布方式：</td>
+          <td class="system_drop">
+              <select id="update_type" name="app[device_type]"  class="cpy_style cang_assort">
+                   <option value="formal" <?php if(!empty($this->appinfo['device_type']) && $this->appinfo['device_type'] =='formal') :?> selected="selected" <?php endif;?>>正式发布</option>
+                  <option value="test" <?php if(!empty($this->appinfo['device_type']) && $this->appinfo['device_type'] =='test') :?> selected="selected" <?php endif;?>>测试发布</option>
+              </select>
+          </td>
+      </tr>
+   <tr>
+          <td>状态：</td>
+          <td class="system_drop">
+              <select id="app_status" name="app[status]"  class="cpy_style cang_assort">
+                   <option value="enable" <?php if(!empty($this->appinfo['status']) && $this->appinfo['status'] =='enable') :?> selected="selected" <?php endif;?>>启用</option>
+                  <option value="disable" <?php if(!empty($this->appinfo['status']) && $this->appinfo['status'] =='disable') :?> selected="selected" <?php endif;?>>停用</option>
+              </select>
+          </td>
+      </tr>
+      <tr class="h170">
+          <td>更新说明：</td>
+          <td>
+              <textarea class="text_cls wp60" name="app[description]" cols="40" rows="6"><?php if(!empty($this->appinfo['description']) ){ echo  $this->appinfo['description'];} ?></textarea>
+          </td>
+      </tr>   
+  </table>
+  <div class="mt36 mb24 tr">
+      <a  onfocus="blur();" href="javascript:void(0)" id="cancle_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+      <a  onfocus="blur();" href="javascript:void(0)" id="submit_btn" class="f16 clF tc search_btn" >提 交</a>
+   </div>
+  </form>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice">数据保存成功！</p>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.queue.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/fileprogress.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/handlers.js"></script>
+<script>
+ var success = false;
+$.validator.setDefaults({
+    submitHandler: function(form) {
+    	$(form).ajaxSubmit({
+			type:'POST',
+			dataType: 'json',
+			success: function (result) {
+				if(result.status == 200) {
+					success = true;
+					$('#sys_notice').text('数据保存成功！');
+				} else if(result.status == 500) {
+					$('#sys_notice').text('系统繁忙，请稍后再试！');
+				} else if(result.msg == 505) {
+					$('#sys_notice').text('亲，你没有这个操作的权限！');
+				}
+				else {
+					$('#sys_notice').text(result.msg);
+				}
+				$( "#message_dialog" ).dialog( "open" );
+				return ;
+			}
+		});    
+    }
+ });
+var app_from = $('#form_app').validate({
+		rules: {
+			'app[platform]': {
+				required: true
+			},
+			'app[description]': {
+				maxlength:1000
+			},
+			'app[is_force]': {
+				required:true
+			},
+			'app[version]': {
+				required:true,
+				maxlength:32
+			},
+			'app[file_path]': {
+				required:true
+			}
+		},
+		ignore : ''
+});	
+    $(function(){
+    	$(".cang_assort").dropkick();
+        $('#cancle_btn').click(function(){
+            window.history.go(-1);
+        });
+      	$('#submit_btn').click(function(){
+          	//表单验证
+          	var res = app_from.form();
+      		if($('#form_app').valid()) {
+      			$('#form_app').submit();
+      		} else {
+          		return false;
+      		}
+        });
+      	 $( "#message_dialog" ).dialog({
+             autoOpen: false,
+             width: 540,
+             height: 240,
+             show: {
+                 effect: "blind",
+                 duration: 300
+             },
+             hide: {
+                 effect: null,
+                 duration: 500
+             },
+             dialogClass: "my_message_dialog",
+             modal: true,
+             buttons: {
+                 "确定": function() {
+                 	$( this ).dialog( "close" );
+                 	if(success) {
+                 		location.href = "/product/ezapp/index?search[platform]=" + $('#platform').val();
+                 	}
+                 }
+             }
+         });
+     	var settings = {
+				flash_url : "<?php echo $this->static;?>/js/libs/swfupload/swfupload.swf",
+				upload_url: "/api/upload/index",
+				post_params: {"type" : "app",'task':1},
+				file_size_limit : "50 MB",
+				file_types : "*.apk;*.ipa",
+				file_types_description : "All Files",
+				file_upload_limit : 50,  //配置上传个数
+				file_queue_limit : 0,
+				custom_settings : {
+					progressTarget : "fsUploadProgress",
+					cancelButtonId : "btnCancel",
+					ProgressStatusId:'img_upload_status'
+				},
+				debug: false,
+				button_window_mode:'Opaque',
+				// Button settings
+				button_image_url: "<?php echo $this->static;?>/images/TestImageNoText_65x29.png",
+				button_width: "65",
+				button_height: "29",
+				button_placeholder_id: "upload_img",
+				button_text: '<span class="falsh_upload_button">上传</span>',
+				button_text_style: '.falsh_upload_button{color:#FFFFFF;}',
+				button_text_left_padding: 16,
+				button_text_top_padding: 5,
+				button_text_top_margin: 10,
+				file_queued_handler : fileQueued,
+				file_queue_error_handler : fileQueueError,
+				file_dialog_complete_handler : fileDialogComplete,
+				upload_error_handler : uploadError,
+				upload_success_handler : function(file, serverData) {
+					try {
+						serverData = eval("("+ serverData +")");
+						var progress_div_id = this.customSettings.progressTarget;
+						var progress = new FileProgress(file, progress_div_id);
+						progress.setComplete();
+						progress.setStatus("上传成功");
+						progress.toggleCancel(false);
+						var pathInput = $('#'+progress_div_id).find('#file_path');
+						$('#file_name').html("<a href=\""+ serverData.result.url +"\" target=\"_blank\">"+serverData.result.file_name+"</a>");
+						pathInput.val(serverData.result.path);
+						$('#check_sum').val(serverData.result.md5);
+					} catch (ex) {
+						this.debug(ex);
+					}
+				},
+				upload_complete_handler : uploadComplete,
+				queue_complete_handler : queueComplete
+		};
+		var swfu = new SWFUpload(settings);
+		$(".gd-disable").click(function(){
+			  return false
+			  
+			})
+    })
+</script>

@@ -1,0 +1,141 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('厂商推送','/operation/account/index'); ?></h3>
+<form action="" method="get"  id="search_form">
+<div class="product_detail_search clearfix mt22 search_div">
+	 <div class="fl system_drop clearfix">
+		<select class="cpy_style product_assort" name="search[status]" style="width: 120px;">
+			<option value="">所有消息状态</option>
+		 <?php foreach ($this->status as $key=>$name) {?>
+		 <option value="<?php echo $key;?>" <?php if(!empty($this->search['status']) && $key == $this->search['status']):?>selected="selected" <?php endif;?>><?php echo $this->t($name);?></option>
+		 <?php }?>
+		</select>
+	</div>
+	<div class="fl clearfix">
+		<input type="text" class="cpy_name  w150" id="cpy_name" name="search[title]" value="<?php if(!empty($this->search['title'])){ echo $this->search['title'];}?>"  placeholder="请输入消息标题">
+	</div>
+	<div class="console_search_wrap fr"><a class="search_icon_btn f16 clF tc ml10" onFocus="blur();" id="search_submit"  href="javascript:;"><i class="find_icon"></i>查 询</a></div>
+</div>
+</form>
+<div class="product_detail_display">
+	 <div class="product_detail_display_tab_wrap clearfix">
+			<div class="fl product_detail_display_tab" id="change_tab">
+            <span class="last" id="official">官方推送</span><span class="on" id="enterprise">厂商推送</span>
+			</div>
+	 </div>
+	 <div class="product_table mt24 f14">
+		   <table class="table_s tc tc_left" width="100%" border="0">
+			 <thead>
+			  <tr>                          
+				<td width="80px">消息ID</td>
+				<td >消息标题</td>
+				<td>发送厂商</td>
+                <td width="80px">发送时间</td>
+				<td width="80px">发送状态</td>
+				<td width="80px" style="text-align:right;">发送量</td>
+				<td width="80px" style="text-align:right;">点击数</td>
+				<td width="80px" style="text-align:center;">操作</td>
+			  </tr>
+			 </thead>
+			 <tbody>
+<?php if($this->paginator->getTotalItemCount() >0) :?>
+<?php foreach ($this->paginator as $v):?>
+<tr>
+<td  ><?php echo $v['id'];?></td>
+<td title = "<?php echo $v['title'];?>">    
+	<?php echo mb_strimwidth($this->escape($v['title']), 0, 80,'...');?>
+</td>
+<td>
+	 <?php if($v['company_name']) { echo $v['company_name'];} else { echo '遥控e族';};?>
+</td>
+<td>
+    <?php if($v['status'] == Model_PushMessage::STATUS_PUBLISHED): ?>
+        <?php echo ($v['start_time'] && $v['start_time'] != '0000-00-00 00:00:00') ? $v['start_time'] : $v['ctime']; ?>
+    <?php else: ?>
+        -
+    <?php endif; ?>
+</td>
+<?php if($v['status'] == Model_PushMessage::STATUS_PUBLISHED): ?>
+    <?php if(isset($this->publishedInfo[$v['message_id']])):?>
+        <?php if($this->publishedInfo[$v['message_id']]['status'] == Model_PushMessage::STATUS_PUSH_COMPLETE): ?>
+        <td><?php echo $this->publishedStatus[$this->publishedInfo[$v['message_id']]['status']]; ?></td>
+        <?php else: ?>
+            <?php if($this->publishedInfo[$v['message_id']]['status'] == Model_PushMessage::STATUS_PUSH_ANALYSIS_FAILED): ?>
+                <td  style="color:#c8c8c8;"><?php echo $this->publishedStatus[$this->publishedInfo[$v['message_id']]['status']]; ?></td>
+            <?php else: ?>
+                <td style="color:green;"><?php echo $this->publishedStatus[$this->publishedInfo[$v['message_id']]['status']]; ?></td>
+            <?php endif; ?>
+        <?php endif; ?>
+    <?php else: ?>
+        <td style="color:green;">分析中</td>
+    <?php endif; ?>
+<?php else: ?>
+    <?php if($v['status'] == Model_PushMessage::STATUS_PUBLISH_FAILED || $v['status'] == Model_PushMessage::STATUS_AUDIT_FAILED || $v['status'] == Model_PushMessage::STATUS_AUDIT_SUCCESS): ?>
+    <td style="color:#c8c8c8;" ><?php if(isset($this->listStatus[$v['status']])) { echo $this->listStatus[$v['status']];} ?></td>
+    <?php elseif($v['status'] == Model_PushMessage::STATUS_PENDING): ?>
+    <td  style="color:red;" ><?php if(isset($this->listStatus[$v['status']])) { echo $this->listStatus[$v['status']];} ?></td> 
+    <?php else: ?>
+    <td ><?php if(isset($this->listStatus[$v['status']])) { echo $this->listStatus[$v['status']];} ?></td> 
+    <?php endif; ?>
+<?php endif; ?>
+<?php if($v['status'] == Model_PushMessage::STATUS_PUBLISHED): ?>
+    <td  style="text-align:right;">
+        <?php if(isset($this->publishedInfo[$v['message_id']])):?>
+            <?php echo $this->publishedInfo[$v['message_id']]['send_num']; ?>
+        <?php else: ?>
+            -
+        <?php endif; ?>
+    </td>
+    <td  style="text-align:right;">
+        <?php if(isset($this->publishedInfo[$v['message_id']])):?>
+            <?php echo $this->publishedInfo[$v['message_id']]['read_num']; ?>
+            <?php if($this->publishedInfo[$v['message_id']]['send_num']):?>
+                (<?php  echo round($this->publishedInfo[$v['message_id']]['read_num']/$this->publishedInfo[$v['message_id']]['send_num'], '2') * 100;?>%)
+            <?php else: ?>
+                (0%)
+            <?php endif; ?>
+        <?php else: ?>
+            -
+        <?php endif; ?>
+    </td>
+<?php else: ?>
+    <td style="text-align:right;">-</td>
+    <td style="text-align:right;">-</td>
+<?php endif; ?>
+<td class="cl0b9600" style="text-align:center;">
+    <?php if($v['status'] == Model_PushMessage::STATUS_PENDING):?>
+    <a href="<?php echo $this->url(array('action' => 'check' , 'id' => $v['id']));?>" class="check_detail cl0b9600">审核</a>
+    <?php endif;?>
+    
+    <?php if($v['status'] == Model_PushMessage::STATUS_AUDIT_FAILED || $v['status'] == Model_PushMessage::STATUS_PUBLISH_FAILED):?>
+    <a href="<?php echo $this->url(array('action' => 'view' , 'id' => $v['id']));?>" class="check_detail cl0b9600">查看</a>
+    <?php endif;?>
+    
+    <?php if($v['status'] == Model_PushMessage::STATUS_AUDIT_SUCCESS):?>
+    <a href="javascript:;" id="push_id_<?php echo $v['id'];?>" class="push_msg cl0b9600">重新推送</a>
+    <?php endif;?>
+
+    <?php if($v['status'] == Model_PushMessage::STATUS_PUBLISHED):?>
+            <?php if(isset($this->publishedInfo[$v['message_id']]) && $this->publishedInfo[$v['message_id']]['status'] == Model_PushMessage::STATUS_PUSH_ANALYSIS_FAILED): ?>
+                <a href="<?php echo $this->url(array('action' => 'view' , 'id' => $v['id']));?>" class="check_detail cl0b9600">查看</a>
+            <?php else: ?>
+                <a href="<?php echo $this->url(array('action' => 'view' , 'id' => $v['id']));?>" class="check_detail cl0b9600">查看</a>
+            <?php endif; ?>
+    <?php endif;?>
+</td>
+</tr>
+<?php endforeach; ?>
+<?php else: ?>
+<tr><td colspan="8" style="text-align:center;">暂无记录</td></tr>
+<?php endif;?>
+			 </tbody>
+	   </table>
+</div>
+</div>
+<?php echo $this->paginationControl($this->paginator, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text">您确认删除此条记录吗？</p>
+</div>
+<input type="hidden" value="account" id="controller_name" />
+<input type="hidden" value="enterprise" id="action_name" />
+<script type="text/javascript" src="<?php echo $this->static;?>/js/message_center.js"></script>

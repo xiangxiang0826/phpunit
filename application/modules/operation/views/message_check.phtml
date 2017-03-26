@@ -1,0 +1,99 @@
+
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('审核消息','/operation/message/index'); ?></h3>
+<form action="" id="check_form">
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th>消息内容</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>标题：</td>
+        <td id="feedback_id"><?php echo $this->info['title'];?></td>
+    </tr>
+    <tr>
+         <td>消息类型：</td>
+         <td>
+           <?php
+               if($this->info['type'] == 1) {
+                    echo '服务信息';
+               } elseif ($this->info['type'] == 2) {
+                    echo '系统消息';
+               }
+            ?>
+         </td>
+    </tr>
+    <tr>
+        <td>内容详情：</td>
+        <td><?php echo $this->escape($this->info['content']);?></td>
+    </tr>
+    <tr>
+        <th>添加链接</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>链接地址：</td>
+        <td class="system_drop">
+              <?php echo $this->info['url'];?>
+        </td>
+    </tr>
+    <tr>
+        <th>发送设置</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>发送对象：</td>
+        <td class="system_drop">
+              <?php 
+                   if($this->info['receive_type'] == 'special') {
+                       echo '特定用户';
+                   } elseif($this->info['receive_type'] == 'all'){
+                       echo '所有用户';
+                   }
+               ?>
+        </td>
+    </tr>
+    <tr>
+        <td>产品设定：</td>
+        <td class="system_drop">
+             <?php if(!empty($this->info['product_name'])) :?>
+              <?php echo implode('，', $this->info['product_name']);?>
+              <?php endif;?>
+        </td>
+    </tr>
+    <tr>
+        <td>计划发送时间：</td>
+        <td class="system_drop" id="send_time">
+              <?php echo $this->info['send_time'];?>
+        </td>
+    </tr>
+    <tr>
+        <th>审核结论</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>审核结论：</td>
+        <td class="system_drop">
+              <input type="radio"  id="pass_radio"  name="opinion[pass]" value="1"  <?php if(Model_Message::STATUS_CHECK_SUCC == $this->info['status']):?> checked="checked"  <?php endif;?>> 通过
+              <input type="radio" name="opinion[pass]" value="0"  <?php if(Model_Message::STATUS_CHECK_FAILED == $this->info['status']):?> checked="checked"  <?php endif;?>> 不通过
+        </td>
+    </tr>
+    <tr>
+        <td>审核意见：</td>
+        <td class="system_drop">
+             <textarea rows="10" cols="50" id="remark" name="opinion[comments]" class="mt10 mb10 text_cls ml20"><?php echo $this->info['comments'];?></textarea>
+        </td>
+        <input type="hidden"  id="message_id"  value="<?php echo $this->info['id'];?>"/>
+    </tr>
+ </table>
+</form>
+<div class="mt36 mb24 tr">
+    <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+    <a  onfocus="blur();" href="javascript:void(0)" id="save_btn" class="f16 clF tc search_btn" >提 交</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;" class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/message.js"></script>

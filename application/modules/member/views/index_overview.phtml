@@ -1,0 +1,202 @@
+<script src="<?php echo $this->static;?>/js//libs/highcharts/highcharts.js"></script>
+<script src="<?php echo $this->static;?>/js/libs/highcharts/hightheme.js"></script>
+<!--页面位置-->
+            <h3 class="location f14"><?php echo $this->menu(); ?></h3>
+            <div class="product_detail mt22">
+            	<form action="/member/index/overview" id="search_form">
+				<div class="product_detail_search clearfix">
+                    <div class="chart_index fl f14">
+                        <span period="current_month" <?php if($this->period == 'current_month'):?>class="on"<?php endif;?>>本月</span>
+                        <span period="last_month" <?php if($this->period == 'last_month'):?>class="on"<?php endif;?>>上月</span>
+                        <span period="seven_days" <?php if($this->period == 'seven_days'):?>class="on"<?php endif;?>>近7天</span>
+                        <span class="last <?php if($this->period == 'thirty_days'):?>on<?php endif;?>" period="thirty_days">近30天</span>
+                    </div>
+                    <div class="chart_search f14 fr mr50">
+                        <input type="text" name="start_date" class="time_pick" id="timer_from" readonly="readonly" value="<?php echo isset($this->start_date) ? $this->start_date : ''?>"/> 
+                         <label> - </label> 
+                        <input type="text" name="end_date" class="time_pick" id="timer_to"  readonly="readonly" value="<?php echo isset($this->end_date) ? $this->end_date : ''?>"/>
+                        <a type="submit" onFocus="blur();" id="search" class="f16 clF tc ml10 search_icon_btn" href="javascript:void(0)"><i class="find_icon"></i>查 询</a>
+                    </div>
+                </div></form>
+				<div class="product_table mt24 f14">
+					<div class="product_detail_search clearfix">
+					<div class="chart_index fl f14 ml10">
+                        <span chart_line="total" class="on">总计</span>
+                        <span chart_line="ez">遥控e族</span>
+                        <span chart_line="enterprise">企业e族</span>
+                    </div>
+                    </div>
+					<div id="high_charts" class="vertical_nav"></div>
+					<table class="tc mt10 tc_left" width="100%" border="0">
+                        <thead>
+                            <tr>
+                                <td width="100px">日期</td>
+                                <td style="text-align: right">新增总计</td>
+                                <td style="text-align: right">来自遥控e族</td>
+                                <td style="text-align: right">来自企业e族</td>
+                                <td style="text-align: right">累计会员数</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                                <tr class="fstrong">
+                                <td>时段数据和</td>
+                                <td style="text-align: right"><?php echo array_sum(array_values($this->statistics_total))?></td>
+                                <td style="text-align: right"><?php echo array_sum(array_values($this->statistics_ez))?></td>
+                                <td style="text-align: right"><?php echo array_sum(array_values($this->statistics_et))?></td>
+                                <td style="text-align: right"><?php echo current($this->statistics_sum);?></td>
+                               </tr> 
+                            	<?php foreach($this->statistics_total as $date=>$data):?>
+                            <tr>
+                                <td><?php echo $date?></td>
+                                <td style="text-align: right"><?php echo $data?></td>
+                                <td style="text-align: right"><?php echo $this->statistics_ez[$date]?></td>
+                                <td style="text-align: right"><?php echo $this->statistics_et[$date]?></td>
+                                <td style="text-align: right"><?php echo $this->statistics_sum[$date]?></td>
+                            </tr>
+                            	<?php endforeach;?>
+                        </tbody>
+                    </table>
+                    <div class="mt10"></div>
+                </div>
+</div>
+<div id="tips_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text" id="tips_msg"></p>
+</div>
+<script>
+    $(function(){
+    	$( "#tips_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "确定": function() {
+                	$( this ).dialog( "close" );
+        		}
+            }
+        });
+        //datepicker
+        (function(){
+            var config={
+                changeMonth: true,
+                changeYear: true,
+                rangeSelect: true,
+                yearRange: '-10:+10',
+                currentText: "Now"
+            }
+            $("#timer_from").datepicker(config);
+            $("#timer_to").datepicker(config);
+        })();
+
+        Highcharts.setOptions({
+            chart: {
+                backgroundColor: {
+                    linearGradient: [0, 0, 500, 500],
+                    stops: [
+                        [0, 'rgb(255, 255, 255)'],
+                        [1, 'rgb(255, 255, 255)']
+                        ]
+                },
+                borderWidth: 1,
+                borderColor:'#adadad',
+                plotBackgroundColor: 'rgba(255, 255, 255, .9)',
+                plotShadow: false,
+                plotBorderWidth: 1,
+            }
+        });
+        var charts = new Highcharts.Chart({
+        	chart: {
+                renderTo: 'high_charts'
+            },
+            title: {
+                text: '会员统计',
+                x: -20 //center
+            },
+            subtitle: {
+                x: -20
+            },
+            xAxis: {
+                categories: <?php echo preg_replace('/2014\-/', '', $this->charts_date);?>,
+                tickInterval: <?php echo $this->date_step?>
+            },
+            yAxis: {
+                title: {
+                    text: '数量',
+                    rotation: 0,// 0表示水平 
+                    margin: 20,                    
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }],
+                minorGridLineWidth: 0,
+            },
+            tooltip: {
+                valueSuffix: '个'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+            },
+            series: [                     
+                 {name: '总计',data: <?php echo $this->statistics_total_json?>},
+                 {name: '遥控e族',data: <?php echo $this->statistics_ez_json?>},
+                 {name: '企业e族',data: <?php echo $this->statistics_et_json?>},                 
+                ]
+        });
+        charts.series[1].hide();
+        charts.series[2].hide();
+        $('span[chart_line]').click(function () {
+			var line_map = {
+				'total':0,
+				'ez':1,
+				'enterprise':2
+			}
+			charts.setTitle({text:charts.series[line_map[$(this).attr('chart_line')]].name});
+			$('span[chart_line]').attr('class','');
+			$(this).attr('class','on');
+			for(var item in line_map) {
+				//console.log(line_map[item]);
+				charts.series[line_map[item]].hide();
+			}
+			charts.series[line_map[$(this).attr('chart_line')]].show();
+		});
+
+        $('span[period]').click(function () {
+			var period = $(this).attr('period');
+			location.href = '/member/index/overview<?php echo $this->base_url?>&period='+period;
+		});
+        $('#search').click(function () {
+        	var start_date = new Date($('#timer_from').val());
+        	var end_date = new Date($('#timer_to').val());
+        	var today = new Date();
+        	if(end_date > today || start_date > today) { // 开始时间不能大于结束时间
+				$('#tips_msg').text('选定时间不能超过今天！');
+    			$( "#tips_dialog" ).dialog( "open" );
+				return false;
+			}
+        	if(start_date > end_date) { // 开始时间不能大于结束时间
+				$('#tips_msg').text('开始时间不能大于结束时间！');
+    			$( "#tips_dialog" ).dialog( "open" );
+				return false;
+			}
+        	var diff_days = countTimeLength('d',$('#timer_from').val(),$('#timer_to').val());
+        	if(diff_days > 60) {
+        		$('#tips_msg').text('抱歉，时间跨度不能超过60天！');
+    			$( "#tips_dialog" ).dialog( "open" );
+				return false;
+            }
+            $('#search_form').submit();
+        });
+   })
+</script>

@@ -1,0 +1,171 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('待发布列表', '/product/index/list'); ?></h3>
+<form action="" method="get"  id="search_form">
+<div class="product_detail mt22">
+      <div class="product_detail_search clearfix">
+                           		<div class="fl system_drop clearfix ml10">
+                                   <select id="cang_assort" class="cpy_style cang_assort" name="search[enterprise_id]" style="width: 120px">
+                                       <option value="">选择厂商</option>
+                                     <?php foreach ($this->enterprises as $k=>$v) :?>
+                                     <option value="<?php echo $k;?>" <?php if($k == $this->search['enterprise_id']):?>selected="selected" <?php endif;?>><?php echo mb_strimwidth($v,0,20,'...');?></option>
+                                     <?php endforeach;?>
+                                   </select>
+                               </div>
+                           		<div class="fl system_drop clearfix ml10">
+                                    <select id="produt_assort" class="cpy_style product_assort" name="search[category]" style="width: 120px">
+                                        <option value="">选择品类</option>
+                                     <?php foreach ($this->category as $v) {?>
+                                     <option value="<?php echo $v['id'];?>" <?php if($v['id'] == $this->search['category']):?>selected="selected" <?php endif;?>><?php echo $v['levelstr'] . $v['name'];?></option>
+                                     <?php }?>
+                                    </select>
+                                </div>
+                           		<div class="fl system_drop clearfix ml10">
+                                    <select id="produt_check_type" class="cpy_style product_assort" name="search[check_type]" style="width: 120px">
+                                        <option value="all">所有状态</option>
+                                     <option value="new" <?php if('new' == $this->search['check_type']):?>selected="selected" <?php endif;?>>新建</option>
+                                     <option value="modify" <?php if('modify' == $this->search['check_type']):?>selected="selected" <?php endif;?>>修改</option>
+                                    </select>
+                                </div>
+                               <div class="fl ml10">
+                                    <input type="text" class="cpy_name wp50" id="cpy_name" name="search[product_name]" value="<?php if(!empty($this->search['product_name'])){ echo $this->search['product_name'];}?>" placeholder="请输入产品名称">
+                                </div>
+                             <div class="console_search_wrap fr mr10"><a class="search_icon_btn f16 clF tc" onFocus="blur();" id="search_submit"  href="javascript:;"><i class="find_icon"></i>查 询</a></div>
+                           </div>
+                           </div>
+      </form>
+      <div class="product_detail_display">
+            <div class="product_detail_display_tab_wrap clearfix">
+                   <div class="fl product_detail_display_tab" id="change_tab">
+                   <span class="last" id="publish">已发布</span>
+                   <span class="on" id="pending">待审核</span>
+                   </div>
+            </div>
+            <div class="product_table mt24 f14">
+                  <table class="table_s tc tc_left auto_table_len" width="100%" border="0">
+                    <thead>
+                     <tr>                          
+                       <td width="50px">产品ID</td>
+                       <td>产品名称（型号）</td>
+                       <td>品类</td>
+                       <td>厂商</td>
+                       <td width="130px">提交审核时间</td>
+                       <td>审核类型</td>
+                       <td>更新备注</td>
+                       <td>审核状态</td>
+                       <td style="text-align: center;">操作</td>
+                     </tr>
+                    </thead>
+                    <tbody>
+                   <?php if(!empty($this->results['rows'])) :?>
+                    <?php foreach ($this->results['rows'] as $row) {?>
+                     <tr id="tr_<?php echo $row['id']?>">
+                       <td><?php echo $row['id'];?></td>
+                       <td><?php echo $row['name'];?></td>
+                       <td><?php echo $row['c_name'];?></td>
+                       <td><?php echo $row['e_name'];?></td>
+                       <td>
+                           <?php echo $row['submit_time'];?>
+                       </td>
+                       <td>
+                           <?php
+                                // 通过这个时间的判断存在与否可以断言，是否在ez_product中是否存在
+                                if($row['p_time']) {
+                                     echo $this->t('product_is_post_true');
+                                } else {
+                                     echo $this->t('product_is_post_false');
+                                }
+                           ?>
+                       </td>
+                       <td title = "<?php echo $row['publish_description']?>"><?php echo mb_strimwidth($row['publish_description'],0,20,'...');?></td>
+                       <td style="color:<?php if($row['status'] == Model_MakeProduct::STATUS_PENDING) { echo 'red';} elseif($row['status'] == Model_MakeProduct::STATUS_AUDIT_FAILED) { echo '#ccc';}?>;"><?php echo $this->t($row['status']);?></td>
+                       <td class="cl0b9600 product_ctrl" style="text-align: center;">
+                            <?php if($row['status'] == Model_MakeProduct::STATUS_PENDING) {?>
+                             <a href="javascript:;"  id="check_<?php echo $row['id'];?>_<?php echo $row['id'];?>" class="check_detail cl0b9600"><?php echo $this->t('check');?></a>
+                             <?php } else {?>
+                              <a href="javascript:;"  id="alerView_<?php echo $row['id'];?>" class="check_detail cl0b9600"><?php echo $this->t('view');?></a>
+                               <?php }?>
+                              <?php if($row['status'] == Model_MakeProduct::STATUS_PUBLISH_FAILED) :?>
+                              &nbsp;<a href="javascript:;"  id="republish_<?php echo $row['id'];?>" class="check_detail cl0b9600">重新发布</a>
+                              <?php endif;?>
+                       </td>
+                     </tr>
+                     <?php }?>
+<?php else:?>
+    <tr><td colspan="9" style="text-align: center;">暂无记录</td></tr>
+<?php endif;?>
+                    </tbody>
+              </table>
+           </div>
+         <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+  </div>
+<div id="check_div" style="display:none;" title="产品审核">
+  <form class="cmxform" method="post" id="check_form">
+    <table class="detail_tabel form_table f14">
+        <tr>
+            <td style="width:25%">产品名称(型号):</td>
+            <td id="product_name"></td>
+        </tr>  
+        <tr>
+            <td>厂商:</td>
+            <td id="product_enterprise"></td>
+        </tr> 
+        <tr>
+            <td>审核类型:</td>
+            <td id="product_check_type"></td>
+        </tr>
+       <tr class="h60">
+            <td>审核结论:</td>
+            <td>
+                 <input  type="radio" name="pass"  value="1" checked="checked"/><label >通过</label>
+                <input  type="radio" name="pass" class="ml20" value="0"/><label>不通过</label>
+            </td>
+        </tr>
+        <tr class="h60">
+            <td>是否在e族APP发布:</td>
+            <td>
+                 <input  type="radio" name="is_ez_app" value="1"/><label >是</label>
+                <input  type="radio" name="is_ez_app" class="ml20" value="0"/><label>否</label>         
+            </td>
+        </tr>
+        <tr class="h170">
+            <td>审核意见:</td>
+            <td><textarea class="text_cls" name="remark" cols="40" rows="6" id="remark"></textarea></td>
+        </tr>
+         <tr>
+            <td>结果通知：</td>
+            <td>
+                <input  type="checkbox" name="message[]"  value="msg" checked="checked"/><label for="message">短信</label>
+                <input  type="checkbox" name="message[]" class="ml56"  value="email" checked="checked"/><label for="e-mail">邮箱</label>
+            </td>
+        </tr>
+        <div class="error" style="text-align: center; color:red;display: none;"></div>
+        <input type="hidden" name="product_id" id="product_id">
+    </table>
+  </form>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;" class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<div id="view_check_div" style="display:none;" title="查看审核意见">
+    <table class="detail_tabel form_table f14">
+        <tr>
+            <td style="width:25%">审核结果:</td>
+            <td id="product_pass"></td>
+        </tr>  
+         <tr style="display: none;">
+            <td style="width:25%">发布范围:</td>
+            <td id="product_cover"></td>
+        </tr>
+        <tr>
+            <td>审核意见:</td>
+            <td id="product_opinion"></td>
+        </tr> 
+    </table>
+ </div>
+<div id="operate_dialog" style="display:none;"  title="系统提醒">
+    <p class="operate_text">操作成功</p>
+    <a id="close_operate"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">确 定</a>
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/product.js"></script>

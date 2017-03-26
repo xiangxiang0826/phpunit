@@ -1,0 +1,41 @@
+<!--页面位置-->
+ <h3 class="location f14"><?php echo $this->menu('查看版本信息', '/product/ezapp/index'); ?></h3>
+ <table class="detail_tabel read_table f14 mt20">
+     <tr class="h56">
+         <th>APP详情
+            <a  target="_blank" href="<?php if(!empty($this->appinfo['file_path'])){ echo $this->uploadServer['baseUrl'] . $this->appinfo['file_path'];}?>"  class="f16 clF tc search_btn grey_btn  fr" >下载</a>
+         </th>
+     </tr>
+     <tr class="h150">
+         <td>
+             <ul class="app_desc">
+                 <li>App名称：<?php echo $this->escape($this->appinfo['name']);?></li>
+                 <li>系统平台：<?php echo $this->appinfo['platform'];?></li>
+                 <li>最新版本：<b><?php echo $this->appinfo['version'];?></b></li>
+                 <li>发布日期：<?php echo $this->appinfo['mtime'];?></li>
+                 <li>升级方式：<?php if($this->appinfo['is_force']) { echo '强制升级';} else { echo '提示升级';};?></li>
+             </ul>
+         </td>
+     </tr>
+     <tr>
+         <th>版本更新说明</th>
+     </tr>
+     <tr class="h150">
+         <td>
+           <?php echo $this->escape($this->appinfo['description']);?>
+         </td>
+     </tr>
+
+ </table>
+ <div class="mt36 mb24 tr">
+     <a  href="javascript:;" id="cancle_btn" class="f16 clF fr tc search_btn grey_btn" >返 回</a>
+ </div>
+  <script>
+ $(document).ready(function(){
+	 $('#cancle_btn').click(function(){
+         window.history.go(-1);
+     });
+
+})
+</script>
+ 

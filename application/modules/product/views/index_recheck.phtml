@@ -1,0 +1,188 @@
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('产品审核', '/product/index/list'); ?></h3>
+<form class="cmxform"  method="post" id="check_form_new">
+<table class="detail_tabel f14 mt20 mb20">
+    <tr>
+        <th><?php echo $this->t('base_info'); ?></th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>产品ID：</td>
+        <td ><?php echo $this->info['id'];?></td>
+    </tr>
+    <tr class="h60">
+        <td>产品名称：</td>
+        <td id="product_name"><?php echo $this->info['name'];?></td>
+    </tr>
+    <tr>
+        <td>产品品类：</td>
+        <td id="product_cate"><?php echo $this->info['c_name'];?></td>
+    </tr>
+    <tr>
+        <td>所属厂商：</td>
+        <td id="product_enter"><?php echo $this->info['e_name'];?></td>
+    </tr>
+    <tr>
+        <td>创建时间：</td>
+        <td id="product_ctime"><?php echo $this->info['ctime'];?></td>
+    </tr>
+    <tr>
+        <td>最新发布时间：</td>
+        <td id="product_mtime">
+            <?php echo (isset($this->info['publish_mtime']) && $this->info['publish_mtime'] && $this->info['publish_mtime'] !== '0000-00-00 00:00:00') ? $this->info['publish_mtime'] : (isset($this->info['publish_ctime'])?$this->info['publish_ctime']:'-');?>
+        </td>
+    </tr>
+    <tr>
+        <th><?php echo $this->t('detail_info'); ?></th>
+        <th></th>
+    </tr>
+   <tr>
+        <td>支持语言：</td>
+        <td id="product_ctime"><?php echo $this->info['langs'];?></td>
+    </tr>
+    <tr>
+        <td>产品二维码：</td>
+        <td id="product_status">
+         <img src="<?php echo $this->api['server'];?>/intranet/generate_qr_code/?width=100&height=100&content=<?php echo urlencode("http://api.1719.com/download/app/?ez_pro_id={$this->info['id']}");?>">
+         <a href="<?php echo $this->url( array('action'=>'downloadqrcode', 'id' => $this->info['id']))?>" target="_blank" class="cl0b9600">下载</a>
+        </td>
+    </tr>
+    <tr>
+        <td>产品状态：</td>
+        <td id="product_status"><b><?php echo $this->t($this->info['status']);?></b></td>
+    </tr>
+    <tr>
+        <th><?php echo $this->t('check_info'); ?></th>
+        <th></th>
+    </tr>
+	<tr>
+		<td>审核结论：</td>
+		<td>
+			 <input  type="radio" name="pass" value="1"/><label for="message">通过</label>
+			<input  type="radio" name="pass" class="ml56" value="0"/><label for="e-mail">不通过</label>
+		</td>
+	</tr>
+	<tr class="h170">
+		<td>审核意见：</td>
+		<td><textarea class="text_cls" name="remark" cols="40" rows="6" id="remark"></textarea>（限120字）</td>
+	</tr>
+	<tr>
+		<td>结果通知：</td>
+		<td>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+			<input  type="checkbox" name="message[]" value="msg"/><label for="message">短信</label>
+			<input  type="checkbox" name="message[]" checked="checked"  class="ml56"  value="email"/><label for="e-mail">邮箱</label>
+		</td>
+		<input type="hidden" name="product_id" id="product_id" value="<?php echo $this->pid; ?>">
+	</tr>
+</table>
+</form>
+ <div class="mt36 mb24 tr">
+	<a href="javascript:;" id="cancle_btn" class="f16 clF fr ml16 tc search_btn grey_btn">返 回</a>
+	<a href="javascript:;" id="submit_btn" class="f16 clF tc search_btn">提交</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice"></p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)">确 定</a>
+</div>
+<script>
+$(document).ready(function(){
+	$( "#message_dialog" ).dialog({
+  		  autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+  	}); 
+    
+    
+	$('#check_form_new').validate({
+		rules: {
+			'remark': {
+				maxlength:120,
+                minlength:6,
+                required:true
+			},
+			'pass': {
+				required:true,
+			}
+		},
+        errorPlacement: function(error, element) {
+            error.appendTo(element.parent());
+        },
+		submitHandler : function(){
+            // 提交前检查数据
+            var pass_val = $('input[name="pass"]:checked').val();
+            var remark_val = $('#remark').val();
+            var alert_msg = '审核结论和审核意见都需要填写';
+            if(typeof(pass_val) == "undefined"){
+                return alert(alert_msg);
+            }
+            var param = $('#check_form_new').serialize();
+            var submitBtn = $('#submit_btn'); 
+            submitBtn.text('提交中..');
+            submitBtn.unbind('click');
+            $.post('/product/index/check', param, function (result) {
+                submitBtn.text('提交');
+                submitBtn.click(function(){
+                    $('#check_form_new').submit();
+            	});
+                if(result.status == 200) {
+                    $('.message_text').text('保存成功！');
+                    return $( "#message_dialog" ).dialog( "open" );
+                }else{
+                    $('.message_text').text('服务器忙，请重试！');
+                    return $( "#message_dialog" ).dialog( "open" );
+                }
+            },'json');
+		}
+	});
+   
+    /**
+     * 审核
+     */
+    $('input[name="pass"]').click(function(){
+         // alert('pass');
+         var val = $(this).val();
+         var remark_div = $('#remark');
+         var id = $('#product_id').val();
+         var product_name = $('#product_name').text();
+         var company_name = $('#product_enter').text();
+         var msg = '亲爱的' + company_name +',您提交的"' + product_name+'"' 
+         if(val == 1) {
+             msg += '已通过审核，请登录e族企业云平台查看详情。';
+             //通过
+             remark_div.val(msg);
+         } else if(val == 0) {
+             //不通过
+             msg += '没有通过审核，请登录e族企业云平台查看详情。';
+             remark_div.val(msg);
+         }
+    });
+	
+	$("#close_message").on("click",function() {
+     	$( "#message_dialog" ).dialog( "close" );
+        if($('.message_text').text().indexOf('保存成功！') != -1){
+            location.href = '<?php echo $this->url(array('controller'=>'index', 'action'=>'pending'))?>';
+            return false;
+        }
+        return;
+    });
+	 
+	$('#cancle_btn').click(function(){
+        window.history.go(-1);
+    });
+	
+	$('#submit_btn').click(function(){
+        $('#check_form_new').submit();
+	});
+});
+</script>

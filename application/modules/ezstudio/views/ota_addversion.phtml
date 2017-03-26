@@ -1,0 +1,357 @@
+<!--页面位置-->
+<link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/jquery.mCustomScrollbar.min.css" />
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.mCustomScrollbar.min.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/swfupload.queue.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/fileprogress.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/libs/swfupload/handlers.js"></script>
+
+<h3 class="location f14"><?php echo $this->menu('添加新版本', '/ezstudio/ota/list'); ?></h3>
+<div class="product_detail_search clearfix">
+    <div class="product_detail_search clearfix">
+        <div class="fl system_drop clearfix ml10">
+             <label class="fl mt4">资源名称：<?php echo $this->type_info['name']; ?></label>
+             <input type="hidden" value="<?php echo $this->type_info['id']; ?>" id="tid" name="tid" />
+         </div>
+    </div>
+                           
+</div>
+	<form class="cmxform"  action="" method="post" id="form_firmware">
+			<table class="detail_tabel remote_table f14 mt20">
+               <tbody>
+            	<tr>
+                    <th>资源信息</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td>版本号：</td>
+                    <td>
+                        <input type="text" class="cpy_name" id="version"  name ="version[version]" value="<?php echo $this->default_version; ?>">
+                        <input type="hidden" value="<?php echo $this->type_info['id']; ?>" id="upgrade_type_id" name="version[upgrade_type_id]" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>版本更新：</td>
+                    <td>
+                        <textarea rows="10" cols="60" class="text_cls wp60" id="description_ver" name="version[description]"></textarea>
+                    </td>
+                </tr>
+                <tr>
+					<td>上传资源：</td>
+					<td>
+					<span class="fieldset flash" id="fsUploadProgress_package"></span>
+					<span id="upload_status_package"></span>
+					<a  id="upload_package" class="f14 clF tc search_btn brue_btn ml56" onfocus="blur();" href="javascript:void(0)">上传</a>
+					<input id="btnCancel__package" type="button" value="取消上传" disabled="disabled" style="display:none" />
+					<input type="hidden" name="version[check_sum]" id="check_sum" value="">
+					<input type="hidden" name="version[file_path]" id="file_path" value="">
+					</td>
+				</tr>
+                <tr class="system_drop">
+                    <td>升级方式：</td>
+                    <td>
+                        <select id="exec_type" class="cpy_style product_assort mt_12" name ="version[exec_type]">
+                          <option value="">选择升级方式</option>
+                          <?php foreach ($this->device_exec_type as $k=>$v) :?>
+                               <option value="<?php echo $k;?>"><?php echo $v;?></option>
+                          <?php endforeach;?>
+                       </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>产品关联：</td>
+                    <td class="system_drop">
+                          <input type="radio"  class="receive_type"  id="pass_radio"  name="version[product_type]" value="all">所有产品
+                          <input type="radio"  class="receive_type"  name="version[product_type]" value="special">特定产品
+                    </td>
+                </tr>
+                <tr style="display:none;" id="products_list_tr">
+                    <td>产品设定：</td>
+                    <td class="system_drop">
+                         <div id="products_div"></div>
+                          &nbsp;&nbsp;&nbsp;
+                          <a href="javascript:;" style="color:#216ed9" id="select_product">选择产品</a>
+                          <input type="hidden" value=""  name="version[product_id]" id="products_hidden" product_info=''>
+                    </td>
+                </tr>
+                <tr class="system_drop">
+                    <td>发布类型：</td>
+                    <td>
+                        <select id="device_type" class="cpy_style product_assort mt_12" name ="version[device_type]">
+                           <option value="">选择发布方式</option>
+                          <?php foreach ($this->device_type as $k=>$v) :?>
+                               <option value="<?php echo $k;?>"><?php echo $v;?></option>
+                          <?php endforeach;?>
+                       </select>
+                    </td>
+                </tr>
+                <tr>	
+                    <td></td>
+                    <td>
+                    <div id="custom_scollbar">
+                        <ul class="clearfix mt20 mb10" id="fsUploadProgress"></ul>
+                        </div>
+                    <div id="img_upload_status"></div>
+                    </td>
+				</tr>
+                </tbody>
+                </table>
+            <div class="mt36 mb24 tr">
+                <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+                <a  onfocus="blur();" href="javascript:void(0)" id="sub_btn" class="f16 clF tc search_btn" >提 交</a>
+            </div>
+</form>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text" id="sys_notice">数据保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn" href="javascript:void(0)" >确 定</a>
+</div>
+
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">您确认删除此上传的文件吗？</p>
+</div>
+<div id="product_list_div" style="display:none;" title="选择产品">
+	
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/hashmap.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/json2.js"></script>
+<script language="javascript" type="text/javascript">
+    var products_map = new HashMap();
+    var products_hidden = $('#products_hidden');
+    if (products_hidden.val()) {
+        var product_info = products_hidden.attr('product_info');
+        var products = JSON.parse(product_info); 
+        for(var m in products) {
+            products_map.put(m, products[m])
+        }
+    }
+    $(function() {
+        var G_validate = false;
+        var img_container = '';
+    	$( "#confirm_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true,
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+                	img_container.remove(); // 移除需要删除的图片
+                	$( this ).dialog( "close" );
+                }
+            }
+        });
+        
+        $( "#message_dialog" ).dialog({
+            autoOpen: false,
+            width: 540,
+            height: 240,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            dialogClass: "my_message_dialog",
+            modal: true
+        });
+        
+        $("#close_message").on("click",function() {
+        	$( "#message_dialog" ).dialog( "close" );
+            if(G_validate) {
+				// location.href = '/product/firmware/commversion?id='+$('#firmware_id').val();
+            }
+            if($('#sys_notice').text() == "数据保存成功！"){
+               var tid = $('#tid').val();
+               window.location.href = '/ezstudio/ota/version/tid/'+tid+'/rand/'+Math.ceil(Math.random()*10);
+            }
+            return false;
+        });
+        
+        $( "#product_list_div" ).dialog({
+              autoOpen: false,
+                width: 940,
+                height: 600,
+                show: {
+                    effect: "blind",
+                    duration: 300
+                },
+                hide: {
+                    effect: null,
+                    duration: 500
+                },
+                dialogClass: "my_message_dialog",
+                modal: true,
+                buttons: {
+                    "取消": function() {
+                        $( this ).dialog( "close" );
+                    },
+                    "确定": function() {
+                        if(products_map.size) {
+                            var products = products_map.keys();
+                            var products_name = products_map.values();
+                            $('#products_hidden').val(products.join(','));
+                            var products_div = $('#products_div');
+                            products_div.text(products_name.join('，'));
+                        }
+                         $( this ).dialog( "close" );
+                    }
+                }
+        });
+
+       $('#form_firmware').validate({
+    		rules: {
+    			'version[version]': {
+                    version:true,
+    				required: true
+    			},
+    			'version[file_path]': {
+    				required: true
+    			},
+    			'version[device_type]': {
+    				required: true
+    			},
+    			'version[product_type]': {
+    				required: true
+    			},
+    			'version[exec_type]': {
+    				required: true
+    			},
+    			'version[description]': {
+    				maxlength:100,
+    				minlength:5
+    			}
+    		},
+            errorPlacement: function(error, element) {
+                error.appendTo(element.parents('td'));
+            },
+    		messages: {   //自定义提示信息
+    			//old_password: "原密码输入错误",
+    		},
+    		ignore : ''
+    	});	
+		// 提交表单
+    	$('#sub_btn').click(function () {
+			if($('#form_firmware').valid()) {
+                var tid = $('#tid').val();
+				$('#form_firmware').ajaxSubmit({
+					url:'/ezstudio/ota/addversion/tid/'+tid, //提交给数据保存接口
+					type:'POST',
+					dataType: 'json',
+					success: function (result) {
+						if(result.status == 200) {
+							G_validate =  true;
+							$('#sys_notice').text('数据保存成功！');
+						} else if(result.status == 500) {
+							G_validate =  false;
+							$('#sys_notice').text('系统繁忙，请稍后再试！');
+						} else if(result.msg == 505) {
+							G_validate =  false;
+							$('#sys_notice').text('亲，你没有这个操作的权限！');
+						} else {
+							G_validate =  false;
+							$('#sys_notice').text(result.msg);
+						}
+						$( "#message_dialog" ).dialog( "open" );
+						return ;
+					}
+				});
+				return false;
+			}
+		});
+		$('#cancel_btn').click(function () {
+			history.go(-1);
+		});
+		$(document).on('click','li[delete_upload]',function () {
+			$( "#confirm_dialog" ).dialog( "open" );
+			img_container = $(this);
+		});
+		
+		//固件包
+    	var settings = {
+				flash_url : "<?php echo $this->static;?>/js/libs/swfupload/swfupload.swf",
+				upload_url: "/api/upload/index",
+				post_params: {"type" : "<?php echo $this->type_info['label']; ?>"},
+				file_size_limit : "50 MB",
+				file_types : "*.gif;*.jpg;*.png;*.bin;*.apk;*.ipa;*.rar;*.zip;*.exe;*.dex",
+				file_types_description : "All Files",
+				file_upload_limit : 100,  //配置上传个数
+				file_queue_limit : 1,
+				custom_settings : {
+					progressTarget : "fsUploadProgress_package",
+					cancelButtonId : "btnCancel__package",
+					ProgressStatusId:'upload_status_package'
+				},
+				debug: false,
+				button_window_mode:'Opaque',
+				// Button settings
+				button_image_url: "<?php echo $this->static;?>/images/TestImageNoText_65x29.png",
+				button_width: "65",
+				button_height: "29",
+				button_placeholder_id: "upload_package",
+				button_text: '<span class="falsh_upload_button">上传</span>',
+				button_text_style: '.falsh_upload_button{color:#FFFFFF;}',
+				button_text_left_padding: 16,
+				button_text_top_padding: 5,
+				button_text_top_margin: 10,
+				file_queued_handler : fileQueued,
+				file_queue_error_handler : fileQueueError,
+				file_dialog_complete_handler : fileDialogComplete,
+				upload_error_handler : uploadError,
+				upload_success_handler : function(file, serverData) {
+					try {
+						serverData = eval("("+ serverData +")");
+						if(serverData.status == 200) {
+							var progress_div_id = this.customSettings.progressTarget;
+							var progress = new FileProgress(file, progress_div_id);
+							progress.setComplete();
+							progress.setStatus("上传成功");
+							progress.toggleCancel(false);
+							var link = '<a target="_blank" href="'+ serverData.result.url +'">'+ serverData.result.file_name +'</a>';
+							$('#file_path').val(serverData.result.path);
+							var file_container = '<span class="mr10">'+ link +'</span>';
+							$("#"+progress_div_id).html(file_container);
+							$('#check_sum').val(serverData.result.md5);
+						} else {
+							var progress_div_id = this.customSettings.progressTarget;
+							$("#"+progress_div_id).html(serverData.result).css('color','red');
+						}
+					} catch (ex) {
+						this.debug(ex);
+					}
+				},
+				upload_complete_handler : uploadComplete,
+				queue_complete_handler : queueComplete
+			};
+			var swfu = new SWFUpload(settings);
+            
+        $('.receive_type').click(function(){
+            var v = $('.receive_type').filter(':checked').val();
+            if (v == 'special') {
+                $('#products_list_tr').show();
+            }else{
+                $('#products_list_tr').hide();
+            }
+        });
+        
+        //产品选择
+          $('#select_product').click(function(){
+              $( "#product_list_div").load('/operation/message/products/selectmodel/radio/', function(){
+                  $( "#product_list_div").dialog('open');
+              })
+          })
+	});
+</script>

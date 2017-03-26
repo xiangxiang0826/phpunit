@@ -1,0 +1,126 @@
+<h3 class="location f14"><?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+<div class="product_detail_search clearfix">
+       <form action="/ezstudio/templatetype/index" method="get"  id="search_form">
+                           <div class="product_detail_search clearfix">
+                              <div class="fl system_drop clearfix ml10">
+                                   <input type="text" class="cpy_name w150" id="name"  name ="search[name]" value="<?php echo isset($this->search['name']) ? $this->search['name'] : ''?>" placeholder="请输入类型名称">
+                               </div>
+                               <div class="console_search_wrap fr mr10"><a class="search_icon_btn f16 clF tc" onFocus="blur();" href="javascript:;" id="search"><i class="find_icon"></i>查 询</a></div>
+                           </div>
+                           </form>
+                           
+</div>
+<div class="product_detail_display">
+									<div class="product_table mt24 f14">
+									<div class="product_detail_search clearfix">
+									<div class="console_search_wrap fr mr10" style="margin-top:8px;"><a class="f16 clF tc search_btn ml16" onFocus="blur();" href="javascript:;" id="add">添 加</a></div>
+									</div>
+                                       <table class="table_s tc mt24 tc_left auto_table_len" width="100%" border="0">
+                                         <thead>
+                                          <tr>                          
+                                            <td width="100px">类型ID</td>
+                                            <td>类型名称</td>
+                                            <td width="150px">状态</td>
+                                            <td width="150px" style="text-align: center;">操作</td>
+                                          </tr>
+                                         </thead>
+                                         <tbody>
+                                         <?php if($this->type_list):?>
+                                         	<?php foreach($this->type_list as $item):?>
+                                         	<tr>
+                                            <td><?php echo $item['id']?></td>
+                                            <td>
+                                            <?php echo $this->escape($item['name'])?>
+                                            </td>
+                                            <td>
+                                            <?php echo $this->status_map[$item['status']]?>
+                                            </td>
+                                            <td class="cl0b9600" style="text-align: center;"><a href="/ezstudio/templatetype/detail?id=<?php echo $item['id']?>">编辑</a> | <a href="javascript:void(0)" delete_id="<?php echo $item['id']?>">删除</a></td>
+                                           </tr>
+                                         	<?php endforeach;?>
+                                         	<?php else:?>
+                                         	<tr><td colspan="4" style="text-align: center;">暂无记录</td></tr>
+                                         <?php endif;?>
+                                         </tbody>
+                                   </table>
+                                </div>
+               <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+          </div>
+</div>
+<div id="confirm_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text">您确认删除此条记录吗？</p>
+</div>
+<div id="msg_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+</div>
+<script language="javascript" type="text/javascript">
+	$(function () {
+		var delete_id = 0;
+		$( "#msg_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            modal: true,
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "确定": function() {
+                	$( this ).dialog( "close" );
+                }
+            }
+        });
+		$( "#confirm_dialog" ).dialog({
+            autoOpen: false,
+            width: 555,
+            dialogClass: "my-dialog",
+            show: {
+                effect: "blind",
+                duration: 300
+            },
+            hide: {
+                effect: null,
+                duration: 500
+            },
+            buttons: {
+                "取消": function() {
+                    $( this ).dialog( "close" );
+                },
+                "确定": function() {
+                	$( this ).dialog( "close" );
+                	$.post('/ezstudio/templatetype/delete', {id:delete_id}, function (data) {
+                    	if(data.status == 406) {
+                        	$('#msg_dialog .message_text').text(data.msg);
+                    		$( "#msg_dialog" ).dialog( "open");
+                    		return false;
+                        } else if (data.msg == 505) {
+                            $('#msg_dialog .message_text').text('亲，你没有这个操作的权限！');
+                            $("#msg_dialog").dialog("open");
+                            return false;
+                        } 
+        				location.href = '/ezstudio/templatetype/index';
+        			},'json');
+                }
+            }
+        });
+        
+		$('#search').click(function () {
+			$('#search_form').submit();
+		});
+		
+		$('#add').click(function () {
+			location.href = '/ezstudio/templatetype/add';
+		});
+
+		$('a[delete_id]').click(function () {
+			delete_id = $(this).attr('delete_id');
+			$( "#confirm_dialog" ).dialog( "open");
+		});
+    });
+</script>

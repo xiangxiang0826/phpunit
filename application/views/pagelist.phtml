@@ -1,0 +1,28 @@
+<?php if($this->pageCount >1):?>
+<div class="my-navigation">
+<div><span class="ml8"><?php echo $this->t('jump');?></span> 
+<select class="simple-pagination-select-specific-page select-page">
+<?php foreach ($this->pagesInRange as $page): ?>
+	<option <?php if ($page == $this->current): ?>selected="selected"<?php endif;?> value="<?php echo $page; ?>" href="<?php echo $this->base_url?>&page=<?php echo $page; ?>"><?php echo $page; ?></option>
+<?php endforeach; ?>
+</select><span class="ml8"><?php echo $this->t('div_page');?></span></div>
+   <div class="simple-pagination-last"><a page-number="<?php echo isset($this->last) ? $this->last : 0; ?>" class="simple-pagination-navigation-last <?php if (empty($this->last) || ($this->last == $this->current)): ?>simple-pagination-navigation-disabled<?php endif;?>" href="<?php echo $this->base_url?>&page=<?php echo $this->last; ?>"><?php echo $this->t('last');?></a></div>
+   <div class="simple-pagination-next"><a page-number="<?php echo isset($this->next) ? $this->next : 0; ?>" class="simple-pagination-navigation-next <?php if (!isset($this->next)): ?>simple-pagination-navigation-disabled<?php endif;?>" href="<?php echo $this->base_url?>&page=<?php echo $this->next; ?>"><?php echo $this->t('next');?></a></div>
+   <div class="simple-pagination-page-numbers">
+	<?php foreach ($this->pagesInRange as $page): ?>
+	<a page-number="<?php echo $page == $this->current ? 0 : $page; ?>" class="simple-pagination-navigation-page <?php if ($page == $this->current): ?>simple-pagination-navigation-disabled<?php endif;?>" href="<?php echo $this->base_url?>&page=<?php echo $page; ?>"><?php echo $page; ?></a>
+	<?php endforeach; ?>
+   </div>
+  <div class="simple-pagination-previous"><a page-number="<?php echo $this->previous?>" class="simple-pagination-navigation-previous <?php if (!isset($this->previous)): ?>simple-pagination-navigation-disabled<?php endif;?>" href="<?php echo $this->base_url?>&page=<?php echo $this->previous; ?>"><?php echo $this->t('pev');?></a></div>
+  <div class="simple-pagination-first"><a page-number="<?php echo $this->first; ?>" class="simple-pagination-navigation-first <?php if (1 == $this->current): ?>simple-pagination-navigation-disabled<?php endif;?>" href="<?php echo $this->base_url?>&page=<?php echo $this->first; ?>"><?php echo $this->t('first');?></a></div>
+  <div><?php echo $this->t('total');?> <span class="simple-pagination-page-count"><?php echo $this->pageCount?></span> <?php echo $this->t('div_page');?></div>   
+</div>
+<script>
+$('.simple-pagination-select-specific-page').change(function(){
+	location.href = $(this).find('option:selected').attr('href');
+})
+$('.simple-pagination-navigation-disabled').click(function(){
+	return false;
+});
+</script>
+<?php endif;?>

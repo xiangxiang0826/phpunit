@@ -1,0 +1,137 @@
+<h3 class="location f14"><?php echo $this->menu('版本信息','/ezstudio/firmware/comm'); ?></h3>
+<div class="product_detail mt22">
+	<div class="product_detail_search clearfix"><label class="fl mt16 ml10">通信固件包括Wifi模组、蓝牙、红外等，此部分固件由遥控e族官方进行升级管理，升级方式均为静默升级</label>
+	<div class="console_search_wrap fr mr10"><a class="f16 clF tc search_btn ml16" onFocus="blur();" href="javascript:;" id="upgrade">添加新版本</a></div>
+	</div>
+    <div class="product_detail_display">
+		<div class="product_table mt24 f14">
+		<?php if($this->version_list):?>
+            <table class="table_s tc" width="100%" border="0">
+            <thead>
+                <tr>      
+                    <td>序号</td>     
+                    <td>固件标识</td>                   
+                    <td>固件名称</td>
+                    <td>版本</td>
+                    <td>更新内容</td>
+                    <td>发布时间</td>
+                    <td>升级方式</td>
+                    <td>发布类型</td>
+                    <td>状态</td>
+                    <td>操作</td>
+                 </tr>
+             </thead>
+             <tbody>
+             <?php if($this->version_list):?>
+             <?php foreach($this->version_list as $k=>$item):
+             	$k++;
+             ?>
+                 <tr <?php if($item['status']== Model_FirmwareMcu::STATUS_DISABLE):?>class="stop"<?php endif;?>>
+                     <td><?php echo $k?></td>
+                     <td title = "<?php echo $this->fireware_comm['label']?>"><?php echo mb_strimwidth($this->fireware_comm['label'],0,15,'...')?></td>
+                     <td title = "<?php echo $item['name']?>"><?php echo mb_strimwidth($item['name'],0,15,'...')?></td>
+                     <td title = "<?php echo $item['version']?>"><?php echo mb_strimwidth($item['version'],0,15,'...')?></td>
+                     <td title = "<?php echo $item['description']?>"><?php echo mb_strimwidth($item['description'],0,20,'...')?></td>
+                     <td><?php echo $item['ctime']?></td>
+                     <td><?php echo $item['is_force'] ?  '强制升级' : '提示升级'?></td>
+                     <td>
+                     <font <?php if($item['status']== Model_FirmwareMcu::STATUS_ENABLE):?>color="<?php echo $item['device_type']== Model_Upgrade::DEVICE_TYPE_TEST ? 'red' : 'green'?>"<?php endif;?>><?php echo $this->device_type_map[$item['device_type']]?></font></td>
+                     <td><font color="<?php echo $item['status']== Model_FirmwareMcu::STATUS_ENABLE ? 'green' : '#c8c8c8'?>"><?php echo $this->status_map[$item['status']]?></font></td>
+                     <td class="cl0b9600">
+                     <a href="javascript:void(0)" device_type="<?php echo $item['device_type']?>" item_id="<?php echo $item['id']?>">
+                     <?php echo $item['device_type']== Model_Upgrade::DEVICE_TYPE_TEST ? '正式发布' : '测试发布'?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+                     <?php if($item['status']== Model_Upgrade::STATUS_DISABLE):?>
+					 <a href="javascript:void(0)" status="<?php echo $item['status']?>" item_id="<?php echo $item['id']?>">启用</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+					 <?php endif?>
+                     <a href="/ezstudio/firmware/editversion?vid=<?php echo $this->id;?>&id=<?php echo $item['id']?>">编辑</a>&nbsp;&nbsp;
+                     |&nbsp;&nbsp; <a href="javascript:void(0)" delete_id="<?php echo $item['id']; ?>">删除</a>
+                     </td>
+                 </tr>
+             <?php endforeach;?>
+             <?php endif;?>
+             </tbody>
+         </table>
+         <?php else:?>
+             <div class="product_detail_search clearfix"><label class="fl mt4 ml10">暂无固件版本，请添加新版本。</label></div>
+         <?php endif;?>
+         </div>
+    <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+    </div>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;" class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<div id="delete_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text">您确定删除这个版本吗？</p>
+</div>
+<script language="javascript" type="text/javascript">
+$(function () {
+	$('#upgrade').click(function () {
+		location.href = '/ezstudio/firmware/upgrade?id=<?php echo $this->id?>';
+	});
+	$('a[device_type]').click(function () {
+		var id = $(this).attr('item_id');
+		var device_type = $(this).attr('device_type');
+		$.post('/ezstudio/firmware/setdevicetype',{id:id,device_type:device_type},function (result) {
+			if (result.msg == 505) {
+                $('#message_dialog .message_text').text('亲，你没有这个操作的权限！');
+                $("#message_dialog").dialog("open");
+                return;
+            }			
+			location.reload();
+		},'json');
+	});
+
+	$('a[status]').click(function () {
+		var id = $(this).attr('item_id');
+		var status = $(this).attr('status');
+		$.post('/ezstudio/firmware/setstatus',{id:id,status:status},function (result) {
+			if (result.msg == 505) {
+                $('#message_dialog .message_text').text('亲，你没有这个操作的权限！');
+                $("#message_dialog").dialog("open");
+                return;
+            }
+			location.reload();
+		},'json');
+	});
+
+	var delete_id = null;
+		$("#delete_dialog" ).dialog({
+        autoOpen: false,
+        width: 555,
+        dialogClass: "my-dialog",
+        modal: true,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: null,
+            duration: 500
+        },
+        buttons: {
+            "取消": function() {
+                $( this ).dialog( "close" );
+            },
+            "确定": function() {
+            	$.post('/ezstudio/ota/delversion', {id:delete_id}, function (result) {
+            		var tip_el = $('#delete_dialog').find('.message_text');
+            		if(result.status == 200) {
+            			tip_el.text('删除成功');
+            			location.reload(true);
+					} else {
+						tip_el.text('删除失败');
+						$("#delete_dialog").dialog("open");
+                        return false;
+					}
+    			},'json');
+            }
+        }
+    });
+	$('a[delete_id]').click(function () {
+		delete_id = $(this).attr('delete_id');
+		$( "#delete_dialog" ).dialog( "open");
+	});
+});
+</script>

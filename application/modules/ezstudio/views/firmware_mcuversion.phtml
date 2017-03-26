@@ -1,0 +1,36 @@
+<h3 class="location f14"><?php echo $this->menu('查看版本','/ezstudio/firmware/mcu'); ?></h3>
+<div class="product_detail mt22">
+         <div class="product_detail_display">
+				<div class="product_table mt24 f14">
+                                       <table class="table_s tc" width="100%" border="0">
+                                         <thead>
+                                          <tr>                          
+                                            <td>固件名</td>
+                                            <td>版本</td>
+                                            <td>更新内容</td>
+                                            <td>升级方式</td>
+                                            <td>发布时间</td>
+                                            <td>启用状态</td>
+                                            <td>操作</td>
+                                          </tr>
+                                         </thead>
+                                         <tbody>
+                                         <?php if($this->version_list):?>
+                                         	<?php foreach($this->version_list as $item):?>
+                                         	<tr>
+                                            <td><?php echo $item['name']?></td>
+                                            <td><?php echo $item['version']?></td>
+                                            <td title = "<?php echo $item['description']?>"><?php echo mb_strimwidth($item['description'], 0, 20 ,'...')?></td>
+                                            <td><?php echo $item['is_force'] ?  '强制升级' : '提示升级'?></td>
+                                            <td><?php echo $item['ctime']?></td>
+                                            <td><?php echo $this->status_map[$item['status']]?></td>
+                                            <td>-</td>
+                                          	</tr>
+                                         	<?php endforeach;?>
+                                         <?php endif;?>
+                                         </tbody>
+                                   </table>
+                        </div>
+                        <?php echo $this->paginationControl($this->pagenation, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+              </div>
+ </div>

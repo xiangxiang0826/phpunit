@@ -1,0 +1,125 @@
+
+<!--页面位置-->
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.form.js"></script>
+<h3 class="location f14"><?php echo $this->menu('添加APP', '/enterprise/apipermission/applist'); ?></h3>
+<form action="/enterprise/apipermission/addapp/" method="post" name="form_add_action" id="form_add_action">
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th style="text-align:left;padding-left:20px;"><?php echo $this->t('base_info');?></th>
+        <th></th>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_app_name');?>：</td>
+        <td>
+            <input type="text" class="cpy_name valid" placeholder="请输入<?php echo $this->t('api_app_name');?>" value="" id="name" name="name" aria-required="true" aria-invalid="false">
+        </td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_user_company');?>：</td>
+        <td class="system_drop">
+    	   <select id="cang_assort" class="cpy_style cang_assort" readOnly="readOnly" name="enterprise_id">
+               <option value="1">遥控e族</option>
+		   </select>
+        </td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_app_remark');?>：</td>
+        <td>
+            <input type="text" class="cpy_name valid" placeholder="请输入<?php echo $this->t('api_app_remark');?>" value="" id="remark" name="remark" aria-required="false" aria-invalid="false">
+        </td>
+    </tr>
+    <tr>
+        <td><?php echo $this->t('api_app_status');?>：</td>
+        <td class="system_drop">
+            <select id="status" class="cpy_style cang_assort f14" name="status">
+              <option value="enable" selected="selected">启用</option>
+              <option value="disable">禁用</option>
+            </select>
+        </td>
+    </tr>
+</table>
+</form>
+<div class="mt36 mb24 tr">
+    <a  onfocus="blur();" href="javascript:void(0)" id="back" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+    <a  onfocus="blur();" href="javascript:void(0)" id="save_action" class="f16 clF fr ml16 tc search_btn" >提 交</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+    <p class="message_text">保存成功！</p>
+    <a id="close_message"  onfocus="blur();" class="f16 clF tc search_btn brue_btn"  href="javascript:void(0)">确 定</a>
+</div>
+<script>
+$(function () {
+	
+	// 提示信息
+	$( "#message_dialog" ).dialog({
+        autoOpen: false,
+        width: 540,
+        height: 240,
+        show: {
+            effect: "blind",
+            duration: 300
+        },
+        hide: {
+            effect: "explode",
+            duration: 500
+        },
+        dialogClass: "my_message_dialog",
+        modal: true
+    });
+
+	$("#close_message").on("click",function() {
+        if($('.message_text').text() == '保存成功！'){
+            location.href = '/enterprise/apipermission/applist';
+        }
+		$( "#message_dialog" ).dialog( "close" );
+	});
+    
+	// 后退
+	$('#back').click(function () {
+		history.go(-1);
+	});
+    $('#form_add_action').validate({
+		rules: {
+			'name': {
+				required: true,
+				minlength: 2,
+				maxlength:32
+			},
+			'remark': {
+				required: false,
+				minlength: 2,
+				maxlength:128
+			},
+            'enterprise_id': {
+                required: true
+            },
+			'status': {
+				required: true
+			}
+		},
+		messages: {   //自定义提示信息
+			
+		}
+	});
+
+	$('#save_action').click(function () {
+		if($('#form_add_action').valid()) {
+			$('#form_add_action').ajaxSubmit({
+				url:$('#form_add_action').attr('action'), //提交给哪个执行
+				type:'POST',
+				dataType: 'json',
+				success: function (result) {
+					if(result.status == 200) {
+                        $('.message_text').text('保存成功！');
+						$( "#message_dialog" ).dialog( "open" );
+					} else {
+						$('.message_text').text(result.msg);
+						$( "#message_dialog" ).dialog( "open" );
+					}
+				}
+			});
+			return false;
+		}
+	});
+});
+</script>

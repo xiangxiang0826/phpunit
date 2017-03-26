@@ -1,0 +1,352 @@
+.tgrid-view {
+  position: relative;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 18px;
+  border: 1px solid #a3b1cc;
+  /*  .tgrid-view1 .tgrid-body-inner {
+    padding-bottom: 20px;
+  }*/
+  /* tree */
+  /*loading box*/
+  /* pager*/
+  /*resize proxy*/
+  /* ��ҳ������ʽ*/
+}
+.tgrid-view .tgrid-view1,
+.tgrid-view .tgrid-view2 {
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+}
+.tgrid-view .tgrid-view1 {
+  left: 0;
+}
+.tgrid-view .tgrid-view2 {
+  right: 0;
+}
+.tgrid-view .tgrid-header {
+  border-style: solid;
+  border-width: 0 0 1px;
+  cursor: default;
+  overflow: hidden;
+}
+.tgrid-view .tgrid-header {
+  /*    background: linear-gradient(to bottom, #F9F9F9 0px, #EFEFEF 100%) repeat-x scroll 0 0 rgba(0, 0, 0, 0);
+    background-color: #b8c8e5;*/
+  *position: relative;
+}
+.tgrid-view .tgrid-header-inner {
+  /* float: left;*/
+  width: 10000px;
+  background: url("images/table_bg.png") repeat-x 0 100%;
+}
+.tgrid-view .tgrid-footer-inner {
+  border-style: solid;
+  border-width: 1px 0 0;
+  float: left;
+  width: 10000px;
+}
+.tgrid-view .tgrid-htable,
+.tgrid-view .tgrid-btable,
+.tgrid-view .tgrid-ftable {
+  border-collapse: separate;
+  color: #000000;
+}
+.tgrid-view .tgrid-row {
+  height: 25px;
+}
+.tgrid-view .tgrid-header-row {
+  height: 30px;
+}
+.tgrid-view .tgrid-header-row .tgrid-cell {
+  text-align: center;
+  font-weight: 700;
+}
+.tgrid-view .tgrid-row-selected {
+  background-color: #ace0f4;
+}
+.tgrid-view .tgrid-row-over,
+.tgrid-view .tgrid-header td.tgrid-header-over {
+  background: #eaf2ff;
+  color: #000000;
+  cursor: default;
+}
+.tgrid-view .tgrid-header td,
+.tgrid-view .tgrid-body td,
+.tgrid-view .tgrid-footer td {
+  border-style: dotted;
+  border-width: 0 1px 1px 0;
+  margin: 0;
+  padding: 0;
+  border-color: #CCCCCC;
+}
+.tgrid-view .tgrid-cell,
+.tgrid-view .tgrid-cell-group,
+.tgrid-view .tgrid-header-rownumber,
+.tgrid-view .tgrid-header-checkbox-radio,
+.tgrid-view .tgrid-cell-rownumber,
+.tgrid-view .tgrid-radio,
+.tgrid-view .tgrid-checkbox {
+  /*font-size: 12px;*/
+  height: 18px;
+  line-height: 18px;
+  margin: 0;
+  overflow: hidden;
+  padding: 0 4px;
+  white-space: nowrap;
+  word-wrap: normal;
+  text-overflow: ellipsis;
+}
+.tgrid-view .tgrid-header-rownumber,
+.tgrid-view .tgrid-cell-rownumber,
+.tgrid-view .tgrid-header-checkbox-radio,
+.tgrid-view .tgrid-radio,
+.tgrid-view .tgrid-checkbox {
+  margin: 0;
+  /*    padding: 0;*/
+  text-align: center;
+}
+.tgrid-view .tgrid-checkbox,
+.tgrid-view .checkbox-checkall {
+  background: url("images/tree_icons.gif") no-repeat -162px -1px;
+}
+.tgrid-view .tgrid-checkbox-checked,
+.tgrid-view .checkbox-checkall-checked {
+  background: url("images/tree_icons.gif") no-repeat -162px -19px;
+}
+.tgrid-view .tgrid-radio {
+  background: url("images/tree_icons.gif") no-repeat -182px -1px;
+}
+.tgrid-view .tgrid-radio-checked {
+  background: url("images/tree_icons.gif") no-repeat -182px -18px;
+}
+.tgrid-view .tgrid-header .tgrid-header-rownumber-td,
+.tgrid-view .tgrid-header .tgrid-header-checkbox-radio-td {
+  border-bottom: 0;
+}
+.tgrid-view .tgrid-header .tgrid-cell {
+  height: auto;
+}
+.tgrid-view .tgrid-header .tgrid-cell span {
+  /*font-size: 12px;*/
+}
+.tgrid-view .tgrid-body {
+  margin: 0;
+  overflow: auto;
+  padding: 0;
+}
+.tgrid-view .tgrid-view1 .tgrid-body-inner {
+  padding-bottom: 20px;
+}
+.tgrid-view .tgrid-view1 .tgrid-body {
+  overflow: hidden;
+}
+.tgrid-view .tgrid-footer {
+  overflow: hidden;
+}
+.tgrid-view .tgrid-header,
+.tgrid-view .tgrid-toolbar,
+.tgrid-view .tgrid-pager-container,
+.tgrid-view .tgrid-footer-inner {
+  border-color: #DDDDDD;
+}
+.tgrid-view .tree-hit {
+  cursor: pointer;
+}
+.tgrid-view .tree-expanded,
+.tgrid-view .tree-collapsed,
+.tgrid-view .tree-folder,
+.tgrid-view .tree-file,
+.tgrid-view .tree-checkbox,
+.tgrid-view .tree-indent {
+  display: inline-block;
+  *zoom: 1;
+  *display: inline;
+  height: 18px;
+  overflow: hidden;
+  vertical-align: top;
+  width: 16px;
+}
+.tgrid-view .tree-expanded {
+  background: url("images/tree_icons.gif") no-repeat -18px 0;
+}
+.tgrid-view .tree-expanded-hover {
+  background: url("images/tree_icons.gif") no-repeat -50px 0;
+}
+.tgrid-view .tree-collapsed {
+  background: url("images/tree_icons.gif") no-repeat 0 0;
+}
+.tgrid-view .tree-collapsed-hover {
+  background: url("images/tree_icons.gif") no-repeat -32px 0;
+}
+.tgrid-view .tree-title {
+  /*.inlineblock();
+  font-size: 12px;*/
+  height: 18px;
+  line-height: 18px;
+  padding: 0 2px;
+  text-decoration: none;
+  vertical-align: top;
+  white-space: nowrap;
+}
+.tgrid-view .tree-folder {
+  background: url("images/tree_icons.gif") no-repeat -208px 0;
+}
+.tgrid-view .tree-folder-open {
+  background: url("images/tree_icons.gif") no-repeat -224px 0;
+}
+.tgrid-view .tree-file {
+  background: url("images/tree_icons.gif") no-repeat -240px 0;
+}
+.tgrid-view .tree-checkbox {
+  background: url("images/tree_icons.gif") no-repeat -208px -18px;
+}
+.tgrid-view .tree-checkbox-checked {
+  background: url("images/tree_icons.gif") no-repeat -224px -18px;
+}
+.tgrid-view .tree-checkbox-partselect {
+  background: url("images/tree_icons.gif") no-repeat -240px -18px;
+}
+.tgrid-view .tgrid-loading-bg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: none;
+  z-index: 100;
+  background: #FFF;
+  opacity: 0.01;
+  filter: alpha(opacity=1);
+}
+.tgrid-view .loading-bg-opacity {
+  background: #E5E5E5;
+  opacity: .5;
+  filter: alpha(opacity=50);
+}
+.tgrid-view .tgrid-loading-box {
+  width: 102px;
+  height: 32px;
+  position: absolute;
+  left: 50%;
+  margin-left: -54px;
+  top: 50%;
+  margin-top: -19px;
+  border: 2px solid #80aae0;
+  padding: 2px;
+  background: #fff;
+  display: none;
+  z-index: 101;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.tgrid-view .tgrid-loading-box span {
+  display: block;
+  line-height: 30px;
+  height: 30px;
+  padding-left: 32px;
+  background: url("images/loading.gif") no-repeat 5px 9px;
+  color: #444;
+  /*font-size:12px;*/
+}
+.tgrid-view .tgrid-pager-container {
+  width: 100%;
+  height: 30px;
+  position: absolute;
+  border-width: 1px 0 0;
+  border-style: solid;
+  bottom: 0;
+  left: 0;
+  background: url("images/table_bg.png") repeat-x 0 100%;
+}
+.tgrid-view .tgrid-pager {
+  padding: 3px 5px;
+}
+.tgrid-view .tgrid-resize-proxy {
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  top: 0;
+  display: none;
+  cursor: e-resize;
+  background: #aac5e7;
+}
+.tgrid-view .tgrid-resize-holder {
+  position: absolute;
+  right: 0;
+  top: -6px;
+  width: 10px;
+  height: 30px;
+  cursor: e-resize;
+}
+.tgrid-view .tgrid-resize-cursor {
+  cursor: e-resize;
+}
+.tgrid-view .tgrid-oddevenrow {
+  background-color: #fff4e5;
+}
+.tgrid-view .grid-pagination {
+  /*    font-size: 12px;*/
+  height: 23px;
+  font-family: "\5B8B\4F53", Helvetica, sans-serif;
+  color: #333;
+  line-height: 23px;
+}
+.tgrid-view .grid-pagination a,
+.tgrid-view .grid-pagination span {
+  display: inline-block;
+  *zoom: 1;
+  *display: inline;
+  margin-left: 5px;
+}
+.tgrid-view .grid-pagination .left-side {
+  float: left;
+}
+.tgrid-view .grid-pagination .right-side {
+  float: right;
+}
+.tgrid-view .grid-pagination a {
+  color: #0078FF;
+  cursor: pointer;
+  text-decoration: none;
+  outline: none;
+}
+.tgrid-view .grid-pagination a:hover {
+  text-decoration: underline;
+}
+.tgrid-view .grid-pagination .pagesize-selected {
+  font-style: normal;
+  color: #fff;
+  background-color: #4971C6 ;
+}
+.tgrid-view .grid-pagination .page-skip-num {
+  padding: 0;
+  margin: 0;
+  width: 23px;
+  height: 15px;
+  border: 0;
+  border-bottom: 1px solid #9EAFE7;
+  text-align: center;
+  background: none;
+}
+.tgrid-view .grid-pagination .page-prev {
+  padding-left: 9px;
+  background: url("images/pagination-prev.png") no-repeat 0 6px;
+}
+.tgrid-view .grid-pagination .page-next {
+  padding-right: 9px;
+  background: url("images/pagination-next.png") no-repeat 40px 6px;
+}
+.tgrid-view .grid-pagination a.btn-normal {
+  border: 1px solid #b3b3b3;
+  height: 21px;
+  line-height: 21px;
+  padding: 0 8px;
+}
+.tgrid-view-tr-height-for-test {
+  height: 25px;
+}
+.tgrid-view-theadtr-height-for-test {
+  height: 30px;
+}

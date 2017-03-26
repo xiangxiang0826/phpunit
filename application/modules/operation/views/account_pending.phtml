@@ -1,0 +1,110 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('待审核列表', '/operation/usermessage/index'); ?></h3>
+<form action="" method="get"  id="search_form">
+<div class="product_detail_search clearfix mt22">
+   <div class="fl system_drop clearfix">
+	   <label class="fl mt4">发送方：</label>
+	   <select id="cang_assort" class="cpy_style cang_assort" name="search[enterprise_id]">
+		   <option value="">选择厂商</option>
+		   <?php foreach ($this->enterprises as $k=>$v) {?>
+		 <option value="<?php echo $k;?>" <?php if($k == $this->search['enterprise_id']):?>selected="selected" <?php endif;?>><?php echo mb_strimwidth($v,0,20,'...');?></option>
+		 <?php }?>
+	   </select>
+   </div>
+	<div class="fl system_drop clearfix">
+		<label class="fl mt4">产品：</label>
+		<select id="produt_assort" class="cpy_style product_assort" name="search[product]">
+			<option value="">选择产品</option>
+		 <?php foreach ($this->products as $key=>$v) {?>
+		 <option value="<?php echo $key;?>" <?php if($key == $this->search['product']):?>selected="selected" <?php endif;?>><?php echo  mb_strimwidth($v,0,20,'...');?></option>
+		 <?php }?>
+		</select>
+	</div>
+	<div class="fl">
+		<label for="cpy_name">消息ID：</label><input type="text" class="cpy_name wp50" id="cpy_name" name="search[id]" value="<?php if(!empty($this->search['id'])){ echo $this->search['id'];}?>">
+	</div>
+	<div class="fl chart_search f14">
+	   <span class="cl63">计划发送日期：</span>
+	 <input type="text" name="search[start]"  class="time_pick" id="timer_from" readonly />
+	 <label> - </label>
+	 <input type="text" name="search[end]" class="time_pick" id="timer_to"  readonly />
+	</div>
+	<div class="console_search_wrap fr"><a class="search_icon_btn f16 clF tc" onFocus="blur();" id="search_submit"  href="javascript:;"><i class="find_icon"></i>查 询</a></div>
+</div>
+</form>
+<div class="product_detail_display">
+	 <div class="product_detail_display_tab_wrap clearfix">
+			<div class="fl product_detail_display_tab" id="change_tab">
+			<span class="last" id="publish">已审核</span><span class="on" id="pending">待审核</span>
+			</div>
+			 <a id="add_version" class="f16 clF tc search_btn fr mr10 nmt10" href="<?php echo $this->url(array('action' =>'edit'));?>">创建消息</a>
+	 </div>
+	 <div class="product_table mt24 f14">
+		   <table class="table_s tc" width="100%" border="0">
+			 <thead>
+			  <tr>                          
+				<td>消息ID</td>
+				<td>发送方</td>
+				<td>消息类型</td>
+				<td>消息标题</td>
+				<td>发送对象</td>
+				<td>计划发送时间</td>
+				<td>状态</td>
+				<td>操作</td>
+			  </tr>
+			 </thead>
+			 <tbody>
+<?php if($this->paginator->getTotalItemCount() >0) :?>
+<?php foreach ($this->paginator as $v):?>
+<tr>
+<td><?php echo $v['id'];?></td>
+<td>
+	 <?php if($v['company_name']) { echo $v['company_name'];} else { echo '遥控e族';};?>
+</td>
+<td>
+	<?php 
+		  if($v['type'] == 1) {
+				echo '服务信息';
+		  } elseif ($v['type'] == 2) {
+				echo '系统消息';
+		  }
+	?>
+</td>
+<td>
+	<?php echo $this->escape($v['title']);?>
+</td>
+<td>
+	<?php 
+			   if($v['receive_type'] == 'all') {
+				   echo '所有用户';
+			   } elseif($v['receive_type'] == 'special') {
+				   echo '特定用户';
+			   }
+	?>
+</td>
+<td><?php echo $v['send_time']; ?></td>
+<td style="color:<?php if($v['status'] == Model_Message::STATUS_NEED_CHECK) { echo 'red';}?>"><?php if(isset($this->status[$v['status']])) { echo $this->status[$v['status']];} ?></td>         
+<td class="cl0b9600"">
+<a href="<?php echo $this->url(array('action'=>'check', 'id' => $v['id']));?>" class="check_detail cl0b9600">审核</a>
+</td>
+</tr>
+<?php endforeach; ?>
+<?php else: ?>
+<tr><td colspan="8">暂无记录</td></tr>
+<?php endif;?>
+			 </tbody>
+	   </table>
+</div>
+<?php echo $this->paginationControl($this->paginator, 'Elastic', 'pagelist.phtml',array('base_url'=>$this->base_url)); ?>
+   <script>
+   $(document).ready(function(){
+	   <?php if($this->search['start']):?>
+	   $("#timer_from").datepicker( 'setDate' , "<?php echo $this->search['start'];?>" );
+	   <?php endif;?>
+	   <?php if($this->search['end']):?>
+	   $("#timer_to").datepicker( 'setDate' , "<?php echo $this->search['end'];?>" );
+	   <?php endif;?>
+});
+  </script>
+  <script type="text/javascript" src="<?php echo $this->static;?>/js/message_center.js"></script>

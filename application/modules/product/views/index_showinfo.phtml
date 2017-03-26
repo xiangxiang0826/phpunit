@@ -1,0 +1,97 @@
+
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('查看产品详情', '/product/index/list'); ?></h3>
+
+<table class="detail_tabel f14 mt20 mb20">
+    <tr>
+        <th>产品信息</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>产品ID：</td>
+        <td ><?php echo $this->info['id'];?></td>
+    </tr>
+    <tr class="h60">
+        <td>产品名称：</td>
+        <td id="product_name"><?php echo $this->info['name'];?></td>
+    </tr>
+    <tr>
+        <td>产品品类：</td>
+        <td id="product_cate"><?php echo $this->info['c_name'];?></td>
+    </tr>
+    <tr>
+        <td>所属厂商：</td>
+        <td id="product_enter"><?php echo $this->info['e_name'];?></td>
+    </tr>
+
+    <tr>
+        <td>创建时间：</td>
+        <td id="product_ctime"><?php echo $this->info['ctime'];?></td>
+    </tr>
+    <tr>
+        <td>最新发布时间：</td>
+        <td id="product_mtime"><?php echo (isset($this->info['publish_mtime']) && $this->info['publish_mtime'] && $this->info['publish_mtime'] !== '0000-00-00 00:00:00') ? $this->info['publish_mtime'] : (isset($this->info['publish_ctime'])?$this->info['publish_ctime']:'-');?></td>
+    </tr>
+    <?php if($this->info['status'] == Model_Product::STATUS_DISABLE) :?>
+    <tr >
+        <td>停用时间：</td>
+        <td id="product_status"><?php echo $this->info['publish_mtime'];?></td>
+    </tr>
+    <?php endif;?>
+    <tr>
+        <th><?php echo $this->t('detail_info'); ?></th>
+        <th></th>
+    </tr>
+   <tr>
+        <td>支持语言：</td>
+        <td id="product_ctime"><?php echo $this->info['langs'];?></td>
+    </tr>
+    <tr>
+        <td>产品状态：</td>
+        <td id="product_status"><b><?php echo $this->t($this->info['status']);?></b></td>
+    </tr>
+    <tr >
+        <td><?php echo $this->t('inform_status'); ?>：</td>
+        <?php $result = $this->info['inform_status'].$this->info['inform_result']; ?>
+        <td>
+            <?php if($result == 33): ?>
+                短信、邮件
+            <?php elseif($result == 31): ?>
+                <font color="red">短信</font>、邮件
+            <?php elseif($result == 32): ?>
+                短信、<font color="red">邮件</font>
+            <?php elseif($result == 30): ?>
+                <font color="red">短信</font>、<font color="red">邮件</font> 
+            <?php elseif($result == 22): ?>
+                短信
+            <?php elseif($result == 20): ?>
+                <font color="red">短信</font>
+            <?php elseif($result == 11): ?>
+                邮件
+            <?php elseif($result == 10): ?>
+                <font color="red">邮件</font> 
+            <?php else: ?>
+                 
+            <?php endif; ?>
+        </td>
+    </tr>
+    <tr>
+        <th><?php echo $this->t('check_info'); ?></th>
+        <th></th>
+    </tr>
+    <tr >
+        <td></td>
+        <td id="product_remark"><?php echo $this->info['remark'];?></td>
+    </tr>
+</table>
+ <div class="mt36 mb24 tr">
+            <a  href="javascript:;" id="cancle_btn" class="f16 clF fr tc search_btn grey_btn" >返 回</a>
+   </div>
+ <script>
+ $(document).ready(function(){
+	 $('#cancle_btn').click(function(){
+         window.history.go(-1);
+     });
+})
+</script>

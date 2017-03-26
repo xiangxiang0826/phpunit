@@ -1,0 +1,159 @@
+<script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.ui.timepicker.addon.js"></script>
+
+<!--页面位置-->
+<?php $menuName = ($this->messageId)?'修改消息':'添加消息'; ?>
+<h3 class="location f14"><?php echo $this->menu($menuName,'/operation/message/index'); ?></h3>
+</h3>
+<form action="" id="message_form">
+<table class="detail_tabel f14 mt20">
+    <tr>
+        <th>消息内容</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>标题：</td>
+        <td id="feedback_id">
+           <input type="text" name="message[title]"  class="cpy_name wp60 " width="70%"  id="title_input" value="<?php if(!empty($this->info['title'])) { echo $this->info['title'];}?>" />
+        </td>
+    </tr>
+    <tr>
+         <td>消息类型：</td>
+         <td class="system_drop">
+            <select id="cang_assort" class="cpy_style cang_assort mb10" name="message[type]" >
+                <option value="">请选择</option>
+                <option value="1"  <?php if(!empty($this->info['type']) && $this->info['type'] ==1):?>selected="selected" <?php endif;?>>服务消息</option>
+                <option value="2"  <?php if(!empty($this->info['type']) && $this->info['type'] ==2):?>selected="selected" <?php endif;?>>系统消息</option>
+            </select>
+         </td>
+    </tr>
+    <tr>
+        <td>内容详情：</td>
+        <td>
+            <textarea rows="10" cols="50" id="remark" name="message[content]" class="mt10 mb10 text_cls"><?php if(!empty($this->info['content'])) { echo $this->info['content'];}?></textarea>
+        </td>
+    </tr>
+    <tr>
+        <th>添加链接</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>链接地址：</td>
+        <td class="system_drop">
+               <input type="text" name="message[url]"  id="message_url" class="cpy_name"  value="<?php if(!empty($this->info['url'])) { echo $this->info['url'];}?>" />
+        </td>
+    </tr>
+    <tr>
+        <th>发送设置</th>
+        <th></th>
+    </tr>
+    <tr>
+        <td>发送对象：</td>
+        <td class="system_drop">
+              <input type="radio"  class="receive_type"  id="pass_radio"  name="message[receive_type]" value="all"  <?php if((!empty($this->info['receive_type']) && $this->info['receive_type'] =='all') || empty($this->info['receive_type'])):?>checked="checked" <?php endif;?>> 所有用户
+              <input type="radio"  class="receive_type"  name="message[receive_type]" value="special"  <?php if(!empty($this->info['receive_type']) && $this->info['receive_type'] =='special'):?>checked="checked" <?php endif;?>> 特定用户
+        </td>
+    </tr>
+    <!-- <tr style="display:none;" id="area_list_tr">
+        <td>地域设定：</td>
+        <td class="system_drop" >
+        </td>
+    </tr> -->
+    <tr style="display:none;" id="products_list_tr">
+        <td>产品设定：</td>
+        <td class="system_drop">
+             <div id="products_div">
+             <?php if(!empty($this->info['product_name'])) :?>
+              <?php echo join('，', $this->info['product_name']);?>
+              <?php endif;?>
+              </div>
+              &nbsp;&nbsp;&nbsp;
+              <a href="javascript:;" style="color:#216ed9" id="select_product">选择产品</a>
+              <input type="hidden" value="<?php if(!empty($this->info['products'])) { echo $this->info['products'];}?>"  name="message[products]" id="products_hidden" product_info='<?php if(!empty($this->info['product_str_info'])) { echo $this->info['product_str_info'];}?>'>
+        </td>
+    </tr>
+    <tr>
+        <td>计划发送时间：</td>
+        <td class="system_drop" id="send_time">
+               <input type="text" name="message[send_time]"  class="time_pick" style="width:15%" id="send_time_input" readonly />
+        </td>
+    </tr>
+ </table>
+</form>
+
+<div class="mt36 mb24 tr">
+    <a  onfocus="blur();" href="javascript:void(0)" id="cancel_btn" class="f16 clF fr ml16 tc search_btn grey_btn" >返 回</a>
+    <a  onfocus="blur();" href="javascript:void(0)" id="edit_btn" class="f16 clF tc search_btn" >提 交</a>
+    <a href="javascript:;" class="f16 clF tc search_btn fl " id="test_send_btn">测试发送</a>
+</div>
+<div id="message_dialog" style="display:none;" title="系统提醒">
+	<p class="message_text"></p>
+	<a id="close_message" href="javascript:;" class="f16 clF tc search_btn brue_btn">确 定</a>
+</div>
+<div id="test_message" style="display:none;"  title=" 测试发送">
+   <form class="cmxform"  action="" method="post" id="test_msg_form">
+   <h1 class="send_title">选择进行消息发送的测试账号</h1>
+     <table class="detail_tabel  send_table f14 mt10">
+                <tr>
+                    <td style="width: 80px;padding-left:0">邮箱/手机：</td>
+                    <td>
+                        <input type="text" class="cpy_name"  name="user_name"  placeholder="请输入邮箱/手机"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 80px;padding-left:0">密码：</td>
+                    <td>
+                        <input type="password" class="cpy_name"  name="password"    placeholder="请输入密码"/>
+                    </td>
+                </tr>
+       </table>
+    </form>
+    <p class="message_text" style="color:red;"></p>
+    <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+	<div class="ui-dialog-buttonset">
+	<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="button" role="button" id="cancle_btn">
+	<span class="ui-button-text" >取消</span>
+	</button>
+	<button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" type="button" role="button" id="true_btn">
+	<span class="ui-button-text" >确定</span>
+	</button>
+	</div>
+</div>
+</div>
+<div id="product_list_div" style="display:none;" title="选择产品">
+	
+</div>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/hashmap.js"></script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/json2.js"></script>
+<script>
+   $(document).ready(function(){
+	 //编辑添加
+	     var config={
+	    	        showSecond: true,
+	    	        changeMonth: true,
+	    	        changeYear: true,
+	    	        rangeSelect: true,
+	    	        timeFormat: 'HH:mm:ss',
+	    	        yearRange: '-10:+10'
+	    };
+	   $("#send_time_input").datetimepicker(config);
+    <?php if(!empty($this->info['send_time'])):?>
+        $("#send_time_input").datetimepicker('setDate','<?php echo $this->info['send_time'];?>');
+    <?php endif;?>
+});
+ var products_map = new HashMap();
+ var products_hidden = $('#products_hidden');
+ if (products_hidden.val()) {
+	 var product_info = products_hidden.attr('product_info');
+	 var products = JSON.parse(product_info); 
+	 for(var m in products) {
+		 products_map.put(m, products[m])
+	 }
+ }
+ if($('.receive_type').is(':checked')) {
+	 var v = $('.receive_type').filter(':checked').val();
+	 if (v == 'special') {
+		 $('#products_list_tr').show();
+	 }
+ }
+</script>
+<script type="text/javascript" src="<?php echo $this->static;?>/js/message.js"></script>

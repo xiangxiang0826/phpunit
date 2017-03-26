@@ -1,0 +1,100 @@
+<!--页面位置-->
+<h3 class="location f14">系统 <?php echo $this->menu(); ?></h3>
+<div class="product_detail mt22">
+<table id="datagrid" title="<?php echo Cms_L::_('block_list'); ?>" style="width:auto;"  
+            data-options="url:'/template/block/data/site_id/<?php echo $this->site_id; ?>',
+					pagination:'true',
+					pageList:[15,30,60,100], 
+					pageSize:'15',
+					striped:'true',
+					fitColumns:'true'" class="detail_tabel psw_table f14 mt20">
+	
+</table>
+</div>
+<script>
+var $datagrid = $('#datagrid');
+var site_id = <?php echo $this->site_id; ?>;
+
+$(function(){
+	$datagrid.datagrid({
+		toolbar : [
+			{text:'<?php echo Cms_L::_('add'); ?>', iconCls:'icon-add', handler:edit_block},
+			{text:'<?php echo Cms_L::_('create_selected'); ?>', handler:create_selected}
+		],
+		columns : [[
+			{field:'id', width:50, checkbox:true},
+			{field:'blk_id', title:'<?php echo Cms_L::_('block')?>ID', width:50},
+			{field:'name', title:'<?php echo Cms_L::_('block_name')?>', width:250},
+			{field:'file_path', title:'<?php echo Cms_L::_('file_path'); ?>', width:150},
+			{field:'edit_time', title:'<?php echo Cms_L::_('action_time'); ?>', width:100},
+			{field:'user_name', title:'<?php echo Cms_L::_('actor'); ?>', width:50},
+			{field:'action', title:'<?php echo Cms_L::_('action'); ?>', width:150, align:'center', formatter:function(val, row, idx){
+				var html;
+				html = '<a href="javascript:;" onclick="edit_block(' + row.id + ')"><?php echo Cms_L::_('edit'); ?></a>';
+				html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="create_html(' + row.id + ')"><?php echo Cms_L::_('create'); ?></a>';
+				html += '&nbsp;|&nbsp;<a href="javascript:;" onclick="delete_block(' + row.id + ')"><?php echo Cms_L::_('delete'); ?></a>';
+				return html;
+			}}
+		]]
+	});
+});
+
+function edit_block(blk_id) {
+	var title;
+	if(typeof blk_id == 'number') {
+		title = '<?php echo Cms_L::_('edit_block'); ?> - [' + site_id + '] - [' + blk_id + ']';
+	} else {
+		title = '<?php echo Cms_L::_('add_block'); ?> - [' + site_id + ']';
+		blk_id = 0;
+	}
+	
+	$.nav_tab.add(title, '/template/block/edit', {site_id:site_id, blk_id:blk_id});
+}
+
+function create_selected() {
+	var blk_ids = $.datagrid.getSelectItems('blk_id');
+
+	if(!blk_ids) {
+		$.messager.alert('<?php echo Cms_L::_('tip'); ?>', '<?php echo Cms_L::_('no_item'); ?>', 'warning');
+		return false;
+	}
+
+	blk_ids = blk_ids.split(',');
+	$.overlay.open({content:'<?php echo Cms_L::_('create...'); ?>', width:130});
+	
+	(function(i){
+		var fn = arguments.callee;
+		if(blk_ids[i]) {
+			$.post('/template/block/create', {site_id:site_id, blk_id:blk_ids[i]}, function(data){
+				if(data.state == 'ok') {
+					$.overlay.set_content('<span class="create-state"><span class="create-done">' + (++i) + '</span> / ' + blk_ids.length + '</span>');
+					fn(i);
+				} else {
+					$.messager.alert('<?php echo Cms_L::_('tip'); ?>', data.msg, 'error');
+				}
+			}, 'json');
+		} else {
+			$datagrid.datagrid('reload');
+			$.overlay.close();
+		}
+	})(0);
+}
+
+function delete_block(blk_id) {
+	$.messager.confirm('<?php echo Cms_L::_('tip'); ?>', '<?php echo Cms_L::_('delete_confirm'); ?>', function(is_del){
+		if(is_del) {
+			$.post('/template/block/delete', {site_id:site_id, blk_id:blk_id}, function(data){
+				if(data.state == 'ok'){
+					$datagrid.datagrid('reload');
+				}
+			}, 'json');
+		}
+	});
+}
+
+function create_html(blk_id) {
+	$.post('/template/block/create', {blk_id:blk_id, site_id:site_id}, function(data){
+		$.messager.alert('<?php echo Cms_L::_('tip'); ?>', data.msg, data.state);
+	}, 'json');
+}
+</script>

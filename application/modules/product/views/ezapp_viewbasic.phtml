@@ -1,0 +1,89 @@
+
+<!--页面位置-->
+<h3 class="location f14"><?php echo $this->menu('查看APP详情', '/product/ezapp/index'); ?></h3>
+<table class="detail_tabel read_table f14 mt20">
+    <tr class="h56">
+        <th>
+            APP详情
+            <a target="_blank" href="<?php if(!empty($this->appinfo['file_path'])){ echo "{$this->uploadServer['baseUrl']}{$this->appinfo['file_path']}";}?>"  class="f16 clF tc search_btn  fr" >下载</a>
+        </th>
+    </tr>
+    <tr class="h150">
+        <td>
+        <div class="img_mark_up mr50"  id="fsUploadProgress">
+         <?php if(!empty($this->appinfo['icon'])) {?>
+                <img src="<?php echo $this->uploadServer['baseUrl'] . $this->appinfo['icon'];?>" />
+                <input name="app[icon]" value="<?php echo $this->appinfo['icon'];?>"  type="hidden" id="app_icon">
+                <?php } else {?>
+                <img src="/static/images/rada.png" />
+                <input name="app[icon]" value=""  type="hidden" id="app_icon">
+         <?php }?>
+         </div>
+            <ul class="app_desc">
+                <li>App名称：<?php echo $this->escape($this->appinfo['name']);?></li>
+                <li>系统平台：<?php echo $this->appinfo['platform'];?></li>
+                <li>最新版本：<?php echo $this->appinfo['version'];?></li>
+                <li>发布日期：<?php echo $this->appinfo['mtime'];?></li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <th>APP简介</th>
+    </tr>
+    <tr class="h80">
+        <td>
+            <?php echo $this->escape($this->appinfo['description']);?>
+        </td>
+    </tr>
+    <tr>
+        <th>版本更新说明</th>
+    </tr>
+    <tr class="h150">
+        <td>
+           <?php if(!empty($this->appinfo['v_description'])) { echo $this->escape($this->appinfo['v_description']);}?>
+        </td>
+    </tr>
+    <tr>
+        <th>App截图</th>
+    </tr>
+    <tr class="h480">
+        <td>
+         <div id="custom_scollbar">
+             <ul class="clearfix mt10">
+            <?php if(!empty($this->appinfo['images'])) {?>
+                <?php foreach ($this->appinfo['images'] as $row) {?>
+                    <li class="mr10" >
+                    <img src="<?php echo $this->uploadServer['baseUrl'] . $row['image'];?>" width="272" height="410" class="cut_make_up" >
+                    </li>  
+                    <?php }?>
+                <?php }?>
+               </ul>
+           </div>
+        </td>
+    </tr>
+</table>
+<div class="mt36 mb24 tr">
+    <a  href="javascript:;" id="cancle_btn" class="f16 clF fr tc search_btn grey_btn" >返 回</a>
+</div>
+ <link type="text/css" rel="stylesheet" href="<?php echo $this->static;?>/styles/jquery.mCustomScrollbar.min.css" />
+ <script type="text/javascript" src="<?php echo $this->static;?>/js/jquery.mCustomScrollbar.min.js"></script>
+  <script>
+ $(document).ready(function(){
+	 $('#cancle_btn').click(function(){
+         window.history.go(-1);
+     });
+	  //图片滑动
+	 $("#custom_scollbar").width($("#custom_scollbar").parent().width());
+        var marginLeft= 7,l=$("#custom_scollbar ul li").length,oLiWidth=(parseInt($("#custom_scollbar ul li").eq(0).width())+marginLeft)*l;
+        $("#custom_scollbar ul").width(oLiWidth);
+        $("#custom_scollbar").mCustomScrollbar({
+            axis:"x",
+            theme:"dark-2",
+            scrollInertia:550,
+            scrollbarPosition:"inside"
+        });
+})
+</script>
+  
+  
+ 
